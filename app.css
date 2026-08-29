@@ -1,0 +1,989 @@
+:root{
+  --bg:#050a0b;
+  --panel:#07100f;
+  --panel2:#081511;
+  --line:rgba(50,224,151,.23);
+  --line-soft:rgba(50,224,151,.12);
+  --green:#20e89a;
+  --text:#f2f6f4;
+  --muted:#98a7a1;
+  --dim:#64736d
+}
+
+*{box-sizing:border-box}
+
+html{background:var(--bg)}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at 65% 20%,rgba(15,103,71,.12),transparent 31%),var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh
+}
+
+button,a{
+  font:inherit;
+  color:inherit
+}
+
+a{text-decoration:none}
+
+.shell{
+  max-width:1360px;
+  margin:auto;
+  padding:4px 18px 28px
+}
+
+.topbar{
+  min-height:104px;
+  border:1px solid var(--line-soft);
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  margin-bottom:28px;
+  background:rgba(5,10,11,.78);
+  gap:18px
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:13px
+}
+
+.brand-mark{
+  width:48px;
+  color:var(--green);
+  flex:none
+}
+
+.brand-mark svg{
+  display:block;
+  width:100%
+}
+
+.brand h1{
+  font-size:24px;
+  line-height:1;
+  margin:0;
+  letter-spacing:-.7px
+}
+
+.brand h1 span,
+.accent{
+  color:var(--green)
+}
+
+.brand p{
+  margin:5px 0 0;
+  color:#bdc7c3;
+  font-size:15px
+}
+
+.links{
+  display:flex;
+  gap:65px;
+  color:#e7ece9
+}
+
+.links a:hover{
+  color:var(--green)
+}
+
+.top-actions{
+  display:flex;
+  gap:18px;
+  align-items:center
+}
+
+.icon-btn,
+.wallet-btn,
+.wallet-chip,
+.network-chip{
+  border:1px solid var(--line);
+  background:rgba(5,10,11,.55);
+  border-radius:13px;
+  height:54px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center
+}
+
+.icon-btn{
+  width:54px;
+  font-size:24px;
+  color:#eaf4ee
+}
+
+.wallet-btn{
+  padding:0 20px;
+  gap:12px;
+  color:white
+}
+
+.wallet-btn svg{
+  width:22px;
+  color:var(--green)
+}
+
+.subnav{
+  display:flex;
+  align-items:center;
+  border-bottom:1px solid rgba(208,229,220,.16);
+  padding:0 12px;
+  gap:45px;
+  min-height:76px
+}
+
+.tabs{
+  display:flex;
+  gap:36px;
+  height:76px;
+  align-items:stretch
+}
+
+.tab{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#eef3f0;
+  border-bottom:2px solid transparent;
+  padding:0 8px;
+  font-size:16px
+}
+
+.tab svg{
+  width:25px;
+  color:#dfe8e4
+}
+
+.tab.active{
+  color:var(--green);
+  border-color:var(--green)
+}
+
+.tab.active svg{
+  color:var(--green)
+}
+
+.status{
+  margin-left:auto;
+  display:flex;
+  gap:16px
+}
+
+.wallet-chip,
+.network-chip{
+  padding:0 17px;
+  gap:11px;
+  color:#dce6e1
+}
+
+.wallet-chip button{
+  border:0;
+  background:none;
+  color:var(--green);
+  font-size:20px;
+  cursor:pointer
+}
+
+.dot{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 14px var(--green)
+}
+
+main{
+  padding:46px 22px 0
+}
+
+.back{
+  display:inline-flex;
+  gap:12px;
+  align-items:center;
+  border:1px solid var(--line-soft);
+  border-radius:10px;
+  padding:12px 16px;
+  color:#d3ded9;
+  margin-bottom:32px
+}
+
+.back:hover{
+  border-color:var(--line);
+  color:var(--green)
+}
+
+.heading-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:32px
+}
+
+.eyebrow{
+  font-size:48px;
+  letter-spacing:-2px;
+  margin:0 0 14px
+}
+
+.intro{
+  color:#c1cbc6;
+  font-size:19px;
+  margin:0;
+  line-height:1.5
+}
+
+.lock-status{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:17px 22px;
+  background:rgba(6,20,15,.7);
+  min-width:190px
+}
+
+.lock-status svg{
+  width:45px;
+  color:var(--green)
+}
+
+.lock-status small{
+  color:#c9d5d0;
+  display:block;
+  margin-bottom:5px
+}
+
+.lock-status strong{
+  font-size:20px;
+  color:var(--green)
+}
+
+.record-card{
+  border:1px solid rgba(45,231,151,.5);
+  border-radius:20px;
+  background:linear-gradient(120deg,rgba(6,21,16,.98),rgba(5,12,11,.9));
+  padding:34px;
+  margin-bottom:28px;
+  box-shadow:0 0 30px rgba(17,160,105,.05)
+}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:28px
+}
+
+.allocation{
+  color:var(--green);
+  font-size:22px;
+  font-weight:700
+}
+
+.pill{
+  border:1px solid rgba(35,231,149,.45);
+  color:var(--green);
+  padding:10px 17px;
+  border-radius:22px;
+  font-weight:700;
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+
+.record-grid{
+  border:1px solid var(--line);
+  background:rgba(2,9,8,.42);
+  border-radius:20px;
+  padding:28px;
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:28px
+}
+
+.seal{
+  min-height:292px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid rgba(152,190,173,.15)
+}
+
+.seal svg{
+  width:230px;
+  color:var(--green);
+  filter:drop-shadow(0 0 15px rgba(32,232,154,.32))
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-content:center;
+  gap:22px
+}
+
+.summary-label{
+  color:#bcc7c2;
+  font-size:16px;
+  margin-bottom:10px
+}
+
+.summary-value{
+  font-size:29px;
+  font-weight:700
+}
+
+.masked{
+  letter-spacing:6px
+}
+
+.ticket{
+  font-size:18px
+}
+
+.details-btn{
+  grid-column:1/-1;
+  height:84px;
+  border:1px solid rgba(89,236,165,.55);
+  background:transparent;
+  border-radius:12px;
+  color:var(--green);
+  font-weight:700;
+  font-size:21px;
+  cursor:pointer
+}
+
+.details-btn:hover{
+  background:rgba(32,232,154,.08)
+}
+
+.notice{
+  display:flex;
+  align-items:center;
+  gap:27px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:27px 38px;
+  background:rgba(5,15,12,.7);
+  margin-bottom:28px
+}
+
+.notice svg{
+  color:var(--green);
+  width:68px;
+  flex:none
+}
+
+.notice h3{
+  margin:0 0 9px;
+  font-size:18px
+}
+
+.notice p{
+  margin:0;
+  color:#b5c1bc
+}
+
+.footer{
+  border:1px solid rgba(190,216,203,.13);
+  border-radius:18px;
+  min-height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  color:#b7c1bc
+}
+
+.footer i{
+  color:var(--green);
+  font-style:normal
+}
+
+.detail-layout{
+  display:grid;
+  grid-template-columns:285px 1fr;
+  gap:22px
+}
+
+.record-id{
+  border:1px solid var(--line-soft);
+  border-radius:12px;
+  padding:17px;
+  margin-top:22px;
+  color:#cfdad5
+}
+
+.record-id small{
+  color:var(--muted);
+  display:block;
+  margin-bottom:8px
+}
+
+.rows{
+  border:1px solid var(--line-soft);
+  border-radius:14px;
+  overflow:hidden
+}
+
+.row{
+  min-height:64px;
+  padding:14px 20px;
+  display:grid;
+  grid-template-columns:38px 1fr auto;
+  align-items:center;
+  border-bottom:1px solid rgba(134,179,160,.14);
+  gap:10px
+}
+
+.row:last-child{
+  border:0
+}
+
+.row svg{
+  width:25px;
+  color:var(--green)
+}
+
+.row b{
+  font-size:16px;
+  font-weight:500
+}
+
+.row span{
+  color:#d5ddd9;
+  text-align:right
+}
+
+.row .value-green{
+  color:var(--green);
+  font-weight:700;
+  font-size:19px
+}
+
+.claim{
+  border:1px solid var(--line);
+  border-radius:18px;
+  display:grid;
+  grid-template-columns:330px 1fr;
+  overflow:hidden;
+  background:rgba(7,15,13,.78);
+  margin-bottom:24px
+}
+
+.claim img{
+  width:100%;
+  height:245px;
+  object-fit:cover;
+  object-position:center;
+  opacity:.84
+}
+
+.claim-text{
+  padding:32px
+}
+
+.claim-text h2{
+  font-size:26px;
+  margin:0 0 11px
+}
+
+.claim-text p{
+  color:#bbc7c1;
+  line-height:1.5;
+  font-size:17px;
+  margin:0 0 20px
+}
+
+.claim-btn{
+  width:100%;
+  height:64px;
+  border:1px solid #6f7166;
+  border-radius:12px;
+  background:#252522;
+  color:#b8b9b6;
+  font-weight:800;
+  font-size:24px;
+  cursor:not-allowed
+}
+
+.after-lock{
+  text-align:right;
+  color:#e8c86d;
+  margin:10px 0 0
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:22px
+}
+
+.info{
+  border:1px solid var(--line-soft);
+  border-radius:16px;
+  padding:21px;
+  min-height:140px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start
+}
+
+.info svg{
+  color:var(--green);
+  width:38px;
+  flex:none
+}
+
+.info h3{
+  font-size:15px;
+  margin:2px 0 8px
+}
+
+.info p{
+  margin:0;
+  color:#b4c0bb;
+  line-height:1.45;
+  font-size:14px
+}
+
+.hidden{
+  display:none
+}
+
+
+/* =========================================================
+   MOBILE PAGE 2 - COMPACT / CLEAN
+   ========================================================= */
+
+@media (max-width:800px){
+
+  .shell{
+    padding:0 8px 18px
+  }
+
+  .topbar{
+    min-height:68px;
+    padding:9px 11px;
+    border-radius:0 0 15px 15px;
+    margin:0 -8px 9px;
+    gap:6px
+  }
+
+  .brand{
+    gap:6px
+  }
+
+  .brand-mark{
+    width:30px
+  }
+
+  .brand h1{
+    font-size:15px;
+    letter-spacing:-.3px
+  }
+
+  .brand p{
+    display:none
+  }
+
+  .links{
+    display:none
+  }
+
+  .top-actions{
+    gap:5px
+  }
+
+  .icon-btn{
+    width:34px;
+    height:34px;
+    font-size:17px
+  }
+
+  .wallet-btn{
+    height:34px;
+    padding:0 7px;
+    gap:5px;
+    font-size:9px
+  }
+
+  .wallet-btn svg{
+    width:13px;
+    height:13px
+  }
+
+
+  /* ---------- TABS ---------- */
+
+  .subnav{
+    min-height:auto;
+    padding:0;
+    gap:5px;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch
+  }
+
+  .tabs{
+    width:100%;
+    height:40px;
+    gap:8px;
+    overflow-x:auto
+  }
+
+  .tab{
+    padding:0 5px;
+    font-size:11px;
+    gap:5px;
+    white-space:nowrap
+  }
+
+  .tab svg{
+    width:15px
+  }
+
+
+  /* ---------- WALLET / NETWORK ---------- */
+
+  .status{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:34px;
+    width:100%;
+    margin:0;
+    padding:3px 0 7px;
+    gap:6px;
+    align-items:center;
+    overflow:visible
+  }
+
+  .wallet-chip,
+  .network-chip{
+    height:34px;
+    min-width:0;
+    padding:0 8px;
+    border-radius:8px;
+    font-size:9px;
+    gap:5px
+  }
+
+  /*
+     IMPORTANT:
+     wallet address is now forced to use only the
+     available space inside the wallet chip.
+  */
+
+  .wallet-chip{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-width:0;
+    max-width:100%;
+    overflow:hidden;
+    flex:1 1 auto
+  }
+
+  .wallet-chip span,
+  .wallet-chip span[data-wallet]{
+    display:block;
+    width:0;
+    min-width:0;
+    max-width:100%;
+    flex:1 1 0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap
+  }
+
+  .wallet-chip button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 24px;
+    width:24px;
+    min-width:24px;
+    max-width:24px;
+    height:24px;
+    padding:0;
+    margin-left:4px;
+    font-size:13px;
+    overflow:hidden
+  }
+
+  .network-chip{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    white-space:nowrap
+  }
+
+  .dot{
+    width:6px;
+    height:6px;
+    min-width:6px;
+    flex:0 0 6px;
+    box-shadow:0 0 8px var(--green)
+  }
+
+
+  /* ---------- MAIN ---------- */
+
+  main{
+    padding:17px 6px 0
+  }
+
+  .back{
+    padding:6px 9px;
+    margin-bottom:12px;
+    font-size:10px
+  }
+
+  .heading-row{
+    display:block;
+    margin-bottom:12px
+  }
+
+  .eyebrow{
+    font-size:27px;
+    letter-spacing:-1px;
+    margin:0 0 5px
+  }
+
+  .intro{
+    font-size:12px;
+    line-height:1.35
+  }
+
+  .lock-status{
+    width:max-content;
+    min-width:0;
+    margin-top:9px;
+    padding:7px 9px;
+    border-radius:9px;
+    gap:6px
+  }
+
+  .lock-status svg{
+    width:22px
+  }
+
+  .lock-status small{
+    font-size:8px;
+    margin-bottom:1px
+  }
+
+  .lock-status strong{
+    font-size:12px
+  }
+
+
+  /* ---------- ALLOCATION ---------- */
+
+  .record-card{
+    padding:12px;
+    margin:0 0 12px;
+    border-radius:12px
+  }
+
+  .card-head{
+    margin-bottom:9px;
+    gap:6px
+  }
+
+  .allocation{
+    font-size:13px
+  }
+
+  .pill{
+    padding:4px 7px;
+    border-radius:12px;
+    gap:3px;
+    font-size:8px
+  }
+
+
+  /* ---------- RECORD GRID ---------- */
+
+  .record-grid{
+    grid-template-columns:1fr;
+    padding:8px;
+    gap:8px;
+    border-radius:10px
+  }
+
+  .seal{
+    min-height:105px;
+    border-right:0;
+    border-bottom:1px solid rgba(152,190,173,.15)
+  }
+
+  .seal svg{
+    width:78px
+  }
+
+  .summary{
+    grid-template-columns:1fr 1fr;
+    gap:8px
+  }
+
+  .summary-label{
+    font-size:9px;
+    margin-bottom:3px
+  }
+
+  .summary-value{
+    font-size:13px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    letter-spacing:1.5px
+  }
+
+  .ticket{
+    font-size:11px
+  }
+
+  .details-btn{
+    height:38px;
+    border-radius:7px;
+    font-size:10px
+  }
+
+
+  /* ---------- NOTICE ---------- */
+
+  .notice{
+    padding:11px;
+    gap:9px;
+    border-radius:10px;
+    margin-bottom:12px
+  }
+
+  .notice svg{
+    width:28px
+  }
+
+  .notice h3{
+    margin-bottom:3px;
+    font-size:12px
+  }
+
+  .notice p{
+    font-size:10px;
+    line-height:1.35
+  }
+
+
+  /* ---------- FOOTER ---------- */
+
+  .footer{
+    min-height:58px;
+    font-size:10px;
+    gap:7px;
+    text-align:center
+  }
+
+
+  /* ---------- DETAILS PAGE ---------- */
+
+  .detail-layout{
+    grid-template-columns:1fr
+  }
+
+  .record-id{
+    margin-top:0;
+    padding:11px;
+    font-size:11px
+  }
+
+  .rows{
+    margin-top:3px
+  }
+
+  .row{
+    padding:9px;
+    grid-template-columns:24px 1fr;
+    min-height:48px;
+    gap:7px
+  }
+
+  .row svg{
+    width:18px
+  }
+
+  .row b{
+    font-size:12px
+  }
+
+  .row span{
+    grid-column:2;
+    text-align:left;
+    color:#b5c2bb;
+    font-size:11px
+  }
+
+  .row .value-green{
+    font-size:13px
+  }
+
+  .claim{
+    grid-template-columns:1fr
+  }
+
+  .claim img{
+    height:150px
+  }
+
+  .claim-text{
+    padding:15px
+  }
+
+  .claim-text h2{
+    font-size:17px
+  }
+
+  .claim-text p{
+    font-size:12px
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+    gap:7px
+  }
+
+  .info{
+    padding:10px;
+    min-height:75px;
+    gap:8px
+  }
+
+  .info svg{
+    width:22px
+  }
+
+  .info h3{
+    font-size:11px
+  }
+
+  .info p{
+    font-size:10px
+  }
+
+  .after-lock{
+    text-align:center;
+    font-size:11px
+  }
+
+}
