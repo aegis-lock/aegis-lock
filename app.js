@@ -1,5 +1,10 @@
 const PROGRAM_ID = 'usdcx_locked.aleo';
 
+const PROGRAM_IDS = [
+  'usdcx_locked.aleo',
+  'vusdc_transaction.aleo'
+];
+
 const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
 
 
@@ -478,7 +483,8 @@ function formatDisplayAmount(value) {
 
 function normalizeAllocationRecord(
   record,
-  index
+  index,
+  programId = PROGRAM_ID
 ) {
 
   const amount =
@@ -578,7 +584,7 @@ function normalizeAllocationRecord(
       record,
 
     program:
-      PROGRAM_ID
+      programId
 
   };
 
@@ -679,19 +685,51 @@ async function requestPlaintextRecords(adapter) {
    * DO NOT add "all".
    */
 
-  const records =
-    await adapter.requestRecords(
-      PROGRAM_ID
+  const allRecords = [];
+
+  for (const programId of PROGRAM_IDS) {
+
+    console.log(
+      'USDCx LOCKED: Requesting records from program:',
+      programId
     );
 
+    try {
 
-  console.log(
-    'USDCx LOCKED: Leo Wallet records returned:',
-    records
-  );
+      const records =
+        await adapter.requestRecords(
+          programId
+        );
 
+      console.log(
+        'USDCx LOCKED: Records returned from',
+        programId,
+        records
+      );
 
-  return extractRecordList(records);
+      const list =
+        extractRecordList(records);
+
+      for (const record of list) {
+        allRecords.push({
+          record,
+          programId
+        });
+      }
+
+    } catch (error) {
+
+      console.warn(
+        'USDCx LOCKED: Could not request records from',
+        programId,
+        error
+      );
+
+    }
+
+  }
+
+  return allRecords;
 
 }
 
@@ -777,10 +815,11 @@ async function getYourRecord() {
 
   const allocations =
     recordList.map(
-      (record, index) =>
+      (item, index) =>
         normalizeAllocationRecord(
-          record,
-          index
+          item.record,
+          index,
+          item.programId
         )
     );
 

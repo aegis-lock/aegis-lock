@@ -6,8 +6,8 @@ const isMobile =
   /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 const adapter = new LeoWalletAdapter({
-  appName: 'USDCx LOCKED',
-  appDescription: 'USDCx LOCKED - Private Lock Protocol',
+  appName: 'AEGIS',
+  appDescription: 'AEGIS - Private Asset Locking Infrastructure',
   isMobile,
   mobileWebviewUrl: window.location.href
 });

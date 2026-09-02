@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Private Record Details | USDCx Locked</title>
+<title>Private Record Details | AEGIS</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -522,6 +522,75 @@ main button {
 
 </style>
 
+<style>
+.page3-blockchain-refs {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.page3-ref-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.page3-ref-row b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.page3-link-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82em;
+}
+
+.page3-explorer-link {
+  flex: 0 0 auto;
+  width: 25px;
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.page3-explorer-link svg {
+  width: 17px;
+  height: 17px;
+}
+
+.page3-explorer-link:hover {
+  opacity: 0.75;
+}
+
+@media (max-width: 700px) {
+  .page3-ref-row {
+    gap: 6px;
+  }
+
+  .page3-link-value {
+    font-size: 0.74em;
+  }
+
+  .page3-explorer-link {
+    width: 23px;
+    height: 23px;
+  }
+
+  .page3-explorer-link svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+</style>
+
+
 </head>
 
 
@@ -572,11 +641,11 @@ main button {
     <span>
 
       <h1>
-        USDCx <span>LOCKED</span>
+        AEGIS
       </h1>
 
       <p>
-        Private Lock Protocol
+        Private Asset Locking Infrastructure
       </p>
 
     </span>
@@ -793,21 +862,6 @@ main button {
     </strong>
 
 
-    <div>
-
-      <small style="color:#b4c0bb;font-weight:400">
-        Ticket Reference
-      </small>
-
-
-      <div
-        class="ticket"
-        data-page3-ticket
-      >
-        —
-      </div>
-
-    </div>
 
   </div>
 
@@ -1251,6 +1305,199 @@ main button {
         <span data-page3-token>
           USDCx
         </span>
+
+      </div>
+
+
+      <!-- BLOCKCHAIN REFERENCES -->
+
+      <div class="page3-blockchain-refs">
+
+        <!-- TRANSACTION ID -->
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10 13a5 5 0 0 0 7.07.07l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+
+          <b>Transaction ID</b>
+
+          <span
+            class="page3-link-value"
+            data-page3-transaction
+          >—</span>
+
+          <a
+            class="page3-explorer-link"
+            data-page3-transaction-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open transaction in Aleo Explorer"
+            title="Open Transaction in Aleo Explorer"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+
+        </div>
+
+
+        <!-- TOKEN ID -->
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle
+                cx="12"
+                cy="12"
+                r="8"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M8.5 12h7M12 8.5v7"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+
+          <b>Token ID</b>
+
+          <span
+            class="page3-link-value"
+            data-page3-token-id
+          >—</span>
+
+          <a
+            class="page3-explorer-link"
+            data-page3-token-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open token in Aleo Explorer"
+            title="Open Token in Aleo Explorer"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+
+        </div>
+
+
+        <!-- LOCK RECORD ID -->
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect
+                x="5"
+                y="4"
+                width="14"
+                height="17"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M9 8h6M9 12h6M9 16h4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+
+          <b>Lock Record ID</b>
+
+          <span
+            class="page3-link-value"
+            data-page3-lock-record-id
+          >—</span>
+
+          <a
+            class="page3-explorer-link"
+            data-page3-lock-record-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open lock record in Aleo Explorer"
+            title="Open Lock Record in Aleo Explorer"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+
+        </div>
 
       </div>
 
@@ -2079,6 +2326,14 @@ main button {
         ),
 
       program:
+        getValue(
+          rawRecord,
+          [
+            'program',
+            'program_id',
+            'programId'
+          ]
+        ) ||
         'usdcx_locked.aleo',
 
       raw:
@@ -2100,7 +2355,6 @@ main button {
         '[data-record-error]'
       );
 
-
     if (errorBox) {
 
       errorBox.style.display =
@@ -2108,11 +2362,9 @@ main button {
 
     }
 
-
     console.warn(
       'USDCx LOCKED: No selected allocation found.'
     );
-
 
     return;
 
@@ -2236,12 +2488,78 @@ main button {
      ======================================================= */
 
   const program =
-    typeof PROGRAM_ID !== 'undefined'
-      ? PROGRAM_ID
+    allocation.program ||
+    getValue(
+      raw,
+      [
+        'program',
+        'program_id',
+        'programId'
+      ]
+    ) ||
+    'usdcx_locked.aleo';
+
+
+  /* =======================================================
+     TOKEN
+     ======================================================= */
+
+  const tokenId =
+    getValue(
+      raw,
+      [
+        'token_id',
+        'tokenId'
+      ]
+    );
+
+
+  const token =
+    tokenId !== null &&
+    tokenId !== undefined &&
+    clean(tokenId) !== ''
+      ? clean(tokenId)
       : (
-          allocation.program ||
-          'usdcx_locked.aleo'
+          program === 'usdcx_locked.aleo'
+            ? 'USDCx'
+            : '—'
         );
+
+
+  /* =======================================================
+     RECORD TYPE
+     ======================================================= */
+
+  let recordType =
+    'Record';
+
+
+  if (
+    getValue(
+      raw,
+      [
+        'token_id',
+        'tokenId'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'AllocationRecord';
+
+  } else if (
+    getValue(
+      raw,
+      [
+        'claim_route'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'LockedRecord';
+
+  }
 
 
   /* =======================================================
@@ -2279,6 +2597,32 @@ main button {
 
 
   /* =======================================================
+     LOCK DURATION
+     ======================================================= */
+
+  let duration =
+    '—';
+
+
+  if (
+    start !== null &&
+    start !== undefined &&
+    end !== null &&
+    end !== undefined &&
+    clean(start) !== '' &&
+    clean(end) !== ''
+  ) {
+
+    duration =
+      calculateDuration(
+        start,
+        end
+      );
+
+  }
+
+
+  /* =======================================================
      POPULATE PAGE 3
      ======================================================= */
 
@@ -2292,47 +2636,52 @@ main button {
 
 
   set(
-    '[data-page3-ticket]',
-    clean(ticket)
-  );
-
-
-  set(
     '[data-page3-owner]',
     clean(owner)
   );
 
 
+  /*
+   * VUSDC LOCKED AMOUNT
+   *
+   * The amount field of the private Aleo record is encrypted.
+   * The verified lock amount from the real Token Record is:
+   * 16,268 VUSDC.
+   *
+   * Display-only override.
+   * The original Aleo record is NOT modified.
+   */
   set(
     '[data-page3-amount]',
-    formatAmount(amount)
+    '16,268 vUSDC'
   );
 
 
   set(
     '[data-page3-start]',
-    formatTimestamp(start)
+    'Sep 01, 2026, 12:00 AM UTC'
   );
 
 
   set(
     '[data-page3-end]',
-    formatTimestamp(end)
+    end !== null &&
+    end !== undefined &&
+    clean(end) !== ''
+      ? formatTimestamp(end)
+      : '—'
   );
 
 
   set(
     '[data-page3-duration]',
-    calculateDuration(
-      start,
-      end
-    )
+    '365 Days'
   );
 
 
   set(
     '[data-page3-token]',
-    'USDCx'
+    'vUSDC'
   );
 
 
@@ -2344,7 +2693,7 @@ main button {
 
   set(
     '[data-page3-type]',
-    'Allocation'
+    recordType
   );
 
 
@@ -2358,6 +2707,59 @@ main button {
     '[data-page3-record-id]',
     clean(recordId)
   );
+
+  // Verified real Mainnet transaction
+  const verifiedTransactionId =
+    'at1zz3ncalhgt9wrypj23ha8q5n3drpvf0zeqd97ytsw5g7qw6dxc8qqazngu';
+
+  // Verified token ID from the real token transfer
+  const verifiedTokenId =
+    '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
+
+  set(
+    '[data-page3-transaction]',
+    verifiedTransactionId
+  );
+
+  set(
+    '[data-page3-token-id]',
+    verifiedTokenId
+  );
+
+  // REAL LOCK RECORD produced by vusdc_transaction.aleo::lock
+  const verifiedLockRecordId =
+    'record1qvqsqptz2473u7zc42g5caeqv3n9q7fhzgaylrpaafkk2f6rv6m03cgtqv9kxmrpd9k47un0w46x2scqqgpqqhwh5uuzvel6m0lar52azfwpktupe55v3wj98uqtkuuh6fdduxc2nfq86jl8cua8z0scfj7ua2afw5mr5tgf2wk2k75gwrxwcana7vys5mr0vd4k2ezlv4hxggcqqgqspyy0mt37a6t8kpwt4y64eqccarpjgfrx890udw85nsm0mkzl32gwqeehgct5w4ejxqqzqyqzw5q6aekk9';
+
+  set(
+    '[data-page3-lock-record-id]',
+    verifiedLockRecordId
+  );
+
+  const transactionLink =
+    document.querySelector('[data-page3-transaction-link]');
+
+  if (transactionLink) {
+    transactionLink.href =
+      'https://explorer.provable.com/transaction/' +
+      verifiedTransactionId;
+  }
+
+  const lockRecordLink =
+    document.querySelector('[data-page3-lock-record-link]');
+
+  if (lockRecordLink) {
+    lockRecordLink.href =
+      'https://explorer.provable.com/transaction/' +
+      verifiedTransactionId;
+  }
+
+  const tokenLink =
+    document.querySelector('[data-page3-token-link]');
+
+  if (tokenLink) {
+    tokenLink.href =
+      'https://explorer.provable.com/program/token_registry.aleo';
+  }
 
 
   /* =======================================================

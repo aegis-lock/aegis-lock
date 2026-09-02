@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Private Allocations | USDCx Locked</title>
+<title>Private Allocations | AEGIS</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -159,16 +159,7 @@ body {
    Everything stays on ONE LINE
    ========================================================= */
 
-.amount-line {
-  display: flex !important;
 
-  align-items: center !important;
-  justify-content: flex-start !important;
-
-  gap: 6px !important;
-
-  white-space: nowrap !important;
-}
 
 /* Amount */
 
@@ -181,44 +172,16 @@ body {
 
 /* Masked amount */
 
-.summary-value.masked {
-  letter-spacing: .12em;
-}
+
 
 /* =========================================================
    NORMAL STANDARD EYE ICON
    Directly beside amount
    ========================================================= */
 
-.amount-eye {
-  width: 26px !important;
-  height: 26px !important;
 
-  display: inline-flex !important;
 
-  align-items: center !important;
-  justify-content: center !important;
 
-  flex: 0 0 26px !important;
-
-  padding: 0 !important;
-  margin: 0 0 0 2px !important;
-
-  background: transparent !important;
-
-  border: 0 !important;
-
-  color: currentColor !important;
-
-  cursor: pointer !important;
-}
-
-.amount-eye svg {
-  width: 18px !important;
-  height: 18px !important;
-
-  display: block !important;
-}
 
 /* =========================================================
    TICKET REFERENCE
@@ -285,23 +248,135 @@ body {
     transform: scale(.76);
   }
 
-  .amount-line {
-    gap: 5px !important;
+  
+
+  
+
+  
+}
+
+</style>
+
+<style>
+
+/* =========================================================
+   PAGE 2 — CLEAN RECORD INFORMATION LAYOUT
+   ========================================================= */
+
+.record-card .summary {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+
+/* Record information stays INSIDE the right half
+   of the allocation card. */
+.record-card .record-mini {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+/* Title */
+.record-card .record-mini-title {
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+/* Information rows */
+.record-card .record-mini-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+
+/* Each information item */
+.record-card .record-mini-grid > div {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  box-sizing: border-box !important;
+}
+
+/* Labels */
+.record-card .record-mini-grid > div > span {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+}
+
+/* Values */
+.record-card .record-mini-grid > div > strong {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: right !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  font-weight: normal !important;
+}
+
+/* Protected message */
+.record-card .record-mini-description {
+  width: 100% !important;
+  margin-top: 16px !important;
+  text-align: left !important;
+  line-height: 1.5 !important;
+}
+
+/* View Details stays below the record information */
+.record-card [data-view-details],
+.record-card .view-details-btn,
+.record-card .details-btn {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 22px !important;
+}
+
+/* =========================================================
+   IMPORTANT:
+   Nothing from the record information may escape
+   the right side of the allocation card.
+   ========================================================= */
+
+.record-card {
+  overflow: hidden !important;
+}
+
+@media (max-width: 700px) {
+
+  .record-card .record-mini-grid > div {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 3px !important;
   }
 
-  .amount-eye {
-    width: 25px !important;
-    height: 25px !important;
-    flex-basis: 25px !important;
+  .record-card .record-mini-grid > div > strong {
+    width: 100% !important;
+    text-align: left !important;
   }
 
-  .amount-eye svg {
-    width: 17px !important;
-    height: 17px !important;
+  .record-card .record-mini-title {
+    white-space: normal !important;
   }
 }
 
 </style>
+
 </head>
 
 <body>
@@ -339,9 +414,9 @@ stroke-width="1.7"/>
 
 <span>
 
-<h1>USDCx <span>LOCKED</span></h1>
+<h1>AEGIS</h1>
 
-<p>Private Lock Protocol</p>
+<p>Private Asset Locking Infrastructure</p>
 
 </span>
 
@@ -522,7 +597,7 @@ Network: Mainnet
 </h2>
 
 <p class="intro">
-View and manage your locked USDCx allocation on Aleo.
+View and manage your private asset allocation on Aleo.
 </p>
 
 </div>
@@ -645,124 +720,6 @@ fill="currentColor"/>
 </div>
 
 <div class="summary">
-
-<!-- =====================================================
-     LOCKED AMOUNT
-     ===================================================== -->
-
-<div>
-
-<div class="summary-label">
-Locked Amount
-</div>
-
-<div class="amount-line">
-
-<!-- USDC LOGO -->
-
-<span
-class="usdc-logo"
-aria-label="USDC"
-style="
-width:16px;
-height:16px;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-flex:0 0 16px;
-">
-
-<svg
-xmlns="http://www.w3.org/2000/svg"
-fill="none"
-viewBox="0 0 16 16"
-width="16"
-height="16"
-aria-hidden="true">
-
-<path
-fill="#3e73c4"
-d="M8 16c4.4183 0 8-3.5817 8-8 0-4.41828-3.5817-8-8-8C3.58172 0 0 3.58172 0 8c0 4.4183 3.58172 8 8 8Z"/>
-
-<path
-fill="#ffffff"
-d="M10.01105 9.062c0-1.062-.64-1.426-1.92-1.578-.914-.1215-1.0965-.364-1.0965-.789 0-.425.305-.698.914-.698.5485 0 .8535.182 1.0055.6375.0158.04405.04475.0822.08295.10925.03815.0271.0837.04185.13055.04225h.4875c.02815.00075.05615-.0042.08235-.0146.02615-.0104.04995-.02605.0699-.0459.01995-.01985.0357-.0436.0462-.0697.01055-.02615.01565-.05415.01505-.0823v-.03c-.0596-.32955-.22635-.6302-.47435-.85525-.248-.22505-.5634-.36185-.89715-.38925V4.571005c0-.1215-.0915-.2125-.2435-.243h-.4575c-.1215 0-.213.091-.2435.243V5.269c-.9145.121-1.493.728-1.493 1.487 0 1.001.609 1.3955 1.889 1.5475.8535.1515 1.1275.334 1.1275.8195 0 .485-.4265.819-1.0055.819-.7925 0-1.0665-.3335-1.158-.789-.03-.121-.122-.182-.2135-.182h-.518c-.02815-.0007-.0561.00435-.0822.0148-.02615.0104-.04985.02605-.0698.0459-.0199.01985-.03555.04355-.04605.06965-.0105.0261-.0156.05405-.01495.08215v.03c.1215.759.6095 1.305 1.615 1.457v.7285c0 .121.0915.2125.2435.2425h.4575c.1215 0 .213-.091.2435-.2425V10.67c.9145-.1515 1.5235-.789 1.5235-1.6085v.0005Z"/>
-
-<path
-fill="#ffffff"
-d="M6.446 12.2485c-2.37698-.85-3.59598-3.49-2.71198-5.8265.457-1.275 1.46248-2.2455 2.71198-2.701.122-.0605.1825-.1515.1825-.3035v-.425c0-.121-.0605-.212-.1825-.2425-.0305 0-.0915 0-.122.03-.68575.21416-1.3224.561865-1.87327 1.023085-.550855.461225-1.00503 1.026855-1.336385 1.664315-.331355.6375-.53334 1.3342-.59432 2.05005-.06098.71585.020245 1.4367.238995 2.12105.548 1.7 1.8585 3.005 3.56498 3.551.122.0605.244 0 .274-.1215.0305-.03.0305-.061.0305-.1215v-.425c0-.091-.091-.212-.1825-.273Zm3.23-9.468c-.122-.061-.244 0-.274.121-.0305.0305-.0305.061-.0305.1215v.425c0 .1215.0915.2425.1825.3035 2.377.85 3.596 3.49 2.712 5.8265-.457 1.275-1.4625 2.2455-2.712 2.701-.122.0605-.1825.1515-.1825.3035v.425c0 .121.0605.212.1825.2425.0305 0 .0915 0 .122-.03.6858-.21415 1.32245-.56185 1.8733-1.0231.55085-.4612 1.00505-1.02685 1.3364-1.6643.33135-.6375.53335-1.3342.5943-2.05005.061-.71585-.02025-1.4367-.239-2.12105-.548-1.73-1.889-3.035-3.565-3.581Z"/>
-
-</svg>
-
-</span>
-
-<!-- AMOUNT -->
-
-<span
-class="summary-value masked"
-data-amount
-data-visible="false"
-data-value="">
-
-••••••••
-
-</span>
-
-<!-- TOKEN -->
-
-<span class="token-symbol">
-USDCx
-</span>
-
-<!-- NORMAL EYE -->
-
-<button
-class="amount-eye"
-type="button"
-data-toggle-amount
-aria-label="Show locked amount"
-title="Show locked amount">
-
-<svg
-viewBox="0 0 24 24"
-fill="none"
-stroke="currentColor"
-stroke-width="2"
-aria-hidden="true">
-
-<path
-d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
-
-<circle
-cx="12"
-cy="12"
-r="2.5"/>
-
-</svg>
-
-</button>
-
-</div>
-
-</div>
-
-<!-- =====================================================
-     TICKET REFERENCE — RIGHT
-     ===================================================== -->
-
-<div>
-
-<div class="summary-label">
-Ticket Reference
-</div>
-
-<div
-class="ticket"
-data-ticket>
-—
-</div>
-
-</div>
 
 <!-- =====================================================
      RECORD INFO
@@ -909,83 +866,6 @@ Secure by cryptography
 <script>
 
 /* =========================================================
-   AMOUNT SHOW / HIDE
-   NORMAL EYE
-   ========================================================= */
-
-document
-.querySelectorAll('[data-toggle-amount]')
-.forEach(button => {
-
-  button.addEventListener('click', () => {
-
-    const amount =
-      button
-        .closest('.amount-line')
-        ?.querySelector('[data-amount]');
-
-    if (!amount) {
-      return;
-    }
-
-    const visible =
-      amount.dataset.visible === 'true';
-
-    const realValue =
-      amount.dataset.value || '';
-
-    if (visible) {
-
-      amount.dataset.visible = 'false';
-
-      amount.classList.add('masked');
-
-      amount.textContent = '••••••••';
-
-      button.setAttribute(
-        'aria-label',
-        'Show locked amount'
-      );
-
-      button.setAttribute(
-        'title',
-        'Show locked amount'
-      );
-
-    } else {
-
-      if (!realValue) {
-
-        console.warn(
-          'USDCx LOCKED: Amount is still encrypted. No plaintext amount available.'
-        );
-
-        return;
-      }
-
-      amount.dataset.visible = 'true';
-
-      amount.classList.remove('masked');
-
-      amount.textContent = realValue;
-
-      button.setAttribute(
-        'aria-label',
-        'Hide locked amount'
-      );
-
-      button.setAttribute(
-        'title',
-        'Hide locked amount'
-      );
-
-    }
-
-  });
-
-});
-
-/* =========================================================
    GET YOUR RECORD
    ========================================================= */
 
@@ -1062,11 +942,23 @@ document
         const number =
           record?.allocationNumber || 1;
 
+        /*
+         * Amount and asset are taken ONLY from the real record.
+         * No hardcoded asset type and no fabricated amount.
+         */
         const amount =
-          record?.amount || '';
+          record?.amount ??
+          record?.display_amount ??
+          record?.microAmount ??
+          record?.value ??
+          '';
 
-        const ticket =
-          record?.ticket || '';
+        const token =
+          record?.token ??
+          record?.tokenSymbol ??
+          record?.asset ??
+          record?.claimableToken ??
+          '';
 
         const status =
           record?.status || 'LOCKED';
@@ -1085,54 +977,18 @@ document
 
         }
 
-        /* Amount */
+        /* Asset / Token */
 
-        const amountElement =
+        const tokenElement =
           document.querySelector(
-            '[data-amount]'
+            '[data-token-symbol]'
           );
 
-        if (amountElement) {
+        if (tokenElement) {
 
-          amountElement.dataset.visible =
-            'false';
-
-          amountElement.classList.add(
-            'masked'
-          );
-
-          amountElement.textContent =
-            '••••••••';
-
-          if (
-            typeof amount === 'string' &&
-            amount.trim() !== ''
-          ) {
-
-            amountElement.dataset.value =
-              amount;
-
-          } else {
-
-            amountElement.dataset.value =
-              '';
-
-          }
-
-        }
-
-        /* Ticket */
-
-        const ticketElement =
-          document.querySelector(
-            '[data-ticket]'
-          );
-
-        if (ticketElement) {
-
-          ticketElement.textContent =
-            ticket
-              ? String(ticket)
+          tokenElement.textContent =
+            token
+              ? String(token)
               : '—';
 
         }
