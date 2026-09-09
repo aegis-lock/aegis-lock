@@ -13,6 +13,13 @@ const ALEO_MAINNET_APIS = [
   'https://api.explorer.provable.com/v1'
 ];
 
+/*
+  TOKEN ID
+  Same value used by the old AEGIS Admin.
+*/
+const TOKEN_ID =
+  '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
+
 /* WALLET ADDRESS */
 const connected =
   sessionStorage.getItem('usdcxAddress') || '';
@@ -618,77 +625,69 @@ function extractRecordIdFromValue(
   return '';
 }
 
-/* EXTRACT LOCK RECORD ID */
+/* EXTRACT LOCK RECORD ID - OLD AEGIS ADMIN METHOD */
 function extractLockRecordId(
-  transition
+  lockTransition,
+  transitions
 ) {
-  const outputs =
-    Array.isArray(
-      transition?.outputs
+  const outputs = [
+    ...(lockTransition?.outputs || []),
+    ...transitions.flatMap(
+      transition =>
+        transition?.outputs || []
     )
-      ? transition.outputs
-      : [];
+  ];
 
   console.log(
-    'USDCx LOCKED: Lock outputs:',
+    'USDCx LOCKED: Searching all Explorer outputs for Lock Record ID:',
     outputs
   );
-
-  /*
-    The lock transition creates the
-    private LockedRecord.
-
-    Search every output instead of
-    assuming a fixed output number.
-  */
 
   for (
     const output
     of outputs
   ) {
-    const recordId =
-      extractRecordIdFromValue(
-        output
-      );
+    const values = [
+      output?.value,
+      output?.record,
+      output?.ciphertext,
+      output?.id
+    ];
 
-    if (recordId) {
-      console.log(
-        'USDCx LOCKED: Lock Record ID found:',
-        recordId
-      );
+    for (
+      const value
+      of values
+    ) {
+      if (
+        typeof value === 'string' &&
+        value.startsWith('record1')
+      ) {
+        console.log(
+          'USDCx LOCKED: Lock Record ID found:',
+          value
+        );
 
-      return recordId;
-    }
-  }
+        return value;
+      }
 
-  /*
-    Defensive fallback for different
-    Explorer response structures.
-  */
+      if (
+        typeof value === 'string' &&
+        value.includes('record1')
+      ) {
+        const match =
+          value.match(
+            /record1[a-z0-9]+/
+          );
 
-  const candidates = [
-    transition?.record,
-    transition?.record_id,
-    transition?.recordId,
-    transition?.records
-  ];
+        if (match) {
+          console.log(
+            'USDCx LOCKED: Lock Record ID found:',
+            match[0]
+          );
 
-  for (
-    const candidate
-    of candidates
-  ) {
-    const recordId =
-      extractRecordIdFromValue(
-        candidate
-      );
-
-    if (recordId) {
-      console.log(
-        'USDCx LOCKED: Lock Record ID found:',
-        recordId
-      );
-
-      return recordId;
+          return match[0];
+        }
+      }
     }
   }
 
@@ -696,330 +695,20 @@ function extractLockRecordId(
 }
 
 /* =========================================================
-   EXTRACT TOKEN ID FROM EXPLORER
+   TOKEN ID
    ========================================================= */
 
 /*
-  Aleo Token IDs are large decimal field values.
-  Explorer may return them either with or without
-  the "field" suffix.
+  Same Token ID used by the old AEGIS Admin.
+
+  Do NOT search arbitrary long numbers inside
+  public Explorer transition outputs.
+
+  The public transaction outputs are not the
+  private Token.token_id field.
 */
-function isLikelyTokenId(value) {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return false;
-  }
-
-  const text =
-    String(value).trim();
-
-  return /^\d{60,80}(?:field)?$/.test(text);
-}
-
-function extractTokenIdFromValue(
-  value
-) {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return '';
-  }
-
-  if (
-    typeof value === 'string'
-  ) {
-    const direct =
-      value.trim();
-
-    if (
-      isLikelyTokenId(
-        direct
-      )
-    ) {
-      return direct;
-    }
-
-    /*
-      Search nested textual structures
-      for an Aleo Token ID, with or
-      without the "field" suffix.
-    */
-
-    const matches =
-      direct.match(
-        /\b\d{60,80}(?:field)?\b/g
-      );
-
-    if (matches?.length) {
-      return matches[0];
-    }
-
-    return '';
-  }
-
-  if (
-    Array.isArray(value)
-  ) {
-    for (
-      const item
-      of value
-    ) {
-      const found =
-        extractTokenIdFromValue(
-          item
-        );
-
-      if (found) {
-        return found;
-      }
-    }
-
-    return '';
-  }
-
-  if (
-    typeof value === 'object'
-  ) {
-    const priorityKeys = [
-      'token_id',
-      'tokenId',
-      'tokenID',
-      'token',
-      'token_id_field',
-      'tokenIdField'
-    ];
-
-    for (
-      const key
-      of priorityKeys
-    ) {
-      if (
-        value[key] !== undefined &&
-        value[key] !== null
-      ) {
-        const candidate =
-          extractTokenIdFromValue(
-            value[key]
-          );
-
-        if (
-          candidate &&
-          isLikelyTokenId(
-            candidate
-          )
-        ) {
-          return candidate;
-        }
-      }
-    }
-
-    /*
-      Search common Explorer fields.
-    */
-
-    const commonKeys = [
-      'value',
-      'data',
-      'input',
-      'inputs',
-      'output',
-      'outputs',
-      'arguments',
-      'record',
-      'record_id',
-      'recordId',
-      'ciphertext'
-    ];
-
-    for (
-      const key
-      of commonKeys
-    ) {
-      if (
-        value[key] !== undefined &&
-        value[key] !== null
-      ) {
-        const found =
-          extractTokenIdFromValue(
-            value[key]
-          );
-
-        if (
-          found &&
-          isLikelyTokenId(found)
-        ) {
-          return found;
-        }
-      }
-    }
-  }
-
-  return '';
-}
-
-/*
-  Search the transaction specifically
-  for a publicly readable Token ID.
-
-  We inspect the lock transition first,
-  then the token_registry transfer
-  transition, then the complete
-  transaction object.
-*/
-function extractTokenIdFromExplorer(
-  transaction,
-  lockTransition
-) {
-  console.log(
-    'USDCx LOCKED: Searching Explorer transaction for Token ID...'
-  );
-
-  /*
-    1. Search lock transition.
-  */
-
-  const fromLock =
-    extractTokenIdFromValue(
-      lockTransition
-    );
-
-  if (
-    fromLock &&
-    isLikelyTokenId(fromLock)
-  ) {
-    console.log(
-      'USDCx LOCKED: Token ID found in lock transition:',
-      fromLock
-    );
-
-    return fromLock;
-  }
-
-  /*
-    2. Search token_registry transfer
-       transition.
-  */
-
-  const transitions =
-    getExplorerTransitions(
-      transaction
-    );
-
-  const transferTransition =
-    transitions.find(
-      transition => {
-        const program =
-          transition?.program ||
-          transition?.program_id ||
-          transition?.programId ||
-          '';
-
-        const functionName =
-          transition?.function ||
-          transition?.function_name ||
-          transition?.functionName ||
-          '';
-
-        return (
-          program ===
-            'token_registry.aleo' &&
-          functionName ===
-            'transfer_private'
-        );
-      }
-    );
-
-  if (transferTransition) {
-    console.log(
-      'USDCx LOCKED: token_registry transfer transition found:',
-      transferTransition
-    );
-
-    const fromTransfer =
-      extractTokenIdFromValue(
-        transferTransition
-      );
-
-    if (
-      fromTransfer &&
-      isLikelyTokenId(fromTransfer)
-    ) {
-      console.log(
-        'USDCx LOCKED: Token ID found in transfer transition:',
-        fromTransfer
-      );
-
-      return fromTransfer;
-    }
-  }
-
-  /*
-    3. Search transaction-level
-       public fields.
-  */
-
-  const transactionCandidates = [
-    transaction?.token_id,
-    transaction?.tokenId,
-    transaction?.token,
-    transaction?.asset,
-    transaction?.asset_id
-  ];
-
-  for (
-    const candidate
-    of transactionCandidates
-  ) {
-    const found =
-      extractTokenIdFromValue(
-        candidate
-      );
-
-    if (
-      found &&
-      isLikelyTokenId(found)
-    ) {
-      console.log(
-        'USDCx LOCKED: Token ID found in transaction:',
-        found
-      );
-
-      return found;
-    }
-  }
-
-  /*
-    4. Last defensive search through
-       the complete public transaction.
-  */
-
-  const completeSearch =
-    extractTokenIdFromValue(
-      transaction
-    );
-
-  if (
-    completeSearch &&
-    isLikelyTokenId(
-      completeSearch
-    )
-  ) {
-    console.log(
-      'USDCx LOCKED: Token ID found in Explorer JSON:',
-      completeSearch
-    );
-
-    return completeSearch;
-  }
-
-  console.warn(
-    'USDCx LOCKED: Token ID is not publicly readable in this Explorer transaction.'
-  );
-
-  return '';
+function getTokenId() {
+  return TOKEN_ID;
 }
 
 /* EXTRACT TRANSITION ID */
@@ -1039,6 +728,11 @@ function normalizeExplorerTransaction(
   transaction,
   transactionId
 ) {
+  const transitions =
+    getExplorerTransitions(
+      transaction
+    );
+
   const lockTransition =
     findLockTransition(
       transaction
@@ -1049,16 +743,23 @@ function normalizeExplorerTransaction(
       lockTransition
     );
 
+  /*
+    Same logic as the old AEGIS Admin:
+    search the lock transition and all
+    transaction transitions for record1...
+  */
   const lockRecordId =
     extractLockRecordId(
-      lockTransition
+      lockTransition,
+      transitions
     );
 
+  /*
+    Token ID comes from the known Token ID
+    used by the old AEGIS Admin.
+  */
   const tokenId =
-    extractTokenIdFromExplorer(
-      transaction,
-      lockTransition
-    );
+    getTokenId();
 
   return {
     transactionId:
@@ -1292,15 +993,15 @@ async function getYourRecord() {
   }
 
   /*
-    Token ID is now obtained from
-    Explorer transaction data.
+    Token ID comes from the same source
+    used by the old AEGIS Admin.
   */
 
   if (
     !explorerData.tokenId
   ) {
     console.warn(
-      'USDCx LOCKED: Explorer did not expose a public Token ID for this transaction.'
+      'USDCx LOCKED: Token ID is not available.'
     );
   }
 
@@ -1452,7 +1153,7 @@ async function getYourRecord() {
       explorerData.transitionId;
 
     allocations[0].tokenId =
-      explorerData.tokenId || '';
+      explorerData.tokenId || TOKEN_ID;
 
     allocations[0].lockRecordId =
       explorerData.lockRecordId;
@@ -1503,7 +1204,7 @@ async function getYourRecord() {
 
     sessionStorage.setItem(
       'usdcxTokenId',
-      explorerData.tokenId || ''
+      explorerData.tokenId || TOKEN_ID
     );
 
     sessionStorage.setItem(
@@ -1535,7 +1236,7 @@ async function getYourRecord() {
 
   console.log(
     'USDCx LOCKED: Explorer Token ID:',
-    explorerData.tokenId || 'NOT PUBLIC'
+    explorerData.tokenId
   );
 
   console.log(
