@@ -2500,6 +2500,9 @@ main button {
         'token_id',
         'tokenId'
       ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxTokenId'
     );
 
 
@@ -2521,6 +2524,9 @@ main button {
         'lock_record_id',
         'lockRecordId'
       ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxLockRecordId'
     );
 
 
@@ -2786,353 +2792,360 @@ main button {
      LOCK RECORD LINK
      ======================================================= */
 
+  const lockRecordLink =
+    document.querySelector(
+      '[data-page3-lock-record-link]'
+    );
+
+
+  if (
+    lockRecordLink &&
+    clean(transactionId)
+  ) {
+
+    lockRecordLink.href =
+      'https://explorer.provable.com/transaction/' +
+      clean(transactionId);
+
+  } else if (lockRecordLink) {
+
+    lockRecordLink.removeAttribute(
+      'href'
+    );
+
+  }
+
+
   /* =======================================================
-   LOCK RECORD LINK
-   ======================================================= */
+     COUNTDOWN
+     ======================================================= */
 
-const lockRecordLink =
-  document.querySelector(
-    '[data-page3-lock-record-link]'
+  const countdownElement =
+    document.querySelector(
+      '[data-lock-countdown]'
+    );
+
+
+  const countdownEndElement =
+    document.querySelector(
+      '[data-countdown-end]'
+    );
+
+
+  const claimButton =
+    document.querySelector(
+      '[data-claim-button]'
+    );
+
+
+  const claimMessage =
+    document.querySelector(
+      '[data-claim-message]'
+    );
+
+
+  const endSeconds =
+    getTimestampSeconds(end);
+
+
+  let countdownTimer =
+    null;
+
+
+  let lockEnded =
+    false;
+
+
+  /* =======================================================
+     UPDATE COUNTDOWN
+     ======================================================= */
+
+  function updateCountdown() {
+
+    if (!countdownElement) {
+      return;
+    }
+
+
+    if (!endSeconds) {
+
+      countdownElement.textContent =
+        '—';
+
+
+      if (countdownEndElement) {
+
+        countdownEndElement.textContent =
+          'Lock end time unavailable';
+
+      }
+
+      return;
+
+    }
+
+
+    const nowSeconds =
+      Math.floor(
+        Date.now() / 1000
+      );
+
+
+    let remaining =
+      endSeconds - nowSeconds;
+
+
+    if (remaining <= 0) {
+
+      lockEnded =
+        true;
+
+
+      countdownElement.textContent =
+        'LOCK ENDED';
+
+
+      countdownElement.classList.add(
+        'countdown-ended'
+      );
+
+
+      if (countdownEndElement) {
+
+        countdownEndElement.textContent =
+          'The lock period has ended';
+
+      }
+
+
+      if (claimButton) {
+
+        claimButton.disabled =
+          false;
+
+        claimButton.textContent =
+          'CLAIM';
+
+      }
+
+
+      if (countdownTimer) {
+
+        clearInterval(
+          countdownTimer
+        );
+
+        countdownTimer =
+          null;
+
+      }
+
+
+      return;
+
+    }
+
+
+    const days =
+      Math.floor(
+        remaining / 86400
+      );
+
+
+    remaining -=
+      days * 86400;
+
+
+    const hours =
+      Math.floor(
+        remaining / 3600
+      );
+
+
+    remaining -=
+      hours * 3600;
+
+
+    const minutes =
+      Math.floor(
+        remaining / 60
+      );
+
+
+    remaining -=
+      minutes * 60;
+
+
+    const seconds =
+      remaining;
+
+
+    countdownElement.textContent =
+      String(days) +
+      'd ' +
+      String(hours).padStart(2, '0') +
+      'h ' +
+      String(minutes).padStart(2, '0') +
+      'm ' +
+      String(seconds).padStart(2, '0') +
+      's';
+
+
+    if (countdownEndElement) {
+
+      countdownEndElement.textContent =
+        'Ends: ' +
+        formatTimestamp(end);
+
+    }
+
+  }
+
+
+  /* =======================================================
+     START COUNTDOWN
+     ======================================================= */
+
+  updateCountdown();
+
+
+  if (endSeconds) {
+
+    countdownTimer =
+      setInterval(
+        updateCountdown,
+        1000
+      );
+
+  }
+
+
+  /* =======================================================
+     CLAIM BUTTON
+     ======================================================= */
+
+  if (claimButton) {
+
+    claimButton.addEventListener(
+      'click',
+      function () {
+
+        if (!lockEnded) {
+
+          if (claimMessage) {
+
+            claimMessage.classList.remove(
+              'success'
+            );
+
+
+            claimMessage.style.display =
+              'block';
+
+
+            claimMessage.textContent =
+              'Not available until lock end.';
+
+          }
+
+
+          return;
+
+        }
+
+
+        if (claimMessage) {
+
+          claimMessage.classList.add(
+            'success'
+          );
+
+
+          claimMessage.style.display =
+            'block';
+
+
+          claimMessage.textContent =
+            'Lock ended. Claim is available for contract integration.';
+
+        }
+
+
+        console.log(
+          'USDCx LOCKED: Lock ended. No transaction was sent.'
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     FINAL LOG
+     ======================================================= */
+
+  console.log(
+    'USDCx LOCKED: Page 3 populated from Page 2 selected record.'
   );
 
-if (
-  lockRecordLink &&
-  clean(transactionId)
-) {
 
-  lockRecordLink.href =
-    'https://explorer.provable.com/transaction/' +
-    clean(transactionId);
-
-} else if (lockRecordLink) {
-
-  lockRecordLink.removeAttribute(
-    'href'
+  console.log(
+    'USDCx LOCKED: Owner:',
+    clean(owner)
   );
 
-}
- 
- 
-  /* ======================================================= 
-     COUNTDOWN 
-     ======================================================= */ 
- 
-  const countdownElement = 
-    document.querySelector( 
-      '[data-lock-countdown]' 
-    ); 
- 
- 
-  const countdownEndElement = 
-    document.querySelector( 
-      '[data-countdown-end]' 
-    ); 
- 
- 
-  const claimButton = 
-    document.querySelector( 
-      '[data-claim-button]' 
-    ); 
- 
- 
-  const claimMessage = 
-    document.querySelector( 
-      '[data-claim-message]' 
-    ); 
- 
- 
-  const endSeconds = 
-    getTimestampSeconds(end); 
- 
- 
-  let countdownTimer = 
-    null; 
- 
- 
-  let lockEnded = 
-    false; 
- 
- 
-  /* ======================================================= 
-     UPDATE COUNTDOWN 
-     ======================================================= */ 
- 
-  function updateCountdown() { 
- 
-    if (!countdownElement) { 
-      return; 
-    } 
- 
- 
-    if (!endSeconds) { 
- 
-      countdownElement.textContent = 
-        '—'; 
- 
- 
-      if (countdownEndElement) { 
- 
-        countdownEndElement.textContent = 
-          'Lock end time unavailable'; 
- 
-      } 
- 
-      return; 
- 
-    } 
- 
- 
-    const nowSeconds = 
-      Math.floor( 
-        Date.now() / 1000 
-      ); 
- 
- 
-    let remaining = 
-      endSeconds - nowSeconds; 
- 
- 
-    if (remaining <= 0) { 
- 
-      lockEnded = 
-        true; 
- 
- 
-      countdownElement.textContent = 
-        'LOCK ENDED'; 
- 
- 
-      countdownElement.classList.add( 
-        'countdown-ended' 
-      ); 
- 
- 
-      if (countdownEndElement) { 
- 
-        countdownEndElement.textContent = 
-          'The lock period has ended'; 
- 
-      } 
- 
- 
-      if (claimButton) { 
- 
-        claimButton.disabled = 
-          false; 
- 
-        claimButton.textContent = 
-          'CLAIM'; 
- 
-      } 
- 
- 
-      if (countdownTimer) { 
- 
-        clearInterval( 
-          countdownTimer 
-        ); 
- 
-        countdownTimer = 
-          null; 
- 
-      } 
- 
- 
-      return; 
- 
-    } 
- 
- 
-    const days = 
-      Math.floor( 
-        remaining / 86400 
-      ); 
- 
- 
-    remaining -= 
-      days * 86400; 
- 
- 
-    const hours = 
-      Math.floor( 
-        remaining / 3600 
-      ); 
- 
- 
-    remaining -= 
-      hours * 3600; 
- 
- 
-    const minutes = 
-      Math.floor( 
-        remaining / 60 
-      ); 
- 
- 
-    remaining -= 
-      minutes * 60; 
- 
- 
-    const seconds = 
-      remaining; 
- 
- 
-    countdownElement.textContent = 
-      String(days) + 
-      'd ' + 
-      String(hours).padStart(2, '0') + 
-      'h ' + 
-      String(minutes).padStart(2, '0') + 
-      'm ' + 
-      String(seconds).padStart(2, '0') + 
-      's'; 
- 
- 
-    if (countdownEndElement) { 
- 
-      countdownEndElement.textContent = 
-        'Ends: ' + 
-        formatTimestamp(end); 
- 
-    } 
- 
-  } 
- 
- 
-  /* ======================================================= 
-     START COUNTDOWN 
-     ======================================================= */ 
- 
-  updateCountdown(); 
- 
- 
-  if (endSeconds) { 
- 
-    countdownTimer = 
-      setInterval( 
-        updateCountdown, 
-        1000 
-      ); 
- 
-  } 
- 
- 
-  /* ======================================================= 
-     CLAIM BUTTON 
-     ======================================================= */ 
- 
-  if (claimButton) { 
- 
-    claimButton.addEventListener( 
-      'click', 
-      function () { 
- 
-        if (!lockEnded) { 
- 
-          if (claimMessage) { 
- 
-            claimMessage.classList.remove( 
-              'success' 
-            ); 
- 
- 
-            claimMessage.style.display = 
-              'block'; 
- 
- 
-            claimMessage.textContent = 
-              'Not available until lock end.'; 
- 
-          } 
- 
- 
-          return; 
- 
-        } 
- 
- 
-        if (claimMessage) { 
- 
-          claimMessage.classList.add( 
-            'success' 
-          ); 
- 
- 
-          claimMessage.style.display = 
-            'block'; 
- 
- 
-          claimMessage.textContent = 
-            'Lock ended. Claim is available for contract integration.'; 
- 
-        } 
- 
- 
-        console.log( 
-          'USDCx LOCKED: Lock ended. No transaction was sent.' 
-        ); 
- 
-      } 
-    ); 
- 
-  } 
- 
- 
-  /* ======================================================= 
-     FINAL LOG 
-     ======================================================= */ 
- 
-  console.log( 
-    'USDCx LOCKED: Page 3 populated from Page 2 selected record.' 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Owner:', 
-    clean(owner) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Amount:', 
-    formatAmount(amount) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Start:', 
-    formatTimestamp(start) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: End:', 
-    formatTimestamp(end) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Duration:', 
-    duration 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Transaction:', 
-    clean(transactionId) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Token ID:', 
-    clean(tokenId) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: Lock Record ID:', 
-    clean(lockRecordId) 
-  ); 
- 
-  console.log( 
-    'USDCx LOCKED: No transaction / no balance transfer.' 
-  ); 
- 
-})(); 
- 
-</script> 
- 
-</body> 
-</html>  
+
+  console.log(
+    'USDCx LOCKED: Amount:',
+    formatAmount(amount)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Start:',
+    formatTimestamp(start)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: End:',
+    formatTimestamp(end)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Duration:',
+    duration
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Transaction:',
+    clean(transactionId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Token ID:',
+    clean(tokenId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Lock Record ID:',
+    clean(lockRecordId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: No transaction / no balance transfer.'
+  );
+
+
+})();
+
+</script>
+
+</body>
+</html>
