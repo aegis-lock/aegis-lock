@@ -2786,28 +2786,31 @@ main button {
      LOCK RECORD LINK
      ======================================================= */
 
-  const lockRecordLink =
-    document.querySelector(
-      '[data-page3-lock-record-link]'
-    );
+  /* =======================================================
+   LOCK RECORD LINK
+   ======================================================= */
 
+const lockRecordLink =
+  document.querySelector(
+    '[data-page3-lock-record-link]'
+  );
 
-  if (
-    lockRecordLink &&
-    clean(lockRecordId)
-  ) {
+if (
+  lockRecordLink &&
+  clean(transactionId)
+) {
 
-    lockRecordLink.href =
-      'https://explorer.provable.com/transaction/' + 
-      clean(lockRecordId); 
- 
-  } else if (lockRecordLink) { 
- 
-    lockRecordLink.removeAttribute( 
-      'href' 
-    ); 
- 
-  } 
+  lockRecordLink.href =
+    'https://explorer.provable.com/transaction/' +
+    clean(transactionId);
+
+} else if (lockRecordLink) {
+
+  lockRecordLink.removeAttribute(
+    'href'
+  );
+
+}
  
  
   /* ======================================================= 
