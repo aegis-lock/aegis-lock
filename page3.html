@@ -1753,6 +1753,15 @@ main button {
 
 
   /* =======================================================
+     CONSTANTS
+     ======================================================= */
+
+  const LOCK_DURATION_DAYS = 365;
+  const LOCK_DURATION_SECONDS =
+    LOCK_DURATION_DAYS * 86400;
+
+
+  /* =======================================================
      CLEAN ALEO VALUE
      ======================================================= */
 
@@ -2042,18 +2051,14 @@ main button {
   function calculateDuration(start, end) {
 
     const s =
-      Number(
-        clean(start)
-      );
+      getTimestampSeconds(start);
 
     const e =
-      Number(
-        clean(end)
-      );
+      getTimestampSeconds(end);
 
     if (
-      !Number.isFinite(s) ||
-      !Number.isFinite(e)
+      s === null ||
+      e === null
     ) {
 
       return '—';
@@ -2334,7 +2339,7 @@ main button {
      START
      ======================================================= */
 
-  const start =
+  let start =
     getValue(
       raw,
       [
@@ -2360,6 +2365,33 @@ main button {
       ]
     ) ||
     allocation.end;
+
+
+  /* =======================================================
+     DERIVE START FROM END
+     ======================================================= */
+
+  if (
+    !clean(start) &&
+    clean(end)
+  ) {
+
+    const endSeconds =
+      getTimestampSeconds(end);
+
+    if (
+      endSeconds !== null
+    ) {
+
+      start =
+        String(
+          endSeconds -
+          LOCK_DURATION_SECONDS
+        );
+
+    }
+
+  }
 
 
   /* =======================================================
@@ -2444,6 +2476,9 @@ main button {
         'txId',
         'transaction'
       ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxTransactionId'
     );
 
 
@@ -2477,18 +2512,14 @@ main button {
       raw,
       [
         'lock_record_id',
-        'lockRecordId',
-        'record_id',
-        'recordId'
+        'lockRecordId'
       ]
     ) ||
     getValue(
       allocation,
       [
         'lock_record_id',
-        'lockRecordId',
-        'record_id',
-        'recordId'
+        'lockRecordId'
       ]
     );
 
@@ -2534,8 +2565,7 @@ main button {
      ======================================================= */
 
   const recordId =
-    findRecordId(raw) ||
-    lockRecordId;
+    findRecordId(raw);
 
 
   /* =======================================================
@@ -2568,11 +2598,38 @@ main button {
      DURATION
      ======================================================= */
 
-  const duration =
+  let duration =
     calculateDuration(
       start,
       end
     );
+
+
+  if (
+    duration === '—' &&
+    clean(start) &&
+    clean(end)
+  ) {
+
+    const startSeconds =
+      getTimestampSeconds(start);
+
+    const endSeconds =
+      getTimestampSeconds(end);
+
+    if (
+      startSeconds !== null &&
+      endSeconds !== null &&
+      endSeconds - startSeconds ===
+        LOCK_DURATION_SECONDS
+    ) {
+
+      duration =
+        '365 Days';
+
+    }
+
+  }
 
 
   /* =======================================================
@@ -2708,10 +2765,19 @@ main button {
     );
 
 
-  if (tokenLink) {
+  if (
+    tokenLink &&
+    clean(tokenId)
+  ) {
 
     tokenLink.href =
       'https://explorer.provable.com/program/token_registry.aleo';
+
+  } else if (tokenLink) {
+
+    tokenLink.removeAttribute(
+      'href'
+    );
 
   }
 
@@ -2728,12 +2794,12 @@ main button {
 
   if (
     lockRecordLink &&
-    clean(transactionId)
+    clean(lockRecordId)
   ) {
 
     lockRecordLink.href =
       'https://explorer.provable.com/transaction/' +
-      clean(transactionId);
+      clean(lockRecordId);
 
   } else if (lockRecordLink) {
 
@@ -3035,6 +3101,11 @@ main button {
   console.log(
     'USDCx LOCKED: End:',
     formatTimestamp(end)
+  );
+
+  console.log(
+    'USDCx LOCKED: Duration:',
+    duration
   );
 
   console.log(
