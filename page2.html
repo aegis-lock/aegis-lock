@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -57,6 +57,69 @@ body {
 
   width: 20px !important;
   height: 20px !important;
+}
+
+/* =========================================================
+   TRANSACTION ID
+   ========================================================= */
+
+.transaction-id-wrap {
+  width: min(360px, 90%) !important;
+
+  margin: 28px auto 0 !important;
+}
+
+.transaction-id-wrap label {
+  display: block !important;
+
+  margin-bottom: 8px !important;
+
+  font-family: Inter, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+
+  color: rgba(255,255,255,.72) !important;
+}
+
+.transaction-id-wrap input {
+  width: 100% !important;
+  height: 46px !important;
+
+  box-sizing: border-box !important;
+
+  padding: 0 14px !important;
+
+  background: rgba(255,255,255,.035) !important;
+  color: #fff !important;
+
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 10px !important;
+
+  outline: none !important;
+
+  font-family: Inter, sans-serif !important;
+  font-size: 12px !important;
+
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease !important;
+}
+
+.transaction-id-wrap input::placeholder {
+  color: rgba(255,255,255,.35) !important;
+}
+
+.transaction-id-wrap input:focus {
+  border-color: rgba(57,255,136,.65) !important;
+
+  background: rgba(57,255,136,.025) !important;
+
+  box-shadow:
+    0 0 18px rgba(57,255,136,.08) !important;
 }
 
 /* =========================================================
@@ -159,29 +222,12 @@ body {
    Everything stays on ONE LINE
    ========================================================= */
 
-
-
-/* Amount */
-
 .summary-value {
   white-space: nowrap !important;
 
   display: inline-flex !important;
   align-items: center !important;
 }
-
-/* Masked amount */
-
-
-
-/* =========================================================
-   NORMAL STANDARD EYE ICON
-   Directly beside amount
-   ========================================================= */
-
-
-
-
 
 /* =========================================================
    TICKET REFERENCE
@@ -227,6 +273,12 @@ body {
     font-size: 11px !important;
   }
 
+  .transaction-id-wrap {
+    width: min(330px, 92%) !important;
+
+    margin-top: 24px !important;
+  }
+
   .get-record-wrap {
     margin-top: 24px !important;
   }
@@ -248,11 +300,6 @@ body {
     transform: scale(.76);
   }
 
-  
-
-  
-
-  
 }
 
 </style>
@@ -272,8 +319,6 @@ body {
   justify-content: center !important;
 }
 
-/* Record information stays INSIDE the right half
-   of the allocation card. */
 .record-card .record-mini {
   width: 100% !important;
   max-width: 100% !important;
@@ -281,10 +326,8 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   text-align: left !important;
-  box-sizing: border-box !important;
 }
 
-/* Title */
 .record-card .record-mini-title {
   width: 100% !important;
   margin: 0 0 18px !important;
@@ -292,7 +335,6 @@ body {
   white-space: nowrap !important;
 }
 
-/* Information rows */
 .record-card .record-mini-grid {
   width: 100% !important;
   max-width: 100% !important;
@@ -302,7 +344,6 @@ body {
   margin: 0 !important;
 }
 
-/* Each information item */
 .record-card .record-mini-grid > div {
   width: 100% !important;
   min-width: 0 !important;
@@ -313,14 +354,12 @@ body {
   box-sizing: border-box !important;
 }
 
-/* Labels */
 .record-card .record-mini-grid > div > span {
   flex: 0 0 auto !important;
   white-space: nowrap !important;
   text-align: left !important;
 }
 
-/* Values */
 .record-card .record-mini-grid > div > strong {
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -330,7 +369,6 @@ body {
   font-weight: normal !important;
 }
 
-/* Protected message */
 .record-card .record-mini-description {
   width: 100% !important;
   margin-top: 16px !important;
@@ -338,7 +376,6 @@ body {
   line-height: 1.5 !important;
 }
 
-/* View Details stays below the record information */
 .record-card [data-view-details],
 .record-card .view-details-btn,
 .record-card .details-btn {
@@ -346,12 +383,6 @@ body {
   max-width: 100% !important;
   margin-top: 22px !important;
 }
-
-/* =========================================================
-   IMPORTANT:
-   Nothing from the record information may escape
-   the right side of the allocation card.
-   ========================================================= */
 
 .record-card {
   overflow: hidden !important;
@@ -373,6 +404,7 @@ body {
   .record-card .record-mini-title {
     white-space: normal !important;
   }
+
 }
 
 </style>
@@ -521,7 +553,7 @@ stroke-width="2">
 <circle cx="12" cy="12" r="3"/>
 
 <path
-d="M19 12a7 7 0 0 0-.12-1.28l2-1.55-2-3.46-2.35.95a7 7 0 0 0-2.2-1.28l-.33-2.38h-4l-.33 2.38a7 7 0 0 0-2.2 1.28l-2.35-.95-2 3.46 2 1.55A7 7 0 0 0 5 12c0 .44.04.87.12 1.28l-2 1.55 2 3.46 2.35-.95a7 7 0 0 0 2.2 1.28L10 21h4l.33-2.38a7 7 0 0 0 2.2-1.28l2.35.95 2-3.46-2-1.55c.08-.41.12-.84.12-1.28Z"/>
+d="M19 12a7 7 0 0 0-.12-1.28l2-1.55-2-3.46-2.35.95a7 7 0 0 0-2.2 1.28l-.33-2.38h-4l-.33 2.38a7 7 0 0 0-2.2 1.28l-2.35-.95-2 3.46 2 1.55A7 7 0 0 0 5 12c0 .44.04.87.12 1.28l-2 1.55 2 3.46 2.35-.95a7 7 0 0 0 2.2 1.28L10 21h4l.33-2.38a7 7 0 0 0 2.2-1.28l2.35.95 2-3.46-2-1.55c.08-.41.12-.84.12-1.28Z"/>
 
 </svg>
 
@@ -601,6 +633,26 @@ View and manage your private asset allocation on Aleo.
 </p>
 
 </div>
+
+</div>
+
+<!-- =====================================================
+     TRANSACTION ID
+     ===================================================== -->
+
+<div class="transaction-id-wrap">
+
+<label for="transaction-id">
+TRANSACTION ID
+</label>
+
+<input
+id="transaction-id"
+type="text"
+placeholder="Enter Transaction ID"
+autocomplete="off"
+spellcheck="false"
+>
 
 </div>
 
@@ -1035,31 +1087,54 @@ document
 
         /* Save selected record */
 
-try {
+        try {
 
-  const safeRecord = JSON.parse(
-    JSON.stringify(
-      record,
-      (_, value) =>
-        typeof value === 'bigint'
-          ? value.toString()
-          : value
-    )
-  );
+          const safeRecord = JSON.parse(
+            JSON.stringify(
+              record,
+              (_, value) =>
+                typeof value === 'bigint'
+                  ? value.toString()
+                  : value
+            )
+          );
 
-  sessionStorage.setItem(
-    'usdcxSelectedRecord',
-    JSON.stringify(safeRecord)
-  );
+          sessionStorage.setItem(
+            'usdcxSelectedRecord',
+            JSON.stringify(safeRecord)
+          );
 
-} catch (storageError) {
+        } catch (storageError) {
 
-  console.warn(
-    'USDCx LOCKED: Could not save selected record:',
-    storageError
-  );
+          console.warn(
+            'USDCx LOCKED: Could not save selected record:',
+            storageError
+          );
 
-}
+        }
+
+        /* Save Transaction ID */
+
+        const transactionInput =
+          document.querySelector(
+            '#transaction-id'
+          );
+
+        if (transactionInput) {
+
+          const transactionId =
+            transactionInput.value.trim();
+
+          if (transactionId) {
+
+            sessionStorage.setItem(
+              'usdcxTransactionId',
+              transactionId
+            );
+
+          }
+
+        }
 
         /* Success */
 
@@ -1120,6 +1195,41 @@ document
   );
 
 });
+
+/* =========================================================
+   RESTORE TRANSACTION ID
+   ========================================================= */
+
+try {
+
+  const savedTransactionId =
+    sessionStorage.getItem(
+      'usdcxTransactionId'
+    );
+
+  const transactionInput =
+    document.querySelector(
+      '#transaction-id'
+    );
+
+  if (
+    savedTransactionId &&
+    transactionInput
+  ) {
+
+    transactionInput.value =
+      savedTransactionId;
+
+  }
+
+} catch (error) {
+
+  console.warn(
+    'USDCx LOCKED: Could not restore Transaction ID:',
+    error
+  );
+
+}
 
 </script>
 
