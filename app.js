@@ -9,6 +9,14 @@ const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
 
 
 /* =========================================================
+ * ALEO MAINNET EXPLORER
+ * ========================================================= */
+
+const ALEO_MAINNET_API =
+  'https://api.explorer.provable.com/v1';
+
+
+/* =========================================================
  * WALLET ADDRESS
  * ========================================================= */
 
@@ -337,6 +345,476 @@ function cleanAleoValue(value) {
 
 
 /* =========================================================
+ * EXPLORER TRANSACTION ID
+ * ========================================================= */
+
+function getTransactionInput() {
+
+  const input =
+    document.querySelector(
+      '#transaction-id'
+    );
+
+
+  if (!input) {
+    return '';
+  }
+
+
+  return input.value.trim();
+
+}
+
+
+/* =========================================================
+ * GET ALEO MAINNET TRANSACTION
+ * ========================================================= */
+
+async function getExplorerTransaction(
+  transactionId
+) {
+
+  const id =
+    String(transactionId || '').trim();
+
+
+  if (!id) {
+
+    throw new Error(
+      'Please enter the Transaction ID first.'
+    );
+
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Searching Aleo Mainnet transaction:',
+    id
+  );
+
+
+  const url =
+    ALEO_MAINNET_API +
+    '/mainnet/transaction/' +
+    encodeURIComponent(id);
+
+
+  const response =
+    await fetch(
+      url,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      }
+    );
+
+
+  if (!response.ok) {
+
+    let details = '';
+
+    try {
+
+      details =
+        await response.text();
+
+    } catch (_) {
+
+      details = '';
+
+    }
+
+
+    throw new Error(
+      'Explorer transaction lookup failed (' +
+      response.status +
+      '). ' +
+      details
+    );
+
+  }
+
+
+  const transaction =
+    await response.json();
+
+
+  if (!transaction) {
+
+    throw new Error(
+      'Explorer returned an empty transaction.'
+    );
+
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Explorer transaction:',
+    transaction
+  );
+
+
+  return transaction;
+
+}
+
+
+/* =========================================================
+ * GET TRANSACTION ID FROM EXPLORER RESPONSE
+ * ========================================================= */
+
+function getExplorerTransactionId(
+  transaction,
+  fallback
+) {
+
+  return (
+    transaction?.id ||
+    transaction?.transaction_id ||
+    transaction?.transactionId ||
+    fallback ||
+    ''
+  );
+
+}
+
+
+/* =========================================================
+ * FIND VUSDC LOCK TRANSITION
+ * ========================================================= */
+
+function findLockTransition(
+  transaction
+) {
+
+  if (!transaction) {
+    return null;
+  }
+
+
+  const transitions = [];
+
+
+  /*
+   * Normal Aleo execution transaction.
+   */
+
+  if (
+    transaction.execution &&
+    Array.isArray(
+      transaction.execution.transitions
+    )
+  ) {
+
+    transitions.push(
+      ...transaction.execution.transitions
+    );
+
+  }
+
+
+  /*
+   * Defensive support for responses where
+   * transitions are returned at top level.
+   */
+
+  if (
+    Array.isArray(
+      transaction.transitions
+    )
+  ) {
+
+    transitions.push(
+      ...transaction.transitions
+    );
+
+  }
+
+
+  /*
+   * Defensive support for a single transition.
+   */
+
+  if (
+    transaction.execution &&
+    transaction.execution.transition
+  ) {
+
+    transitions.push(
+      transaction.execution.transition
+    );
+
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Explorer transitions:',
+    transitions
+  );
+
+
+  /*
+   * Exact match only.
+   *
+   * We do NOT select another program/function.
+   */
+
+  const lockTransition =
+    transitions.find(
+      transition => {
+
+        const program =
+          transition?.program ||
+          transition?.program_id ||
+          transition?.programId ||
+          '';
+
+
+        const functionName =
+          transition?.function ||
+          transition?.function_name ||
+          transition?.functionName ||
+          '';
+
+
+        return (
+          program ===
+            'vusdc_transaction.aleo' &&
+          functionName ===
+            'lock'
+        );
+
+      }
+    );
+
+
+  if (!lockTransition) {
+
+    console.warn(
+      'USDCx LOCKED: vusdc_transaction.aleo::lock transition was not found.'
+    );
+
+    return null;
+
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Lock transition found:',
+    lockTransition
+  );
+
+
+  return lockTransition;
+
+}
+
+
+/* =========================================================
+ * EXTRACT PUBLIC EXPLORER METADATA
+ * ========================================================= */
+
+function normalizeExplorerTransaction(
+  transaction,
+  transactionId
+) {
+
+  const transition =
+    findLockTransition(
+      transaction
+    );
+
+
+  const realTransactionId =
+    getExplorerTransactionId(
+      transaction,
+      transactionId
+    );
+
+
+  /*
+   * If the transaction exists but does not contain
+   * our lock transition, keep the transaction itself
+   * but mark the lock transition as missing.
+   */
+
+  if (!transition) {
+
+    return {
+
+      transactionId:
+        realTransactionId,
+
+      transitionId:
+        '',
+
+      program:
+        '',
+
+      function:
+        '',
+
+      tokenId:
+        '',
+
+      lockRecordId:
+        '',
+
+      transition:
+        null,
+
+      transaction:
+        transaction
+
+    };
+
+  }
+
+
+  const transitionId =
+    transition.id ||
+    transition.transition_id ||
+    transition.transitionId ||
+    '';
+
+
+  /*
+   * IMPORTANT:
+   *
+   * Token ID and Lock Record ID are private values
+   * unless the Explorer response actually exposes them.
+   *
+   * We NEVER manufacture them.
+   */
+
+  const tokenId =
+    transition.token_id ||
+    transition.tokenId ||
+    '';
+
+
+  const lockRecordId =
+    transition.record_id ||
+    transition.recordId ||
+    transition.lock_record_id ||
+    transition.lockRecordId ||
+    '';
+
+
+  return {
+
+    transactionId:
+      realTransactionId,
+
+    transitionId:
+      transitionId,
+
+    program:
+      transition.program ||
+      transition.program_id ||
+      transition.programId ||
+      'vusdc_transaction.aleo',
+
+    function:
+      transition.function ||
+      transition.function_name ||
+      transition.functionName ||
+      'lock',
+
+    tokenId:
+      tokenId,
+
+    lockRecordId:
+      lockRecordId,
+
+    transition:
+      transition,
+
+    transaction:
+      transaction
+
+  };
+
+}
+
+
+/* =========================================================
+ * SAVE EXPLORER DATA
+ * ========================================================= */
+
+function saveExplorerTransaction(
+  data
+) {
+
+  try {
+
+    sessionStorage.setItem(
+      'usdcxExplorerTransaction',
+      JSON.stringify(data)
+    );
+
+
+    if (data.transactionId) {
+
+      sessionStorage.setItem(
+        'usdcxTransactionId',
+        data.transactionId
+      );
+
+    }
+
+
+    if (data.transitionId) {
+
+      sessionStorage.setItem(
+        'usdcxTransitionId',
+        data.transitionId
+      );
+
+    }
+
+
+    if (data.tokenId) {
+
+      sessionStorage.setItem(
+        'usdcxTokenId',
+        data.tokenId
+      );
+
+    }
+
+
+    if (data.lockRecordId) {
+
+      sessionStorage.setItem(
+        'usdcxLockRecordId',
+        data.lockRecordId
+      );
+
+    }
+
+
+    console.log(
+      'USDCx LOCKED: Explorer data saved:',
+      data
+    );
+
+
+  } catch (error) {
+
+    console.warn(
+      'USDCx LOCKED: Could not save Explorer data:',
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
  * FORMAT STATUS
  *
  * IMPORTANT:
@@ -388,23 +866,6 @@ function formatStatus(value) {
  * FORMAT DISPLAY AMOUNT
  *
  * USDCx DISPLAY SCALE
- *
- * IMPORTANT:
- *
- * Example:
- *
- * 140000u64.private
- *
- * becomes:
- *
- * 140000
- *
- * then:
- *
- * 140000 / 100
- *
- * = 1400.00
- *
  * ========================================================= */
 
 function formatDisplayAmount(value) {
@@ -446,11 +907,6 @@ function formatDisplayAmount(value) {
    * Integer display value.
    *
    * USDCx allocation display uses /100.
-   *
-   * Example:
-   *
-   * 140000
-   * → 1400.00
    */
 
   if (/^\d+$/.test(text)) {
@@ -563,22 +1019,10 @@ function normalizeAllocationRecord(
         ? cleanAleoValue(end)
         : '',
 
-    /*
-     * IMPORTANT:
-     *
-     * Display value is LOCKED.
-     *
-     * Raw record still contains status = 1.
-     */
-
     status:
       status !== null
         ? formatStatus(status)
         : '',
-
-    /*
-     * Keep the original blockchain record untouched.
-     */
 
     raw:
       record,
@@ -654,7 +1098,9 @@ function extractRecordList(records) {
  *
  * ========================================================= */
 
-async function requestPlaintextRecords(adapter) {
+async function requestPlaintextRecords(
+  adapter
+) {
 
   console.log(
     'USDCx LOCKED: Requesting records from Leo Wallet...'
@@ -678,17 +1124,12 @@ async function requestPlaintextRecords(adapter) {
   );
 
 
-  /*
-   * CORRECT CALL.
-   *
-   * DO NOT add true.
-   * DO NOT add "all".
-   */
-
   const allRecords = [];
 
 
-  for (const programId of PROGRAM_IDS) {
+  for (
+    const programId of PROGRAM_IDS
+  ) {
 
     console.log(
       'USDCx LOCKED: Requesting records from program:',
@@ -712,10 +1153,14 @@ async function requestPlaintextRecords(adapter) {
 
 
       const list =
-        extractRecordList(records);
+        extractRecordList(
+          records
+        );
 
 
-      for (const record of list) {
+      for (
+        const record of list
+      ) {
 
         allRecords.push({
           record,
@@ -772,7 +1217,97 @@ async function getYourRecord() {
   );
 
 
-  /* Connect if necessary */
+  /* =======================================================
+   * STEP 1
+   * SEARCH TRANSACTION IN ALEO MAINNET EXPLORER
+   * ======================================================= */
+
+  const transactionId =
+    getTransactionInput();
+
+
+  if (!transactionId) {
+
+    throw new Error(
+      'Please enter the Transaction ID first.'
+    );
+
+  }
+
+
+  const explorerTransaction =
+    await getExplorerTransaction(
+      transactionId
+    );
+
+
+  const explorerData =
+    normalizeExplorerTransaction(
+      explorerTransaction,
+      transactionId
+    );
+
+
+  /*
+   * The entered transaction must actually contain:
+   *
+   * vusdc_transaction.aleo::lock
+   *
+   * We do not accept another program/function.
+   */
+
+  if (
+    explorerData.program !==
+      'vusdc_transaction.aleo' ||
+    explorerData.function !==
+      'lock'
+  ) {
+
+    throw new Error(
+      'The Transaction ID does not contain a vusdc_transaction.aleo::lock transition.'
+    );
+
+  }
+
+
+  saveExplorerTransaction(
+    explorerData
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Explorer lookup successful.'
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Transaction ID:',
+    explorerData.transactionId
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Transition ID:',
+    explorerData.transitionId
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Token ID:',
+    explorerData.tokenId || 'PRIVATE / NOT EXPOSED'
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Lock Record ID:',
+    explorerData.lockRecordId || 'PRIVATE / NOT EXPOSED'
+  );
+
+
+  /* =======================================================
+   * STEP 2
+   * CONNECT IF NECESSARY
+   * ======================================================= */
 
   if (!adapter.account) {
 
@@ -792,16 +1327,15 @@ async function getYourRecord() {
 
   /*
    * Get the CURRENT wallet address.
-   *
-   * This is important because Leo Wallet can return
-   * records from more than one requested program.
    */
 
   const currentAddress =
     cleanAleoValue(
       adapter.account?.address ||
       adapter.account?.publicKey ||
-      sessionStorage.getItem('usdcxAddress') ||
+      sessionStorage.getItem(
+        'usdcxAddress'
+      ) ||
       ''
     );
 
@@ -821,10 +1355,10 @@ async function getYourRecord() {
   );
 
 
-  /*
-   * Request records ONLY after
-   * GET YOUR RECORD is clicked.
-   */
+  /* =======================================================
+   * STEP 3
+   * REQUEST PRIVATE RECORDS FROM LEO WALLET
+   * ======================================================= */
 
   const recordList =
     await requestPlaintextRecords(
@@ -849,49 +1383,50 @@ async function getYourRecord() {
   }
 
 
-  /*
-   * IMPORTANT:
-   *
-   * Do NOT simply use recordList[0].
-   *
-   * We must first find records whose owner
-   * matches the CURRENT connected wallet.
-   */
+  /* =======================================================
+   * STEP 4
+   * MATCH CURRENT WALLET OWNER
+   * ======================================================= */
 
   const matchingRecords =
-    recordList.filter(item => {
+    recordList.filter(
+      item => {
 
-      const owner =
-        getRecordValue(
-          item.record,
-          [
-            'owner',
-            'owner_address'
-          ]
+        const owner =
+          getRecordValue(
+            item.record,
+            [
+              'owner',
+              'owner_address'
+            ]
+          );
+
+
+        const cleanOwner =
+          cleanAleoValue(
+            owner
+          );
+
+
+        const matches =
+          cleanOwner ===
+          currentAddress;
+
+
+        console.log(
+          'USDCx LOCKED: Checking record owner:',
+          cleanOwner,
+          'MATCH:',
+          matches,
+          'PROGRAM:',
+          item.programId
         );
 
 
-      const cleanOwner =
-        cleanAleoValue(owner);
+        return matches;
 
-
-      const matches =
-        cleanOwner === currentAddress;
-
-
-      console.log(
-        'USDCx LOCKED: Checking record owner:',
-        cleanOwner,
-        'MATCH:',
-        matches,
-        'PROGRAM:',
-        item.programId
-      );
-
-
-      return matches;
-
-    });
+      }
+    );
 
 
   console.log(
@@ -911,10 +1446,10 @@ async function getYourRecord() {
   }
 
 
-  /*
-   * Normalize ONLY records belonging to
-   * the currently connected wallet.
-   */
+  /* =======================================================
+   * STEP 5
+   * NORMALIZE WALLET RECORD
+   * ======================================================= */
 
   const allocations =
     matchingRecords.map(
@@ -927,20 +1462,44 @@ async function getYourRecord() {
     );
 
 
-  /*
-   * Save first selected record
-   * for Page 3.
+  /* =======================================================
+   * STEP 6
+   * ATTACH REAL EXPLORER DATA
    *
-   * IMPORTANT:
-   *
-   * usdcxSelectedRecord
-   * contains the ORIGINAL raw record.
-   *
-   * usdcxSelectedAllocation
-   * contains the frontend-normalized data.
-   */
+   * Nothing is fabricated.
+   * Private values remain private.
+   * ======================================================= */
+
+  allocations[0].transactionId =
+    explorerData.transactionId || '';
+
+
+  allocations[0].transitionId =
+    explorerData.transitionId || '';
+
+
+  allocations[0].tokenId =
+    explorerData.tokenId || '';
+
+
+  allocations[0].lockRecordId =
+    explorerData.lockRecordId || '';
+
+
+  allocations[0].explorer =
+    explorerData;
+
+
+  /* =======================================================
+   * STEP 7
+   * SAVE SELECTED RECORD
+   * ======================================================= */
 
   try {
+
+    /*
+     * Original raw private record.
+     */
 
     sessionStorage.setItem(
       'usdcxSelectedRecord',
@@ -950,12 +1509,86 @@ async function getYourRecord() {
     );
 
 
+    /*
+     * Normalized allocation.
+     */
+
     sessionStorage.setItem(
       'usdcxSelectedAllocation',
       JSON.stringify(
         allocations[0]
       )
     );
+
+
+    /*
+     * Full Explorer response metadata.
+     */
+
+    sessionStorage.setItem(
+      'usdcxExplorerTransaction',
+      JSON.stringify(
+        explorerData
+      )
+    );
+
+
+    /*
+     * Transaction ID.
+     */
+
+    sessionStorage.setItem(
+      'usdcxTransactionId',
+      explorerData.transactionId
+    );
+
+
+    /*
+     * Transition ID if available.
+     */
+
+    if (
+      explorerData.transitionId
+    ) {
+
+      sessionStorage.setItem(
+        'usdcxTransitionId',
+        explorerData.transitionId
+      );
+
+    }
+
+
+    /*
+     * Token ID only when genuinely returned.
+     */
+
+    if (
+      explorerData.tokenId
+    ) {
+
+      sessionStorage.setItem(
+        'usdcxTokenId',
+        explorerData.tokenId
+      );
+
+    }
+
+
+    /*
+     * Lock Record ID only when genuinely returned.
+     */
+
+    if (
+      explorerData.lockRecordId
+    ) {
+
+      sessionStorage.setItem(
+        'usdcxLockRecordId',
+        explorerData.lockRecordId
+      );
+
+    }
 
 
   } catch (storageError) {
@@ -971,6 +1604,12 @@ async function getYourRecord() {
   console.log(
     'USDCx LOCKED: Selected wallet record:',
     allocations[0]
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Explorer metadata:',
+    explorerData
   );
 
 
@@ -1105,6 +1744,26 @@ document
           'usdcxSelectedAllocation'
         );
 
+        sessionStorage.removeItem(
+          'usdcxExplorerTransaction'
+        );
+
+        sessionStorage.removeItem(
+          'usdcxTransactionId'
+        );
+
+        sessionStorage.removeItem(
+          'usdcxTransitionId'
+        );
+
+        sessionStorage.removeItem(
+          'usdcxTokenId'
+        );
+
+        sessionStorage.removeItem(
+          'usdcxLockRecordId'
+        );
+
 
         location.href =
           'index.html';
@@ -1132,4 +1791,9 @@ console.log(
 console.log(
   'USDCx LOCKED: Decrypt permission:',
   DECRYPT_PERMISSION
+);
+
+console.log(
+  'USDCx LOCKED: Explorer:',
+  ALEO_MAINNET_API
 );
