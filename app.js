@@ -1154,15 +1154,6 @@ async function getYourRecord() {
 
   /*
     STEP 5
-    Save Explorer information.
-  */
-
-  saveExplorerTransaction(
-    explorerData
-  );
-
-  /*
-    STEP 6
     Connect Leo Wallet if needed.
   */
 
@@ -1198,7 +1189,93 @@ async function getYourRecord() {
   );
 
   /*
+    ========================================================
+    STEP 6
+    WALLET <-> TRANSACTION VALIDATION
+
+    The transaction is accepted ONLY when the exact
+    connected wallet + transaction pair exists in the
+    private backend.
+
+    Wallet A + Transaction A = ACCEPT
+    Wallet A + Transaction B = REJECT
+    Wallet B + Transaction A = REJECT
+    Wallet B + Transaction B = ACCEPT
+    ========================================================
+  */
+
+  const backendAmount =
+    await getBackendAllocationAmount(
+      currentAddress,
+      explorerData.transactionId
+    );
+
+  if (!backendAmount) {
+    console.warn(
+      'USDCx LOCKED: Wallet + Transaction mismatch. Record rejected.'
+    );
+
+    /*
+      Clear any previously selected transaction/record
+      so Page 3 cannot display stale information.
+    */
+
+    sessionStorage.removeItem(
+      'usdcxSelectedRecord'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxSelectedAllocation'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxExplorerTransaction'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxExplorerData'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxTransactionId'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxTransitionId'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxTokenId'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxLockRecordId'
+    );
+
+    return [];
+  }
+
+  console.log(
+    'USDCx LOCKED: Wallet + Transaction MATCHED.'
+  );
+
+  console.log(
+    'USDCx LOCKED: Private backend amount:',
+    backendAmount
+  );
+
+  /*
     STEP 7
+    Only after the Wallet + Transaction pair
+    has passed validation, save Explorer information.
+  */
+
+  saveExplorerTransaction(
+    explorerData
+  );
+
+  /*
+    STEP 8
     Get private records from Leo Wallet.
   */
 
@@ -1221,7 +1298,7 @@ async function getYourRecord() {
   }
 
   /*
-    STEP 8
+    STEP 9
     Match records to connected wallet.
   */
 
@@ -1274,7 +1351,7 @@ async function getYourRecord() {
   }
 
   /*
-    STEP 9
+    STEP 10
     Normalize private allocation.
   */
 
@@ -1289,7 +1366,7 @@ async function getYourRecord() {
     );
 
   /*
-    STEP 10
+    STEP 11
     Attach Explorer data to selected allocation.
   */
 
@@ -1320,24 +1397,17 @@ async function getYourRecord() {
     /*
       PRIVATE BACKEND AMOUNT
 
-      The amount is NOT stored in this public
-      frontend file.
+      The amount has already been validated
+      against BOTH:
 
-      The backend returns the amount only when
-      BOTH the connected wallet address and the
-      transaction ID match.
+      1. connected wallet
+      2. transaction ID
+
+      Therefore use the validated backend value.
     */
 
-    const backendAmount =
-      await getBackendAllocationAmount(
-        currentAddress,
-        explorerData.transactionId
-      );
-
     allocations[0].amount =
-      backendAmount
-        ? String(backendAmount)
-        : '';
+      String(backendAmount);
 
     console.log(
       'USDCx LOCKED: Backend amount for wallet + transaction:',
@@ -1346,7 +1416,7 @@ async function getYourRecord() {
   }
 
   /*
-    STEP 11
+    STEP 12
     Save selected private record.
   */
 
