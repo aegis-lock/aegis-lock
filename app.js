@@ -21,19 +21,14 @@ const TOKEN_ID =
   '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
 
 /* =========================================================
-   MANUAL LOCK AMOUNTS
-   Each amount belongs ONLY to its matching wallet + transaction.
+   PRIVATE ALLOCATION BACKEND
+   Amounts are stored outside the public GitHub frontend.
    ========================================================= */
 
-const MANUAL_LOCK_AMOUNTS = {
-  'aleo1pfrufqykz42dsd6wnhr090rv4eenj26v74umwggfpm9x0utteqys82wgrj|at1zz3ncalhgt9wrypj23ha8q5n3drpvf0zeqd97ytsw5g7qw6dxc8qqazngu':
-    '16928.00 vUSDC',
+const AEGIS_API_BASE =
+  'http://localhost:3000';
 
-  'aleo1tvsqayf3gv5pafnata8uehulc87w74qfmj8rcr32cwaq5egr9q9syu854s|at16dpvg7k36gtncjvd3r25c3gdc3f2s8a887q2l4t5f204nxqew5xqxz80f8':
-    '13918.00 vUSDC'
-};
-
-function getManualLockAmount(
+async function getBackendAllocationAmount(
   walletAddress,
   transactionId
 ) {
@@ -47,13 +42,64 @@ function getManualLockAmount(
     return '';
   }
 
-  const key =
-    `${wallet}|${transaction}`;
+  try {
+    console.log(
+      'USDCx LOCKED: Requesting private allocation amount from backend...'
+    );
 
-  return (
-    MANUAL_LOCK_AMOUNTS[key] ||
-    ''
-  );
+    const response =
+      await fetch(
+        `${AEGIS_API_BASE}/api/allocation`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            walletAddress: wallet,
+            transactionId: transaction
+          })
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `Backend request failed: HTTP ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (
+      !data ||
+      !data.found
+    ) {
+      console.log(
+        'USDCx LOCKED: No private allocation amount matched.'
+      );
+
+      return '';
+    }
+
+    const amount =
+      String(data.amount || '').trim();
+
+    console.log(
+      'USDCx LOCKED: Private allocation amount received from backend:',
+      amount || 'EMPTY'
+    );
+
+    return amount;
+
+  } catch (error) {
+    console.error(
+      'USDCx LOCKED: Backend allocation lookup failed:',
+      error
+    );
+
+    return '';
+  }
 }
 
 /* WALLET ADDRESS */
@@ -62,53 +108,86 @@ const connected =
 
 function shortenAddress(address) {
   if (!address) return 'Not connected';
-  if (address.length <= 16) return address;
-  return address.slice(0, 10) + '...' + address.slice(-4);
+
+  if (address.length <= 16) {
+    return address;
+  }
+
+  return (
+    address.slice(0, 10) +
+    '...' +
+    address.slice(-4)
+  );
 }
 
 function updateWalletDisplay(address) {
-  document.querySelectorAll('[data-wallet]').forEach(el => {
-    el.textContent = shortenAddress(address);
-    el.setAttribute('title', address || '');
-  });
+  document
+    .querySelectorAll('[data-wallet]')
+    .forEach(el => {
+      el.textContent =
+        shortenAddress(address);
+
+      el.setAttribute(
+        'title',
+        address || ''
+      );
+    });
 }
 
 updateWalletDisplay(connected);
 
 /* COPY WALLET */
-document.querySelectorAll('[data-copy]').forEach(button => {
-  button.addEventListener('click', async () => {
-    const address =
-      sessionStorage.getItem('usdcxAddress') || '';
+document
+  .querySelectorAll('[data-copy]')
+  .forEach(button => {
 
-    if (!address) return;
+    button.addEventListener(
+      'click',
+      async () => {
 
-    if (!navigator.clipboard || !navigator.clipboard.writeText) {
-      return;
-    }
+        const address =
+          sessionStorage.getItem(
+            'usdcxAddress'
+          ) || '';
 
-    try {
-      await navigator.clipboard.writeText(address);
+        if (!address) return;
 
-      const original = button.innerHTML;
-      button.innerHTML = '✓';
+        if (
+          !navigator.clipboard ||
+          !navigator.clipboard.writeText
+        ) {
+          return;
+        }
 
-      setTimeout(() => {
-        button.innerHTML = original;
-      }, 1200);
+        try {
+          await navigator.clipboard.writeText(
+            address
+          );
 
-    } catch (error) {
-      console.warn(
-        'USDCx LOCKED: Copy failed:',
-        error
-      );
-    }
+          const original =
+            button.innerHTML;
+
+          button.innerHTML = '✓';
+
+          setTimeout(() => {
+            button.innerHTML =
+              original;
+          }, 1200);
+
+        } catch (error) {
+          console.warn(
+            'USDCx LOCKED: Copy failed:',
+            error
+          );
+        }
+      }
+    );
   });
-});
 
 /* CONNECT LEO WALLET */
 async function connectLeoForRecords() {
-  const adapter = window.usdcxLeoAdapter;
+  const adapter =
+    window.usdcxLeoAdapter;
 
   if (!adapter) {
     throw new Error(
@@ -167,10 +246,16 @@ async function connectLeoForRecords() {
 }
 
 /* RECORD VALUE HELPER */
-function getRecordValue(record, names) {
+function getRecordValue(
+  record,
+  names
+) {
   if (!record) return null;
 
-  for (const name of names) {
+  for (
+    const name
+    of names
+  ) {
     if (
       record[name] !== undefined &&
       record[name] !== null
@@ -183,7 +268,10 @@ function getRecordValue(record, names) {
     record.data &&
     typeof record.data === 'object'
   ) {
-    for (const name of names) {
+    for (
+      const name
+      of names
+    ) {
       if (
         record.data[name] !== undefined &&
         record.data[name] !== null
@@ -197,7 +285,10 @@ function getRecordValue(record, names) {
     record.record &&
     typeof record.record === 'object'
   ) {
-    for (const name of names) {
+    for (
+      const name
+      of names
+    ) {
       if (
         record.record[name] !== undefined &&
         record.record[name] !== null
@@ -219,22 +310,26 @@ function cleanAleoValue(value) {
     return '';
   }
 
-  let text = String(value).trim();
+  let text =
+    String(value).trim();
 
-  text = text.replace(
-    /^"(.*)"$/,
-    '$1'
-  );
+  text =
+    text.replace(
+      /^"(.*)"$/,
+      '$1'
+    );
 
-  text = text.replace(
-    /\.(private|public)$/i,
-    ''
-  );
+  text =
+    text.replace(
+      /\.(private|public)$/i,
+      ''
+    );
 
-  text = text.replace(
-    /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
-    ''
-  );
+  text =
+    text.replace(
+      /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
+      ''
+    );
 
   return text.trim();
 }
@@ -256,7 +351,10 @@ function formatStatus(value) {
     return 'UNKNOWN';
   }
 
-  return status || 'UNKNOWN';
+  return (
+    status ||
+    'UNKNOWN'
+  );
 }
 
 /* FORMAT DISPLAY AMOUNT */
@@ -272,16 +370,21 @@ function formatDisplayAmount(value) {
   const text =
     cleanAleoValue(value);
 
-  if (!text) return '';
+  if (!text) {
+    return '';
+  }
 
   if (text.includes('.')) {
     return text;
   }
 
   if (/^\d+$/.test(text)) {
-    const number = Number(text);
+    const number =
+      Number(text);
 
-    if (Number.isSafeInteger(number)) {
+    if (
+      Number.isSafeInteger(number)
+    ) {
       return (
         number / 100
       ).toFixed(2);
@@ -344,7 +447,8 @@ function normalizeAllocationRecord(
     );
 
   return {
-    allocationNumber: index + 1,
+    allocationNumber:
+      index + 1,
 
     amount:
       formatDisplayAmount(amount),
@@ -369,9 +473,11 @@ function normalizeAllocationRecord(
         ? formatStatus(status)
         : '',
 
-    raw: record,
+    raw:
+      record,
 
-    program: programId
+    program:
+      programId
   };
 }
 
@@ -453,13 +559,16 @@ async function getExplorerTransaction(
       );
 
       const response =
-        await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Accept':
-              'application/json'
+        await fetch(
+          url,
+          {
+            method: 'GET',
+            headers: {
+              'Accept':
+                'application/json'
+            }
           }
-        });
+        );
 
       if (!response.ok) {
         throw new Error(
@@ -487,7 +596,8 @@ async function getExplorerTransaction(
       return transaction;
 
     } catch (error) {
-      lastError = error;
+      lastError =
+        error;
 
       console.warn(
         'USDCx LOCKED: Explorer API failed:',
@@ -571,6 +681,7 @@ function findLockTransition(
   const lockTransition =
     transitions.find(
       transition => {
+
         const program =
           transition?.program ||
           transition?.program_id ||
@@ -1117,6 +1228,7 @@ async function getYourRecord() {
   const matchingRecords =
     recordList.filter(
       item => {
+
         const owner =
           getRecordValue(
             item.record,
@@ -1182,6 +1294,7 @@ async function getYourRecord() {
   */
 
   if (allocations[0]) {
+
     allocations[0].transactionId =
       explorerData.transactionId;
 
@@ -1189,7 +1302,8 @@ async function getYourRecord() {
       explorerData.transitionId;
 
     allocations[0].tokenId =
-      explorerData.tokenId || TOKEN_ID;
+      explorerData.tokenId ||
+      TOKEN_ID;
 
     allocations[0].lockRecordId =
       explorerData.lockRecordId;
@@ -1204,17 +1318,29 @@ async function getYourRecord() {
       'lock';
 
     /*
-      MANUAL AMOUNT
-      Match BOTH wallet address and transaction ID.
+      PRIVATE BACKEND AMOUNT
+
+      The amount is NOT stored in this public
+      frontend file.
+
+      The backend returns the amount only when
+      BOTH the connected wallet address and the
+      transaction ID match.
     */
-    allocations[0].amount =
-      getManualLockAmount(
+
+    const backendAmount =
+      await getBackendAllocationAmount(
         currentAddress,
         explorerData.transactionId
       );
 
+    allocations[0].amount =
+      backendAmount
+        ? String(backendAmount)
+        : '';
+
     console.log(
-      'USDCx LOCKED: Manual amount for wallet + transaction:',
+      'USDCx LOCKED: Backend amount for wallet + transaction:',
       allocations[0].amount || 'NOT FOUND'
     );
   }
