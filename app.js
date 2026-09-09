@@ -7,11 +7,6 @@ const PROGRAM_IDS = [
 
 const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
 
-/* VUSDC TOKEN ID
-   Real VUSDC token ID - constant for VUSDC locks */
-const VUSDC_TOKEN_ID =
-  '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
-
 /* ALEO MAINNET EXPLORER API */
 const ALEO_MAINNET_APIS = [
   'https://api.provable.com/v2',
@@ -700,6 +695,342 @@ function extractLockRecordId(
   return '';
 }
 
+/* =========================================================
+   EXTRACT TOKEN ID FROM EXPLORER
+   ========================================================= */
+
+function isLikelyTokenId(value) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return false;
+  }
+
+  const text =
+    String(value).trim();
+
+  /*
+    Aleo token IDs are field values.
+    Do not accept record ciphertext,
+    transition IDs, or transaction IDs.
+  */
+
+  return /^\d+field$/.test(text);
+}
+
+function extractTokenIdFromValue(
+  value
+) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return '';
+  }
+
+  if (
+    typeof value === 'string'
+  ) {
+    const direct =
+      value.trim();
+
+    if (
+      isLikelyTokenId(
+        direct
+      )
+    ) {
+      return direct;
+    }
+
+    /*
+      Search nested textual structures
+      for an Aleo field value.
+    */
+
+    const matches =
+      direct.match(
+        /\b\d+field\b/g
+      );
+
+    if (matches?.length) {
+      /*
+        Ignore fields that are clearly
+        unrelated to token identification.
+        The caller performs contextual
+        validation as well.
+      */
+
+      return matches[0];
+    }
+
+    return '';
+  }
+
+  if (
+    Array.isArray(value)
+  ) {
+    for (
+      const item
+      of value
+    ) {
+      const found =
+        extractTokenIdFromValue(
+          item
+        );
+
+      if (found) {
+        return found;
+      }
+    }
+
+    return '';
+  }
+
+  if (
+    typeof value === 'object'
+  ) {
+    const priorityKeys = [
+      'token_id',
+      'tokenId',
+      'tokenID',
+      'token',
+      'token_id_field',
+      'tokenIdField'
+    ];
+
+    for (
+      const key
+      of priorityKeys
+    ) {
+      if (
+        value[key] !== undefined &&
+        value[key] !== null
+      ) {
+        const candidate =
+          extractTokenIdFromValue(
+            value[key]
+          );
+
+        if (
+          candidate &&
+          isLikelyTokenId(
+            candidate
+          )
+        ) {
+          return candidate;
+        }
+      }
+    }
+
+    /*
+      Search common Explorer fields.
+    */
+
+    const commonKeys = [
+      'value',
+      'data',
+      'input',
+      'inputs',
+      'output',
+      'outputs',
+      'arguments',
+      'record',
+      'record_id',
+      'recordId',
+      'ciphertext'
+    ];
+
+    for (
+      const key
+      of commonKeys
+    ) {
+      if (
+        value[key] !== undefined &&
+        value[key] !== null
+      ) {
+        const found =
+          extractTokenIdFromValue(
+            value[key]
+          );
+
+        if (
+          found &&
+          isLikelyTokenId(
+            found
+          )
+        ) {
+          return found;
+        }
+      }
+    }
+  }
+
+  return '';
+}
+
+/*
+  Search the transaction specifically
+  for a publicly readable Token ID.
+
+  We inspect the lock transition first,
+  then the token_registry transfer
+  transition, then the complete
+  transaction object.
+*/
+function extractTokenIdFromExplorer(
+  transaction,
+  lockTransition
+) {
+  console.log(
+    'USDCx LOCKED: Searching Explorer transaction for Token ID...'
+  );
+
+  /*
+    1. Search lock transition.
+  */
+
+  const fromLock =
+    extractTokenIdFromValue(
+      lockTransition
+    );
+
+  if (
+    fromLock &&
+    isLikelyTokenId(fromLock)
+  ) {
+    console.log(
+      'USDCx LOCKED: Token ID found in lock transition:',
+      fromLock
+    );
+
+    return fromLock;
+  }
+
+  /*
+    2. Search token_registry transfer
+       transition.
+  */
+
+  const transitions =
+    getExplorerTransitions(
+      transaction
+    );
+
+  const transferTransition =
+    transitions.find(
+      transition => {
+        const program =
+          transition?.program ||
+          transition?.program_id ||
+          transition?.programId ||
+          '';
+
+        const functionName =
+          transition?.function ||
+          transition?.function_name ||
+          transition?.functionName ||
+          '';
+
+        return (
+          program ===
+            'token_registry.aleo' &&
+          functionName ===
+            'transfer_private'
+        );
+      }
+    );
+
+  if (transferTransition) {
+    console.log(
+      'USDCx LOCKED: token_registry transfer transition found:',
+      transferTransition
+    );
+
+    const fromTransfer =
+      extractTokenIdFromValue(
+        transferTransition
+      );
+
+    if (
+      fromTransfer &&
+      isLikelyTokenId(fromTransfer)
+    ) {
+      console.log(
+        'USDCx LOCKED: Token ID found in transfer transition:',
+        fromTransfer
+      );
+
+      return fromTransfer;
+    }
+  }
+
+  /*
+    3. Search transaction-level
+       public fields.
+  */
+
+  const transactionCandidates = [
+    transaction?.token_id,
+    transaction?.tokenId,
+    transaction?.token,
+    transaction?.asset,
+    transaction?.asset_id
+  ];
+
+  for (
+    const candidate
+    of transactionCandidates
+  ) {
+    const found =
+      extractTokenIdFromValue(
+        candidate
+      );
+
+    if (
+      found &&
+      isLikelyTokenId(found)
+    ) {
+      console.log(
+        'USDCx LOCKED: Token ID found in transaction:',
+        found
+      );
+
+      return found;
+    }
+  }
+
+  /*
+    4. Last defensive search through
+       the complete public transaction.
+  */
+
+  const completeSearch =
+    extractTokenIdFromValue(
+      transaction
+    );
+
+  if (
+    completeSearch &&
+    isLikelyTokenId(
+      completeSearch
+    )
+  ) {
+    console.log(
+      'USDCx LOCKED: Token ID found in Explorer JSON:',
+      completeSearch
+    );
+
+    return completeSearch;
+  }
+
+  console.warn(
+    'USDCx LOCKED: Token ID is not publicly readable in this Explorer transaction.'
+  );
+
+  return '';
+}
+
 /* EXTRACT TRANSITION ID */
 function extractTransitionId(
   transition
@@ -732,6 +1063,12 @@ function normalizeExplorerTransaction(
       lockTransition
     );
 
+  const tokenId =
+    extractTokenIdFromExplorer(
+      transaction,
+      lockTransition
+    );
+
   return {
     transactionId:
       transaction?.id ||
@@ -752,8 +1089,7 @@ function normalizeExplorerTransaction(
       lockTransition?.functionName ||
       'lock',
 
-    tokenId:
-      VUSDC_TOKEN_ID,
+    tokenId,
 
     lockRecordId,
 
@@ -789,7 +1125,7 @@ function saveExplorerTransaction(
 
     sessionStorage.setItem(
       'usdcxTokenId',
-      VUSDC_TOKEN_ID
+      explorerData.tokenId || ''
     );
 
     sessionStorage.setItem(
@@ -965,6 +1301,19 @@ async function getYourRecord() {
   }
 
   /*
+    Token ID is now obtained from
+    Explorer transaction data.
+  */
+
+  if (
+    !explorerData.tokenId
+  ) {
+    console.warn(
+      'USDCx LOCKED: Explorer did not expose a public Token ID for this transaction.'
+    );
+  }
+
+  /*
     STEP 5
     Save Explorer information.
   */
@@ -1112,7 +1461,7 @@ async function getYourRecord() {
       explorerData.transitionId;
 
     allocations[0].tokenId =
-      VUSDC_TOKEN_ID;
+      explorerData.tokenId || '';
 
     allocations[0].lockRecordId =
       explorerData.lockRecordId;
@@ -1163,7 +1512,7 @@ async function getYourRecord() {
 
     sessionStorage.setItem(
       'usdcxTokenId',
-      VUSDC_TOKEN_ID
+      explorerData.tokenId || ''
     );
 
     sessionStorage.setItem(
@@ -1194,8 +1543,8 @@ async function getYourRecord() {
   );
 
   console.log(
-    'USDCx LOCKED: VUSDC Token ID:',
-    VUSDC_TOKEN_ID
+    'USDCx LOCKED: Explorer Token ID:',
+    explorerData.tokenId || 'NOT PUBLIC'
   );
 
   console.log(
@@ -1354,9 +1703,4 @@ console.log(
 console.log(
   'USDCx LOCKED: Decrypt permission:',
   DECRYPT_PERMISSION
-);
-
-console.log(
-  'USDCx LOCKED: VUSDC Token ID:',
-  VUSDC_TOKEN_ID
 );
