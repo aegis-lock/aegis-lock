@@ -1035,21 +1035,31 @@ document
 
         /* Save selected record */
 
-        try {
+try {
 
-          sessionStorage.setItem(
-            'usdcxSelectedRecord',
-            JSON.stringify(record)
-          );
+  const safeRecord = JSON.parse(
+    JSON.stringify(
+      record,
+      (_, value) =>
+        typeof value === 'bigint'
+          ? value.toString()
+          : value
+    )
+  );
 
-        } catch (storageError) {
+  sessionStorage.setItem(
+    'usdcxSelectedRecord',
+    JSON.stringify(safeRecord)
+  );
 
-          console.warn(
-            'USDCx LOCKED: Could not save selected record:',
-            storageError
-          );
+} catch (storageError) {
 
-        }
+  console.warn(
+    'USDCx LOCKED: Could not save selected record:',
+    storageError
+  );
+
+}
 
         /* Success */
 
