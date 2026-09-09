@@ -687,12 +687,14 @@ async function requestPlaintextRecords(adapter) {
 
   const allRecords = [];
 
+
   for (const programId of PROGRAM_IDS) {
 
     console.log(
       'USDCx LOCKED: Requesting records from program:',
       programId
     );
+
 
     try {
 
@@ -701,21 +703,27 @@ async function requestPlaintextRecords(adapter) {
           programId
         );
 
+
       console.log(
         'USDCx LOCKED: Records returned from',
         programId,
         records
       );
 
+
       const list =
         extractRecordList(records);
 
+
       for (const record of list) {
+
         allRecords.push({
           record,
           programId
         });
+
       }
+
 
     } catch (error) {
 
@@ -728,6 +736,7 @@ async function requestPlaintextRecords(adapter) {
     }
 
   }
+
 
   return allRecords;
 
@@ -782,6 +791,37 @@ async function getYourRecord() {
 
 
   /*
+   * Get the CURRENT wallet address.
+   *
+   * This is important because Leo Wallet can return
+   * records from more than one requested program.
+   */
+
+  const currentAddress =
+    cleanAleoValue(
+      adapter.account?.address ||
+      adapter.account?.publicKey ||
+      sessionStorage.getItem('usdcxAddress') ||
+      ''
+    );
+
+
+  if (!currentAddress) {
+
+    throw new Error(
+      'Connected wallet address could not be determined.'
+    );
+
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Current wallet:',
+    currentAddress
+  );
+
+
+  /*
    * Request records ONLY after
    * GET YOUR RECORD is clicked.
    */
@@ -793,7 +833,7 @@ async function getYourRecord() {
 
 
   console.log(
-    'USDCx LOCKED: Record count:',
+    'USDCx LOCKED: Total records returned:',
     recordList.length
   );
 
@@ -810,11 +850,74 @@ async function getYourRecord() {
 
 
   /*
-   * Normalize all records.
+   * IMPORTANT:
+   *
+   * Do NOT simply use recordList[0].
+   *
+   * We must first find records whose owner
+   * matches the CURRENT connected wallet.
+   */
+
+  const matchingRecords =
+    recordList.filter(item => {
+
+      const owner =
+        getRecordValue(
+          item.record,
+          [
+            'owner',
+            'owner_address'
+          ]
+        );
+
+
+      const cleanOwner =
+        cleanAleoValue(owner);
+
+
+      const matches =
+        cleanOwner === currentAddress;
+
+
+      console.log(
+        'USDCx LOCKED: Checking record owner:',
+        cleanOwner,
+        'MATCH:',
+        matches,
+        'PROGRAM:',
+        item.programId
+      );
+
+
+      return matches;
+
+    });
+
+
+  console.log(
+    'USDCx LOCKED: Records matching current wallet:',
+    matchingRecords.length
+  );
+
+
+  if (!matchingRecords.length) {
+
+    console.log(
+      'USDCx LOCKED: No record belongs to the current wallet.'
+    );
+
+    return [];
+
+  }
+
+
+  /*
+   * Normalize ONLY records belonging to
+   * the currently connected wallet.
    */
 
   const allocations =
-    recordList.map(
+    matchingRecords.map(
       (item, index) =>
         normalizeAllocationRecord(
           item.record,
@@ -854,6 +957,7 @@ async function getYourRecord() {
       )
     );
 
+
   } catch (storageError) {
 
     console.warn(
@@ -862,6 +966,12 @@ async function getYourRecord() {
     );
 
   }
+
+
+  console.log(
+    'USDCx LOCKED: Selected wallet record:',
+    allocations[0]
+  );
 
 
   console.log(
