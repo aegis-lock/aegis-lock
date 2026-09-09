@@ -26,7 +26,7 @@ const TOKEN_ID =
    ========================================================= */
 
 const AEGIS_API_BASE =
-  'http://localhost:3000';
+  'https://aegis-backend-72a5.onrender.com';
 
 async function getBackendAllocationAmount(
   walletAddress,
