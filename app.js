@@ -699,6 +699,11 @@ function extractLockRecordId(
    EXTRACT TOKEN ID FROM EXPLORER
    ========================================================= */
 
+/*
+  Aleo Token IDs are large decimal field values.
+  Explorer may return them either with or without
+  the "field" suffix.
+*/
 function isLikelyTokenId(value) {
   if (
     value === null ||
@@ -710,13 +715,7 @@ function isLikelyTokenId(value) {
   const text =
     String(value).trim();
 
-  /*
-    Aleo token IDs are field values.
-    Do not accept record ciphertext,
-    transition IDs, or transaction IDs.
-  */
-
-  return /^\d+field$/.test(text);
+  return /^\d{60,80}(?:field)?$/.test(text);
 }
 
 function extractTokenIdFromValue(
@@ -745,22 +744,16 @@ function extractTokenIdFromValue(
 
     /*
       Search nested textual structures
-      for an Aleo field value.
+      for an Aleo Token ID, with or
+      without the "field" suffix.
     */
 
     const matches =
       direct.match(
-        /\b\d+field\b/g
+        /\b\d{60,80}(?:field)?\b/g
       );
 
     if (matches?.length) {
-      /*
-        Ignore fields that are clearly
-        unrelated to token identification.
-        The caller performs contextual
-        validation as well.
-      */
-
       return matches[0];
     }
 
@@ -856,9 +849,7 @@ function extractTokenIdFromValue(
 
         if (
           found &&
-          isLikelyTokenId(
-            found
-          )
+          isLikelyTokenId(found)
         ) {
           return found;
         }
