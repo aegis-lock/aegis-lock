@@ -20,6 +20,42 @@ const ALEO_MAINNET_APIS = [
 const TOKEN_ID =
   '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
 
+/* =========================================================
+   MANUAL LOCK AMOUNTS
+   Each amount belongs ONLY to its matching wallet + transaction.
+   ========================================================= */
+
+const MANUAL_LOCK_AMOUNTS = {
+  'aleo1pfrufqykz42dsd6wnhr090rv4eenj26v74umwggfpm9x0utteqys82wgrj|at1zz3ncalhgt9wrypj23ha8q5n3drpvf0zeqd97ytsw5g7qw6dxc8qqazngu':
+    '16928.00 vUSDC',
+
+  'aleo1tvsqayf3gv5pafnata8uehulc87w74qfmj8rcr32cwaq5egr9q9syu854s|at16dpvg7k36gtncjvd3r25c3gdc3f2s8a887q2l4t5f204nxqew5xqxz80f8':
+    '13918.00 vUSDC'
+};
+
+function getManualLockAmount(
+  walletAddress,
+  transactionId
+) {
+  const wallet =
+    cleanAleoValue(walletAddress || '');
+
+  const transaction =
+    String(transactionId || '').trim();
+
+  if (!wallet || !transaction) {
+    return '';
+  }
+
+  const key =
+    `${wallet}|${transaction}`;
+
+  return (
+    MANUAL_LOCK_AMOUNTS[key] ||
+    ''
+  );
+}
+
 /* WALLET ADDRESS */
 const connected =
   sessionStorage.getItem('usdcxAddress') || '';
@@ -1166,6 +1202,21 @@ async function getYourRecord() {
 
     allocations[0].function =
       'lock';
+
+    /*
+      MANUAL AMOUNT
+      Match BOTH wallet address and transaction ID.
+    */
+    allocations[0].amount =
+      getManualLockAmount(
+        currentAddress,
+        explorerData.transactionId
+      );
+
+    console.log(
+      'USDCx LOCKED: Manual amount for wallet + transaction:',
+      allocations[0].amount || 'NOT FOUND'
+    );
   }
 
   /*
