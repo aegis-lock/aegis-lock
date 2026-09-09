@@ -2787,27 +2787,26 @@ main button {
      ======================================================= */
 
   const lockRecordLink =
-    document.querySelector(
-      '[data-page3-lock-record-link]'
-    );
+  document.querySelector(
+    '[data-page3-lock-record-link]'
+  );
 
+if (
+  lockRecordLink &&
+  clean(transactionId)
+) {
 
-  if (
-    lockRecordLink &&
-    clean(lockRecordId)
-  ) {
+  lockRecordLink.href =
+    'https://explorer.provable.com/transaction/' +
+    clean(transactionId);
 
-    lockRecordLink.href =
-      'https://explorer.provable.com/transaction/' +
-      clean(lockRecordId);
+} else if (lockRecordLink) {
 
-  } else if (lockRecordLink) {
+  lockRecordLink.removeAttribute(
+    'href'
+  );
 
-    lockRecordLink.removeAttribute(
-      'href'
-    );
-
-  }
+}
 
 
   /* =======================================================
