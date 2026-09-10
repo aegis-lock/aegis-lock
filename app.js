@@ -1052,9 +1052,9 @@ async function requestPlaintextRecords(adapter) {
  * CURRENT STEP:
  *
  * 1. Read Transaction ID entered by client.
- * 2. Search Aleo Mainnet.
- * 3. Save original transaction response.
- * 4. Continue existing Leo Wallet lookup.
+ * 2. Try searching Aleo Mainnet.
+ * 3. Blockchain failure MUST NOT stop Leo Wallet.
+ * 4. Continue Leo Wallet lookup.
  *
  * NO BACKEND.
  * NO MATCHING.
@@ -1122,21 +1122,52 @@ async function getYourRecord() {
   /* =======================================================
    * STEP 2
    * ALEO MAINNET TRANSACTION LOOKUP
+   *
+   * IMPORTANT:
+   *
+   * Blockchain lookup is independent from
+   * Leo Wallet lookup.
+   *
+   * If browser CORS prevents the request,
+   * Leo Wallet lookup MUST continue.
    * ======================================================= */
 
-  const transaction =
-    await fetchMainnetTransaction(
-      transactionId
+  let transaction = null;
+
+
+  try {
+
+    transaction =
+      await fetchMainnetTransaction(
+        transactionId
+      );
+
+
+    console.log(
+      'AEGIS: Transaction lookup successful:',
+      transaction
     );
 
 
-  console.log(
-    'AEGIS: Transaction lookup successful:',
-    transaction
-  );
+  } catch (error) {
+
+    console.warn(
+      'AEGIS: Blockchain transaction lookup failed:',
+      error
+    );
 
 
-  /* Connect if necessary */
+    console.warn(
+      'AEGIS: Continuing with Leo Wallet record lookup.'
+    );
+
+  }
+
+
+  /* =======================================================
+   * STEP 3
+   * CONNECT LEO WALLET IF NECESSARY
+   * ======================================================= */
 
   if (!adapter.account) {
 
@@ -1171,10 +1202,10 @@ async function getYourRecord() {
   }
 
 
-  /*
-   * Request records ONLY after
-   * GET YOUR RECORD is clicked.
-   */
+  /* =======================================================
+   * STEP 4
+   * REQUEST PRIVATE RECORDS
+   * ======================================================= */
 
   const recordList =
     await requestPlaintextRecords(
@@ -1199,10 +1230,11 @@ async function getYourRecord() {
   }
 
 
-  /*
-   * Only records belonging to the
-   * connected wallet.
-   */
+  /* =======================================================
+   * STEP 5
+   * ONLY RECORDS BELONGING TO
+   * CONNECTED WALLET
+   * ======================================================= */
 
   const ownedRecords =
     recordList.filter(
@@ -1232,9 +1264,10 @@ async function getYourRecord() {
   }
 
 
-  /*
-   * Prefer LockedRecord.
-   */
+  /* =======================================================
+   * STEP 6
+   * PREFER LockedRecord
+   * ======================================================= */
 
   const lockedRecords =
     ownedRecords.filter(
@@ -1250,9 +1283,10 @@ async function getYourRecord() {
       : ownedRecords[0];
 
 
-  /*
-   * Normalize ONLY actual record data.
-   */
+  /* =======================================================
+   * STEP 7
+   * NORMALIZE ONLY ACTUAL RECORD DATA
+   * ======================================================= */
 
   const normalized =
     normalizeLockedRecord(
@@ -1262,11 +1296,12 @@ async function getYourRecord() {
     );
 
 
-  /*
-   * Save ORIGINAL raw private record.
+  /* =======================================================
+   * STEP 8
+   * SAVE ORIGINAL PRIVATE RECORD
    *
    * Page 3 uses this as its primary source.
-   */
+   * ======================================================= */
 
   try {
 
@@ -1292,6 +1327,7 @@ async function getYourRecord() {
       )
     );
 
+
   } catch (storageError) {
 
     console.warn(
@@ -1306,6 +1342,21 @@ async function getYourRecord() {
     'AEGIS: Selected private LockedRecord:',
     normalized
   );
+
+
+  if (transaction) {
+
+    console.log(
+      'AEGIS: Blockchain transaction data is available.'
+    );
+
+  } else {
+
+    console.warn(
+      'AEGIS: Blockchain transaction data is not available from this browser request.'
+    );
+
+  }
 
 
   return [
