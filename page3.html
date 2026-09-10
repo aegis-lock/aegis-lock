@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -821,6 +820,7 @@ main button {
       class="allocation"
       data-page3-allocation
     >
+      ALLOCATION 01
     </strong>
 
   </div>
@@ -939,6 +939,7 @@ main button {
           class="owner-value"
           data-page3-owner
         >
+          —
         </span>
 
       </div>
@@ -955,6 +956,7 @@ main button {
           class="record-id-value"
           data-page3-record-id
         >
+          —
         </span>
 
       </div>
@@ -1010,6 +1012,7 @@ main button {
           class="amount-value"
           data-page3-amount
         >
+          —
         </span>
 
       </div>
@@ -1069,6 +1072,7 @@ main button {
 
 
         <span data-page3-start>
+          —
         </span>
 
       </div>
@@ -1122,6 +1126,7 @@ main button {
 
 
         <span data-page3-end>
+          —
         </span>
 
       </div>
@@ -1172,6 +1177,7 @@ main button {
 
 
         <span data-page3-duration>
+          —
         </span>
 
       </div>
@@ -1222,6 +1228,7 @@ main button {
 
 
         <span data-page3-token>
+          —
         </span>
 
       </div>
@@ -1264,6 +1271,7 @@ main button {
             class="page3-link-value"
             data-page3-transaction
           >
+            —
           </span>
 
 
@@ -1342,6 +1350,7 @@ main button {
             class="page3-link-value"
             data-page3-token-id
           >
+            —
           </span>
 
 
@@ -1422,6 +1431,7 @@ main button {
             class="page3-link-value"
             data-page3-lock-record-id
           >
+            —
           </span>
 
 
@@ -1513,6 +1523,7 @@ main button {
 
 
         <span data-page3-program>
+          —
         </span>
 
       </div>
@@ -1558,6 +1569,7 @@ main button {
 
 
         <span data-page3-type>
+          —
         </span>
 
       </div>
@@ -1579,6 +1591,7 @@ main button {
       class="countdown-value"
       data-lock-countdown
     >
+      —
     </span>
 
 
@@ -1586,6 +1599,7 @@ main button {
       class="countdown-end"
       data-countdown-end
     >
+      Waiting for lock end time
     </span>
 
   </div>
@@ -1733,7 +1747,26 @@ main button {
 
 (function () {
 
-  console.log('AEGIS: Page 3 loading wallet LockedRecord only...');
+  console.log(
+    'USDCx LOCKED: Page 3 loading selected record...'
+  );
+
+
+  /* =======================================================
+     CONSTANTS
+     ======================================================= */
+
+  const LOCK_DURATION_DAYS = 365;
+  const LOCK_DURATION_SECONDS =
+    LOCK_DURATION_DAYS * 86400;
+
+  /* =======================================================
+     FIXED TOKEN ID
+     Same VUSDC Token ID for all locks
+     ======================================================= */
+
+  const FIXED_TOKEN_ID =
+    '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
 
 
   /* =======================================================
@@ -1772,39 +1805,78 @@ main button {
 
 
   /* =======================================================
-     GET VALUE FROM WALLET RECORD ONLY
+     GET VALUE FROM RECORD / ALLOCATION
      ======================================================= */
 
-  function getRecordValue(record, name) {
+  function getValue(record, names) {
 
     if (!record) {
-      return '';
+      return null;
     }
 
-    if (
-      record[name] !== undefined &&
-      record[name] !== null
-    ) {
-      return record[name];
+    for (const name of names) {
+
+      if (
+        record[name] !== undefined &&
+        record[name] !== null
+      ) {
+
+        return record[name];
+
+      }
+
     }
+
 
     if (
       record.data &&
-      typeof record.data === 'object' &&
-      record.data[name] !== undefined &&
-      record.data[name] !== null
+      typeof record.data === 'object'
     ) {
-      return record.data[name];
+
+      for (const name of names) {
+
+        if (
+          record.data[name] !== undefined &&
+          record.data[name] !== null
+        ) {
+
+          return record.data[name];
+
+        }
+
+      }
+
     }
 
-    return '';
+
+    if (
+      record.record &&
+      typeof record.record === 'object'
+    ) {
+
+      for (const name of names) {
+
+        if (
+          record.record[name] !== undefined &&
+          record.record[name] !== null
+        ) {
+
+          return record.record[name];
+
+        }
+
+      }
+
+    }
+
+
+    return null;
 
   }
 
 
   /* =======================================================
      SET PAGE VALUE
-     EMPTY WHEN FIELD DOES NOT EXIST
      ======================================================= */
 
   function set(selector, value) {
@@ -1818,16 +1890,66 @@ main button {
 
     element.textContent =
       value !== null &&
-      value !== undefined
+      value !== undefined &&
+      value !== ''
         ? value
-        : '';
+        : '—';
+
+  }
+
+
+  /* =======================================================
+     FORMAT AMOUNT
+     ======================================================= */
+
+  function formatAmount(value) {
+
+    const text =
+      clean(value);
+
+    if (!text) {
+      return '—';
+    }
+
+    if (
+      text.includes('vUSDC') ||
+      text.includes('VUSDC') ||
+      text.includes('USDCx')
+    ) {
+
+      return text;
+
+    }
+
+    if (text.includes('.')) {
+
+      return text + ' vUSDC';
+
+    }
+
+    if (/^\d+$/.test(text)) {
+
+      const number =
+        Number(text);
+
+      if (Number.isSafeInteger(number)) {
+
+        return (
+          number / 100
+        ).toFixed(2) +
+        ' vUSDC';
+
+      }
+
+    }
+
+    return text + ' vUSDC';
 
   }
 
 
   /* =======================================================
      FORMAT TIMESTAMP
-     ONLY WHEN locked_end EXISTS IN RECORD
      ======================================================= */
 
   function formatTimestamp(value) {
@@ -1836,7 +1958,7 @@ main button {
       clean(value);
 
     if (!text) {
-      return '';
+      return '—';
     }
 
     if (/^\d+$/.test(text)) {
@@ -1850,7 +1972,9 @@ main button {
       ) {
 
         const date =
-          new Date(seconds * 1000);
+          new Date(
+            seconds * 1000
+          );
 
         if (
           !Number.isNaN(
@@ -1912,50 +2036,109 @@ main button {
 
     }
 
+    const parsed =
+      Date.parse(text);
+
+    if (Number.isFinite(parsed)) {
+
+      return Math.floor(
+        parsed / 1000
+      );
+
+    }
+
     return null;
 
   }
 
 
   /* =======================================================
-     GET CURRENT CONNECTED WALLET
+     CALCULATE DURATION
      ======================================================= */
 
-  function getCurrentWalletAddress() {
+  function calculateDuration(start, end) {
 
-    const address1 =
-      sessionStorage.getItem(
-        'usdcxAddress'
-      );
+    const s =
+      getTimestampSeconds(start);
 
-    if (address1) {
-      return clean(address1);
+    const e =
+      getTimestampSeconds(end);
+
+    if (
+      s === null ||
+      e === null
+    ) {
+
+      return '—';
+
     }
 
+    const seconds =
+      e - s;
 
-    const address2 =
-      sessionStorage.getItem(
-        'walletAddress'
-      );
-
-    if (address2) {
-      return clean(address2);
+    if (seconds <= 0) {
+      return '—';
     }
 
+    const days =
+      seconds / 86400;
 
-    return '';
+    if (
+      Math.abs(
+        days - Math.round(days)
+      ) < 0.01
+    ) {
+
+      return (
+        Math.round(days) +
+        ' Days'
+      );
+
+    }
+
+    return (
+      days.toFixed(2) +
+      ' Days'
+    );
 
   }
 
 
   /* =======================================================
-     READ ONLY THE SELECTED WALLET LOCKED RECORD
+     FIND RECORD ID
      ======================================================= */
 
-  let walletRecord = null;
+  function findRecordId(record) {
+
+    return getValue(
+      record,
+      [
+        'id',
+        'record_id',
+        'recordId',
+        'serial_number',
+        'commitment'
+      ]
+    );
+
+  }
+
+
+  /* =======================================================
+     READ PAGE 2 SESSION DATA
+     ======================================================= */
+
+  let allocation = null;
+  let rawRecord = null;
 
 
   try {
+
+    const savedAllocation =
+      sessionStorage.getItem(
+        'usdcxSelectedAllocation'
+      );
+
 
     const savedRecord =
       sessionStorage.getItem(
@@ -1963,164 +2146,132 @@ main button {
       );
 
 
+    if (savedAllocation) {
+
+      allocation =
+        JSON.parse(
+          savedAllocation
+        );
+
+    }
+
+
     if (savedRecord) {
 
-      const parsed =
+      rawRecord =
         JSON.parse(
           savedRecord
         );
-
-
-      /*
-       * Page 2 may store one record
-       * or an array of records.
-       *
-       * If an array is supplied, ONLY select:
-       *
-       * vusdc_transaction.aleo
-       * LockedRecord
-       */
-
-      if (Array.isArray(parsed)) {
-
-        walletRecord =
-          parsed.find(function (record) {
-
-            return (
-              record &&
-              clean(record.program_id) ===
-                'vusdc_transaction.aleo' &&
-              clean(record.recordName) ===
-                'LockedRecord'
-            );
-
-          }) || null;
-
-      } else {
-
-        walletRecord =
-          parsed;
-
-      }
 
     }
 
   } catch (error) {
 
     console.error(
-      'AEGIS: Could not read selected wallet record:',
+      'USDCx LOCKED: Could not read Page 3 session data:',
       error
     );
 
-    walletRecord = null;
+  }
+
+
+  console.log(
+    'USDCx LOCKED: Selected allocation:',
+    allocation
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Raw record:',
+    rawRecord
+  );
+
+
+  /* =======================================================
+     FALLBACK TO RAW RECORD
+     ======================================================= */
+
+  if (
+    !allocation &&
+    rawRecord
+  ) {
+
+    allocation = {
+
+      allocationNumber: 1,
+
+      amount:
+        getValue(
+          rawRecord,
+          [
+            'display_amount',
+            'amount',
+            'locked_amount'
+          ]
+        ),
+
+      ticket:
+        getValue(
+          rawRecord,
+          [
+            'ticket_ref',
+            'ticket_reference',
+            'ticket'
+          ]
+        ),
+
+      start:
+        getValue(
+          rawRecord,
+          [
+            'locked_start',
+            'start_time',
+            'start'
+          ]
+        ),
+
+      end:
+        getValue(
+          rawRecord,
+          [
+            'locked_end',
+            'end_time',
+            'end'
+          ]
+        ),
+
+      status:
+        getValue(
+          rawRecord,
+          [
+            'status'
+          ]
+        ),
+
+      program:
+        getValue(
+          rawRecord,
+          [
+            'program',
+            'program_id',
+            'programId'
+          ]
+        ) ||
+        'vusdc_transaction.aleo',
+
+      raw:
+        rawRecord
+
+    };
 
   }
 
 
   /* =======================================================
-     VALIDATE THE SELECTED RECORD
+     NO RECORD
      ======================================================= */
 
-  if (!walletRecord) {
-
-    const errorBox =
-      document.querySelector(
-        '[data-record-error]'
-      );
-
-    if (errorBox) {
-      errorBox.style.display = 'block';
-    }
-
-    console.error(
-      'AEGIS: No LockedRecord found in selected wallet record.'
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * If the selected object is not the actual
-   * vusdc_transaction.aleo LockedRecord,
-   * do not display it.
-   */
-
-  if (
-    clean(walletRecord.program_id) !==
-      'vusdc_transaction.aleo' ||
-    clean(walletRecord.recordName) !==
-      'LockedRecord'
-  ) {
-
-    const errorBox =
-      document.querySelector(
-        '[data-record-error]'
-      );
-
-    if (errorBox) {
-      errorBox.style.display = 'block';
-    }
-
-    console.error(
-      'AEGIS: Selected record is not a vusdc_transaction.aleo LockedRecord.'
-    );
-
-    return;
-
-  }
-
-
-  /* =======================================================
-     CURRENT WALLET / RECORD OWNER VALIDATION
-     ======================================================= */
-
-  const currentWallet =
-    getCurrentWalletAddress();
-
-
-  const recordOwner =
-    clean(
-      getRecordValue(
-        walletRecord,
-        'owner'
-      )
-    );
-
-
-  /*
-   * Never allow a record from another wallet
-   * to appear on Page 3.
-   */
-
-  if (
-    currentWallet &&
-    recordOwner &&
-    currentWallet.toLowerCase() !==
-      recordOwner.toLowerCase()
-  ) {
-
-    console.error(
-      'AEGIS: Selected LockedRecord does not belong to current wallet.'
-    );
-
-
-    try {
-
-      sessionStorage.removeItem(
-        'usdcxSelectedRecord'
-      );
-
-    } catch (error) {
-
-      console.error(
-        'AEGIS: Could not clear invalid selected record:',
-        error
-      );
-
-    }
-
+  if (!allocation) {
 
     const errorBox =
       document.querySelector(
@@ -2132,129 +2283,366 @@ main button {
       errorBox.style.display =
         'block';
 
-      errorBox.innerHTML =
-        'No private lock record belongs to the connected wallet.<br>Please return to Page 2 and use GET YOUR RECORD first.';
-
     }
+
+    console.warn(
+      'USDCx LOCKED: No selected allocation found.'
+    );
 
     return;
 
   }
 
 
-  console.log(
-    'AEGIS: Wallet LockedRecord:',
-    walletRecord
-  );
+  /* =======================================================
+     SOURCE RECORD
+     ======================================================= */
+
+  const raw =
+    allocation.raw ||
+    rawRecord ||
+    allocation;
 
 
   /* =======================================================
-     VALUES — WALLET LOCKED RECORD ONLY
+     OWNER
      ======================================================= */
 
   const owner =
-    getRecordValue(
-      walletRecord,
-      'owner'
+    getValue(
+      raw,
+      [
+        'owner',
+        'owner_address'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'owner'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxAddress'
     );
 
 
-  const recordId =
-    getRecordValue(
-      walletRecord,
-      'id'
-    );
+  /* =======================================================
+     AMOUNT
+     ======================================================= */
+
+  const amount =
+    getValue(
+      raw,
+      [
+        'display_amount',
+        'amount',
+        'locked_amount'
+      ]
+    ) ||
+    allocation.amount;
 
 
-  const program =
-    getRecordValue(
-      walletRecord,
-      'program_id'
-    );
+  /* =======================================================
+     START
+     ======================================================= */
+
+  let start =
+    getValue(
+      raw,
+      [
+        'locked_start',
+        'start_time',
+        'start'
+      ]
+    ) ||
+    allocation.start;
 
 
-  const recordType =
-    getRecordValue(
-      walletRecord,
-      'recordName'
-    );
+  /* =======================================================
+     END
+     ======================================================= */
+
+  const end =
+    getValue(
+      raw,
+      [
+        'locked_end',
+        'end_time',
+        'end'
+      ]
+    ) ||
+    allocation.end;
 
 
-  const status =
-    getRecordValue(
-      walletRecord,
-      'data'
-    )
-      ? getRecordValue(
-          walletRecord.data,
-          'status'
-        )
-      : '';
+  /* =======================================================
+     DERIVE START FROM END
+     ======================================================= */
 
+  if (
+    !clean(start) &&
+    clean(end)
+  ) {
 
-  const lockedEnd =
-    getRecordValue(
-      walletRecord,
-      'data'
-    )
-      ? getRecordValue(
-          walletRecord.data,
-          'locked_end'
-        )
-      : '';
+    const endSeconds =
+      getTimestampSeconds(end);
 
+    if (
+      endSeconds !== null
+    ) {
 
-  const claimRoute =
-    getRecordValue(
-      walletRecord,
-      'data'
-    )
-      ? getRecordValue(
-          walletRecord.data,
-          'claim_route'
-        )
-      : '';
+      start =
+        String(
+          endSeconds -
+          LOCK_DURATION_SECONDS
+        );
+
+    }
+
+  }
 
 
   /* =======================================================
      STATUS
      ======================================================= */
 
-  let displayStatus =
-    clean(status);
+  const status =
+    getValue(
+      raw,
+      [
+        'status'
+      ]
+    ) ||
+    allocation.status ||
+    'LOCKED';
 
 
-  if (displayStatus === '1') {
+  /* =======================================================
+     PROGRAM
+     ======================================================= */
 
-    displayStatus =
-      'LOCKED';
+  const program =
+    getValue(
+      raw,
+      [
+        'program',
+        'program_id',
+        'programId'
+      ]
+    ) ||
+    allocation.program ||
+    'vusdc_transaction.aleo';
 
-  } else if (displayStatus === '0') {
 
-    displayStatus =
-      'UNLOCKED';
+  /* =======================================================
+     TOKEN
+     ======================================================= */
+
+  const token =
+    getValue(
+      raw,
+      [
+        'token',
+        'tokenSymbol',
+        'asset',
+        'claimableToken'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'token',
+        'tokenSymbol',
+        'asset',
+        'claimableToken'
+      ]
+    ) ||
+    'vUSDC';
+
+
+  /* =======================================================
+     TRANSACTION ID
+     ======================================================= */
+
+  const transactionId =
+    getValue(
+      raw,
+      [
+        'transaction_id',
+        'transactionId',
+        'tx_id',
+        'txId',
+        'transaction'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'transaction_id',
+        'transactionId',
+        'tx_id',
+        'txId',
+        'transaction'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxTransactionId'
+    );
+
+
+  /* =======================================================
+     TOKEN ID
+     FIXED — SAME FOR ALL LOCKS
+     ======================================================= */
+
+  const tokenId =
+    FIXED_TOKEN_ID;
+
+
+  /* =======================================================
+     LOCK RECORD ID
+     ======================================================= */
+
+  const lockRecordId =
+    getValue(
+      raw,
+      [
+        'lock_record_id',
+        'lockRecordId'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'lock_record_id',
+        'lockRecordId'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxLockRecordId'
+    );
+
+
+  /* =======================================================
+     RECORD TYPE
+     ======================================================= */
+
+  let recordType =
+    'Record';
+
+
+  if (
+    getValue(
+      raw,
+      [
+        'claim_route'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'LockedRecord';
+
+  } else if (
+    getValue(
+      raw,
+      [
+        'token_id',
+        'tokenId'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'AllocationRecord';
 
   }
 
 
   /* =======================================================
-     POPULATE PAGE
-     ONLY WITH VALUES THAT EXIST IN LockedRecord
+     RECORD ID
      ======================================================= */
 
-  /*
-   * Allocation does not exist in LockedRecord.
-   */
+  const recordId =
+    findRecordId(raw);
+
+
+  /* =======================================================
+     RECORD NUMBER
+     ======================================================= */
+
+  const allocationNumber =
+    allocation.allocationNumber || 1;
+
+
+  /* =======================================================
+     STATUS DISPLAY
+     ======================================================= */
+
+  let displayStatus =
+    clean(status).toUpperCase();
+
+
+  if (
+    displayStatus === '1'
+  ) {
+
+    displayStatus =
+      'LOCKED';
+
+  }
+
+
+  /* =======================================================
+     DURATION
+     ======================================================= */
+
+  let duration =
+    calculateDuration(
+      start,
+      end
+    );
+
+
+  if (
+    duration === '—' &&
+    clean(start) &&
+    clean(end)
+  ) {
+
+    const startSeconds =
+      getTimestampSeconds(start);
+
+    const endSeconds =
+      getTimestampSeconds(end);
+
+    if (
+      startSeconds !== null &&
+      endSeconds !== null &&
+      endSeconds - startSeconds ===
+        LOCK_DURATION_SECONDS
+    ) {
+
+      duration =
+        '365 Days';
+
+    }
+
+  }
+
+
+  /* =======================================================
+     POPULATE PAGE 3
+     ======================================================= */
 
   set(
     '[data-page3-allocation]',
-    ''
+    'ALLOCATION ' +
+    String(
+      allocationNumber
+    ).padStart(2, '0')
   );
 
-
-  /*
-   * Owner exists directly in wallet record.
-   */
 
   set(
     '[data-page3-owner]',
@@ -2262,60 +2650,35 @@ main button {
   );
 
 
-  /*
-   * Amount does not exist in LockedRecord.
-   */
-
   set(
     '[data-page3-amount]',
-    ''
+    formatAmount(amount)
   );
 
-
-  /*
-   * Locked Start does not exist in LockedRecord.
-   */
 
   set(
     '[data-page3-start]',
-    ''
+    formatTimestamp(start)
   );
 
-
-  /*
-   * Locked End exists in LockedRecord.
-   */
 
   set(
     '[data-page3-end]',
-    formatTimestamp(lockedEnd)
+    formatTimestamp(end)
   );
 
-
-  /*
-   * Duration does not exist in LockedRecord.
-   * Do not calculate it.
-   */
 
   set(
     '[data-page3-duration]',
-    ''
+    duration
   );
 
-
-  /*
-   * Claimable Token does not exist in LockedRecord.
-   */
 
   set(
     '[data-page3-token]',
-    ''
+    clean(token)
   );
 
-
-  /*
-   * Program exists directly in wallet record.
-   */
 
   set(
     '[data-page3-program]',
@@ -2323,19 +2686,11 @@ main button {
   );
 
 
-  /*
-   * Record Type exists directly in wallet record.
-   */
-
   set(
     '[data-page3-type]',
-    clean(recordType)
+    recordType
   );
 
-
-  /*
-   * Status exists in wallet record data.
-   */
 
   set(
     '[data-page3-status]',
@@ -2343,49 +2698,36 @@ main button {
   );
 
 
-  /*
-   * Record ID exists directly in wallet response.
-   */
-
   set(
     '[data-page3-record-id]',
     clean(recordId)
   );
 
 
-  /*
-   * Transaction ID does not exist in LockedRecord.
-   */
+  /* =======================================================
+     BLOCKCHAIN REFERENCES
+     ======================================================= */
 
   set(
     '[data-page3-transaction]',
-    ''
+    clean(transactionId)
   );
 
-
-  /*
-   * Token ID does not exist in LockedRecord.
-   */
 
   set(
     '[data-page3-token-id]',
-    ''
+    clean(tokenId)
   );
 
 
-  /*
-   * Lock Record ID uses the actual wallet record id.
-   */
-
   set(
     '[data-page3-lock-record-id]',
-    clean(recordId)
+    clean(lockRecordId)
   );
 
 
   /* =======================================================
-     EXPLORER LINKS
-     NO EXTERNAL SOURCE IS USED
+     TRANSACTION LINK
      ======================================================= */
 
   const transactionLink =
@@ -2393,55 +2735,82 @@ main button {
       '[data-page3-transaction-link]'
     );
 
-  if (transactionLink) {
+
+  if (
+    transactionLink &&
+    clean(transactionId)
+  ) {
+
+    transactionLink.href =
+      'https://explorer.provable.com/transaction/' +
+      clean(transactionId);
+
+  } else if (transactionLink) {
 
     transactionLink.removeAttribute(
       'href'
     );
 
-    transactionLink.style.display =
-      'none';
-
   }
 
+
+  /* =======================================================
+     TOKEN LINK
+     ======================================================= */
 
   const tokenLink =
     document.querySelector(
       '[data-page3-token-link]'
     );
 
-  if (tokenLink) {
+
+  if (
+    tokenLink &&
+    clean(tokenId)
+  ) {
+
+    tokenLink.href =
+      'https://explorer.provable.com/program/token_registry.aleo';
+
+  } else if (tokenLink) {
 
     tokenLink.removeAttribute(
       'href'
     );
 
-    tokenLink.style.display =
-      'none';
-
   }
 
+
+  /* =======================================================
+     LOCK RECORD LINK
+     ======================================================= */
 
   const lockRecordLink =
     document.querySelector(
       '[data-page3-lock-record-link]'
     );
 
-  if (lockRecordLink) {
+
+  if (
+    lockRecordLink &&
+    clean(transactionId)
+  ) {
+
+    lockRecordLink.href =
+      'https://explorer.provable.com/transaction/' +
+      clean(transactionId);
+
+  } else if (lockRecordLink) {
 
     lockRecordLink.removeAttribute(
       'href'
     );
-
-    lockRecordLink.style.display =
-      'none';
 
   }
 
 
   /* =======================================================
      COUNTDOWN
-     SOURCE = LockedRecord.locked_end ONLY
      ======================================================= */
 
   const countdownElement =
@@ -2469,9 +2838,7 @@ main button {
 
 
   const endSeconds =
-    getTimestampSeconds(
-      lockedEnd
-    );
+    getTimestampSeconds(end);
 
 
   let countdownTimer =
@@ -2482,6 +2849,10 @@ main button {
     false;
 
 
+  /* =======================================================
+     UPDATE COUNTDOWN
+     ======================================================= */
+
   function updateCountdown() {
 
     if (!countdownElement) {
@@ -2489,22 +2860,16 @@ main button {
     }
 
 
-    if (endSeconds === null) {
+    if (!endSeconds) {
 
       countdownElement.textContent =
-        '';
+        '—';
+
 
       if (countdownEndElement) {
 
         countdownEndElement.textContent =
-          '';
-
-      }
-
-      if (claimButton) {
-
-        claimButton.disabled =
-          true;
+          'Lock end time unavailable';
 
       }
 
@@ -2520,8 +2885,7 @@ main button {
 
 
     let remaining =
-      endSeconds -
-      nowSeconds;
+      endSeconds - nowSeconds;
 
 
     if (remaining <= 0) {
@@ -2568,6 +2932,7 @@ main button {
           null;
 
       }
+
 
       return;
 
@@ -2623,19 +2988,21 @@ main button {
 
       countdownEndElement.textContent =
         'Ends: ' +
-        formatTimestamp(
-          lockedEnd
-        );
+        formatTimestamp(end);
 
     }
 
   }
 
 
+  /* =======================================================
+     START COUNTDOWN
+     ======================================================= */
+
   updateCountdown();
 
 
-  if (endSeconds !== null) {
+  if (endSeconds) {
 
     countdownTimer =
       setInterval(
@@ -2648,7 +3015,6 @@ main button {
 
   /* =======================================================
      CLAIM BUTTON
-     UI ONLY — NO TRANSACTION
      ======================================================= */
 
   if (claimButton) {
@@ -2665,13 +3031,16 @@ main button {
               'success'
             );
 
+
             claimMessage.style.display =
               'block';
+
 
             claimMessage.textContent =
               'Not available until lock end.';
 
           }
+
 
           return;
 
@@ -2684,8 +3053,10 @@ main button {
             'success'
           );
 
+
           claimMessage.style.display =
             'block';
+
 
           claimMessage.textContent =
             'Lock ended. Claim is available for contract integration.';
@@ -2694,7 +3065,7 @@ main button {
 
 
         console.log(
-          'AEGIS: Lock ended. No transaction was sent.'
+          'USDCx LOCKED: Lock ended. No transaction was sent.'
         );
 
       }
@@ -2704,66 +3075,66 @@ main button {
 
 
   /* =======================================================
-     DEBUG
+     FINAL LOG
      ======================================================= */
 
   console.log(
-    'AEGIS: Current Wallet:',
-    currentWallet
+    'USDCx LOCKED: Page 3 populated from Page 2 selected record.'
   );
 
 
   console.log(
-    'AEGIS: Owner:',
+    'USDCx LOCKED: Owner:',
     clean(owner)
   );
 
 
   console.log(
-    'AEGIS: Record ID:',
-    clean(recordId)
+    'USDCx LOCKED: Amount:',
+    formatAmount(amount)
   );
 
 
   console.log(
-    'AEGIS: Lock Record ID:',
-    clean(recordId)
+    'USDCx LOCKED: Start:',
+    formatTimestamp(start)
   );
 
 
   console.log(
-    'AEGIS: Program:',
-    clean(program)
+    'USDCx LOCKED: End:',
+    formatTimestamp(end)
   );
 
 
   console.log(
-    'AEGIS: Record Type:',
-    clean(recordType)
+    'USDCx LOCKED: Duration:',
+    duration
   );
 
 
   console.log(
-    'AEGIS: Status:',
-    displayStatus
+    'USDCx LOCKED: Transaction:',
+    clean(transactionId)
   );
 
 
   console.log(
-    'AEGIS: Locked End:',
-    formatTimestamp(lockedEnd)
+    'USDCx LOCKED: Token ID:',
+    clean(tokenId)
   );
 
 
   console.log(
-    'AEGIS: Claim Route:',
-    clean(claimRoute)
+    'USDCx LOCKED: Lock Record ID:',
+    clean(lockRecordId)
   );
 
 
   console.log(
-    'AEGIS: Page 3 source = wallet LockedRecord only.'
+    'USDCx LOCKED: No transaction / no balance transfer.'
   );
+
 
 })();
 
@@ -2771,4 +3142,3 @@ main button {
 
 </body>
 </html>
-```
