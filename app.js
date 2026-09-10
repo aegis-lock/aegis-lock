@@ -1,156 +1,153 @@
-const PROGRAM_ID = 'usdcx_locked.aleo';
+const PROGRAM_ID = 'vusdc_transaction.aleo';
 
 const PROGRAM_IDS = [
-  'usdcx_locked.aleo',
   'vusdc_transaction.aleo'
 ];
 
 const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
 
-/* ALEO MAINNET EXPLORER API */
-const ALEO_MAINNET_APIS = [
-  'https://api.provable.com/v2',
-  'https://api.explorer.provable.com/v1'
-];
-
-/*
-  TOKEN ID
-  Same value used by the old AEGIS Admin.
-*/
-const TOKEN_ID =
-  '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
 
 /* =========================================================
-   PRIVATE ALLOCATION BACKEND
-   Amounts are stored outside the public GitHub frontend.
-   ========================================================= */
+ * WALLET ADDRESS
+ * ========================================================= */
 
-const AEGIS_API_BASE =
-  'http://localhost:3000';
-
-async function getBackendAllocationAmount(
-  walletAddress,
-  transactionId
-) {
-  const wallet =
-    cleanAleoValue(walletAddress || '');
-
-  const transaction =
-    String(transactionId || '').trim();
-
-  if (!wallet || !transaction) {
-    return '';
-  }
-
-  try {
-    const response =
-      await fetch(
-        `${AEGIS_API_BASE}/api/allocation`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            walletAddress: wallet,
-            transactionId: transaction
-          })
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `Backend request failed: ${response.status}`
-      );
-    }
-
-    const data =
-      await response.json();
-
-    return data.found
-      ? String(data.amount || '')
-      : '';
-  } catch (error) {
-    console.error(
-      'AEGIS: Backend allocation lookup failed:',
-      error
-    );
-    return '';
-  }
-}
-
-/* WALLET ADDRESS */
 const connected =
   sessionStorage.getItem('usdcxAddress') || '';
 
+
 function shortenAddress(address) {
-  if (!address) return 'Not connected';
-  if (address.length <= 16) return address;
-  return address.slice(0, 10) + '...' + address.slice(-4);
+
+  if (!address) {
+    return 'Not connected';
+  }
+
+  if (address.length <= 16) {
+    return address;
+  }
+
+  return (
+    address.slice(0, 10) +
+    '...' +
+    address.slice(-4)
+  );
 }
 
+
 function updateWalletDisplay(address) {
-  document.querySelectorAll('[data-wallet]').forEach(el => {
-    el.textContent = shortenAddress(address);
-    el.setAttribute('title', address || '');
-  });
+
+  document
+    .querySelectorAll('[data-wallet]')
+    .forEach(el => {
+
+      el.textContent =
+        shortenAddress(address);
+
+      el.setAttribute(
+        'title',
+        address || ''
+      );
+
+    });
+
 }
+
 
 updateWalletDisplay(connected);
 
-/* COPY WALLET */
-document.querySelectorAll('[data-copy]').forEach(button => {
-  button.addEventListener('click', async () => {
-    const address =
-      sessionStorage.getItem('usdcxAddress') || '';
 
-    if (!address) return;
+/* =========================================================
+ * COPY WALLET
+ * ========================================================= */
 
-    if (!navigator.clipboard || !navigator.clipboard.writeText) {
-      return;
-    }
+document
+  .querySelectorAll('[data-copy]')
+  .forEach(button => {
 
-    try {
-      await navigator.clipboard.writeText(address);
+    button.addEventListener(
+      'click',
+      async () => {
 
-      const original = button.innerHTML;
-      button.innerHTML = '✓';
+        const address =
+          sessionStorage.getItem('usdcxAddress') || '';
 
-      setTimeout(() => {
-        button.innerHTML = original;
-      }, 1200);
+        if (!address) {
+          return;
+        }
 
-    } catch (error) {
-      console.warn(
-        'USDCx LOCKED: Copy failed:',
-        error
-      );
-    }
+        if (
+          !navigator.clipboard ||
+          !navigator.clipboard.writeText
+        ) {
+          return;
+        }
+
+        try {
+
+          await navigator.clipboard.writeText(
+            address
+          );
+
+          const original =
+            button.innerHTML;
+
+          button.innerHTML = '✓';
+
+          setTimeout(() => {
+
+            button.innerHTML =
+              original;
+
+          }, 1200);
+
+        } catch (error) {
+
+          console.warn(
+            'AEGIS: Copy failed:',
+            error
+          );
+
+        }
+
+      }
+    );
+
   });
-});
 
-/* CONNECT LEO WALLET */
+
+/* =========================================================
+ * CONNECT LEO WALLET
+ *
+ * MAINNET
+ *
+ * DECRYPT_UPON_REQUEST
+ * ========================================================= */
+
 async function connectLeoForRecords() {
-  const adapter = window.usdcxLeoAdapter;
+
+  const adapter =
+    window.usdcxLeoAdapter;
 
   if (!adapter) {
+
     throw new Error(
       'Leo Wallet adapter not available.'
     );
+
   }
 
   console.log(
-    'USDCx LOCKED: Connecting Leo Wallet...'
+    'AEGIS: Connecting Leo Wallet...'
   );
 
   console.log(
-    'USDCx LOCKED: Network: MAINNET'
+    'AEGIS: Network: MAINNET'
   );
 
   console.log(
-    'USDCx LOCKED: Decrypt permission:',
+    'AEGIS: Decrypt permission:',
     DECRYPT_PERMISSION
   );
+
 
   const account =
     await adapter.connect(
@@ -158,21 +155,27 @@ async function connectLeoForRecords() {
       DECRYPT_PERMISSION
     );
 
+
   console.log(
-    'USDCx LOCKED: Leo Wallet connected:',
+    'AEGIS: Leo Wallet connected:',
     account
   );
+
 
   const address =
     account?.address ||
     account?.publicKey ||
     adapter.publicKey;
 
+
   if (!address) {
+
     throw new Error(
       'Leo Wallet connected but no address was returned.'
     );
+
   }
+
 
   sessionStorage.setItem(
     'usdcxAddress',
@@ -184,163 +187,296 @@ async function connectLeoForRecords() {
     address
   );
 
+
   updateWalletDisplay(address);
 
+
   return account;
+
 }
 
-/* RECORD VALUE HELPER */
+
+/* =========================================================
+ * RECORD VALUE HELPER
+ * ========================================================= */
+
 function getRecordValue(record, names) {
-  if (!record) return null;
+
+  if (!record) {
+    return null;
+  }
+
+
+  /* Direct fields */
 
   for (const name of names) {
+
     if (
       record[name] !== undefined &&
       record[name] !== null
     ) {
+
       return record[name];
+
     }
+
   }
+
+
+  /* data.* */
 
   if (
     record.data &&
     typeof record.data === 'object'
   ) {
+
     for (const name of names) {
+
       if (
         record.data[name] !== undefined &&
         record.data[name] !== null
       ) {
+
         return record.data[name];
+
       }
+
     }
+
   }
+
+
+  /* record.* */
 
   if (
     record.record &&
     typeof record.record === 'object'
   ) {
+
     for (const name of names) {
+
       if (
         record.record[name] !== undefined &&
         record.record[name] !== null
       ) {
+
         return record.record[name];
+
       }
+
     }
+
   }
 
+
   return null;
+
 }
 
-/* CLEAN ALEO VALUE */
+
+/* =========================================================
+ * CLEAN ALEO VALUE
+ * ========================================================= */
+
 function cleanAleoValue(value) {
+
   if (
     value === null ||
     value === undefined
   ) {
+
     return '';
+
   }
 
-  let text = String(value).trim();
 
-  text = text.replace(
-    /^"(.*)"$/,
-    '$1'
-  );
+  let text =
+    String(value).trim();
 
-  text = text.replace(
-    /\.(private|public)$/i,
-    ''
-  );
 
-  text = text.replace(
-    /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
-    ''
-  );
+  text =
+    text.replace(
+      /^"(.*)"$/,
+      '$1'
+    );
+
+
+  text =
+    text.replace(
+      /\.(private|public)$/i,
+      ''
+    );
+
+
+  text =
+    text.replace(
+      /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
+      ''
+    );
+
 
   return text.trim();
+
 }
 
-/* FORMAT STATUS */
+
+/* =========================================================
+ * FORMAT STATUS
+ *
+ * Raw record:
+ *
+ * status = 1
+ *
+ * Display:
+ *
+ * LOCKED
+ *
+ * The original record is never modified.
+ * ========================================================= */
+
 function formatStatus(value) {
+
   const status =
     cleanAleoValue(value);
+
 
   if (status === '1') {
     return 'LOCKED';
   }
 
+
   if (status === '2') {
     return 'CLAIMED';
   }
+
 
   if (status === '0') {
     return 'UNKNOWN';
   }
 
-  return status || 'UNKNOWN';
+
+  return status;
+
 }
 
-/* FORMAT DISPLAY AMOUNT */
-function formatDisplayAmount(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ''
-  ) {
+
+/* =========================================================
+ * RECORD TYPE
+ *
+ * Current lock record:
+ *
+ * LockedRecord
+ *
+ * The type is identified only when the
+ * record actually contains LockedRecord fields.
+ * ========================================================= */
+
+function getRecordType(record) {
+
+  if (!record) {
     return '';
   }
 
-  const text =
-    cleanAleoValue(value);
 
-  if (!text) return '';
+  const claimRoute =
+    getRecordValue(
+      record,
+      ['claim_route']
+    );
 
-  if (text.includes('.')) {
-    return text;
+
+  const lockedEnd =
+    getRecordValue(
+      record,
+      ['locked_end']
+    );
+
+
+  const status =
+    getRecordValue(
+      record,
+      ['status']
+    );
+
+
+  if (
+    claimRoute !== null ||
+    lockedEnd !== null ||
+    status !== null
+  ) {
+
+    return 'LockedRecord';
+
   }
 
-  if (/^\d+$/.test(text)) {
-    const number = Number(text);
 
-    if (Number.isSafeInteger(number)) {
-      return (
-        number / 100
-      ).toFixed(2);
-    }
-  }
+  return '';
 
-  return text;
 }
 
-/* NORMALIZE ALLOCATION RECORD */
-function normalizeAllocationRecord(
+
+/* =========================================================
+ * NORMALIZE LOCKED RECORD
+ *
+ * IMPORTANT:
+ *
+ * Only information actually present
+ * in the private record is returned.
+ *
+ * Missing values remain empty.
+ *
+ * NO:
+ * - Explorer
+ * - Backend
+ * - fixed TOKEN_ID
+ * - fixed amount
+ * - invented start date
+ * - invented transaction ID
+ * ========================================================= */
+
+function normalizeLockedRecord(
   record,
   index,
-  programId = PROGRAM_ID
+  programId
 ) {
-  const amount =
+
+  const owner =
     getRecordValue(
       record,
-      [
-        'display_amount',
-        'amount',
-        'locked_amount'
-      ]
+      ['owner']
     );
 
-  const ticket =
+
+  const claimRoute =
     getRecordValue(
       record,
-      [
-        'ticket_ref',
-        'ticket_reference',
-        'ticket'
-      ]
+      ['claim_route']
     );
 
-  const start =
+
+  const lockedEnd =
+    getRecordValue(
+      record,
+      ['locked_end']
+    );
+
+
+  const status =
+    getRecordValue(
+      record,
+      ['status']
+    );
+
+
+  /*
+   * locked_start is intentionally searched,
+   * but the current LockedRecord does not contain it.
+   *
+   * Therefore it remains empty unless the
+   * actual returned record contains it.
+   */
+
+  const lockedStart =
     getRecordValue(
       record,
       [
@@ -350,41 +486,114 @@ function normalizeAllocationRecord(
       ]
     );
 
-  const end =
+
+  /*
+   * Amount is NOT part of LockedRecord.
+   *
+   * Do not invent it from Token records.
+   */
+
+  const amount =
     getRecordValue(
       record,
       [
-        'locked_end',
-        'end_time',
-        'end'
+        'amount',
+        'display_amount',
+        'locked_amount'
       ]
     );
 
-  const status =
+
+  /*
+   * These values are intentionally only read
+   * if they actually exist in the record.
+   */
+
+  const tokenId =
     getRecordValue(
       record,
-      ['status']
+      [
+        'token_id',
+        'tokenId'
+      ]
     );
 
+
+  const transactionId =
+    getRecordValue(
+      record,
+      [
+        'transaction_id',
+        'transactionId'
+      ]
+    );
+
+
+  const lockRecordId =
+    getRecordValue(
+      record,
+      [
+        'lock_record_id',
+        'lockRecordId',
+        'record_id',
+        'recordId'
+      ]
+    );
+
+
+  const duration =
+    calculateDuration(
+      lockedStart,
+      lockedEnd
+    );
+
+
   return {
-    allocationNumber: index + 1,
+
+    allocationNumber:
+      index + 1,
+
+    recordType:
+      getRecordType(record),
+
+    owner:
+      owner !== null
+        ? cleanAleoValue(owner)
+        : '',
+
+    claimRoute:
+      claimRoute !== null
+        ? cleanAleoValue(claimRoute)
+        : '',
 
     amount:
-      formatDisplayAmount(amount),
+      amount !== null
+        ? cleanAleoValue(amount)
+        : '',
 
-    ticket:
-      ticket !== null
-        ? cleanAleoValue(ticket)
+    tokenId:
+      tokenId !== null
+        ? cleanAleoValue(tokenId)
+        : '',
+
+    transactionId:
+      transactionId !== null
+        ? cleanAleoValue(transactionId)
+        : '',
+
+    lockRecordId:
+      lockRecordId !== null
+        ? cleanAleoValue(lockRecordId)
         : '',
 
     start:
-      start !== null
-        ? cleanAleoValue(start)
+      lockedStart !== null
+        ? cleanAleoValue(lockedStart)
         : '',
 
     end:
-      end !== null
-        ? cleanAleoValue(end)
+      lockedEnd !== null
+        ? cleanAleoValue(lockedEnd)
         : '',
 
     status:
@@ -392,944 +601,517 @@ function normalizeAllocationRecord(
         ? formatStatus(status)
         : '',
 
-    raw: record,
+    duration,
 
-    program: programId
+    program:
+      programId || '',
+
+    raw:
+      record
+
   };
+
 }
 
-/* EXTRACT RECORD LIST */
+
+/* =========================================================
+ * CALCULATE DURATION
+ *
+ * Only calculated when BOTH start and end
+ * actually exist in the record.
+ * ========================================================= */
+
+function calculateDuration(
+  start,
+  end
+) {
+
+  if (
+    start === null ||
+    start === undefined ||
+    end === null ||
+    end === undefined
+  ) {
+
+    return '';
+
+  }
+
+
+  const startText =
+    cleanAleoValue(start);
+
+  const endText =
+    cleanAleoValue(end);
+
+
+  if (
+    !startText ||
+    !endText
+  ) {
+
+    return '';
+
+  }
+
+
+  const startNumber =
+    Number(startText);
+
+  const endNumber =
+    Number(endText);
+
+
+  if (
+    !Number.isFinite(startNumber) ||
+    !Number.isFinite(endNumber)
+  ) {
+
+    return '';
+
+  }
+
+
+  const seconds =
+    endNumber - startNumber;
+
+
+  if (seconds < 0) {
+    return '';
+  }
+
+
+  const days =
+    seconds / 86400;
+
+
+  if (
+    Number.isInteger(days)
+  ) {
+
+    return `${days} Days`;
+
+  }
+
+
+  return '';
+
+}
+
+
+/* =========================================================
+ * EXTRACT RECORD LIST
+ * ========================================================= */
+
 function extractRecordList(records) {
+
   if (Array.isArray(records)) {
     return records;
   }
+
 
   if (
     records &&
     Array.isArray(records.records)
   ) {
+
     return records.records;
+
   }
+
 
   if (
     records &&
     records.result &&
     Array.isArray(records.result)
   ) {
+
     return records.result;
+
   }
+
 
   if (
     records &&
     records.result &&
-    Array.isArray(
-      records.result.records
-    )
+    Array.isArray(records.result.records)
   ) {
+
     return records.result.records;
+
   }
+
 
   return [];
+
 }
+
 
 /* =========================================================
-   EXPLORER
-   ========================================================= */
+ * OWNER MATCH
+ * ========================================================= */
 
-/* GET TRANSACTION ID FROM PAGE 2 */
-function getTransactionInput() {
-  const input =
-    document.querySelector(
-      '#transaction-id'
-    );
-
-  if (!input) {
-    return '';
-  }
-
-  return input.value.trim();
-}
-
-/* FETCH TRANSACTION FROM ALEO MAINNET */
-async function getExplorerTransaction(
-  transactionId
+function recordOwnerMatches(
+  record,
+  walletAddress
 ) {
-  if (!transactionId) {
-    throw new Error(
-      'Transaction ID is required.'
-    );
-  }
-
-  let lastError = null;
-
-  for (
-    const apiBase
-    of ALEO_MAINNET_APIS
-  ) {
-    const url =
-      `${apiBase}/mainnet/transaction/${encodeURIComponent(transactionId)}`;
-
-    try {
-      console.log(
-        'USDCx LOCKED: Querying Explorer:',
-        url
-      );
-
-      const response =
-        await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Accept':
-              'application/json'
-          }
-        });
-
-      if (!response.ok) {
-        throw new Error(
-          `Explorer returned HTTP ${response.status}`
-        );
-      }
-
-      const transaction =
-        await response.json();
-
-      if (
-        !transaction ||
-        typeof transaction !== 'object'
-      ) {
-        throw new Error(
-          'Explorer returned invalid transaction data.'
-        );
-      }
-
-      console.log(
-        'USDCx LOCKED: Explorer transaction:',
-        transaction
-      );
-
-      return transaction;
-
-    } catch (error) {
-      lastError = error;
-
-      console.warn(
-        'USDCx LOCKED: Explorer API failed:',
-        apiBase,
-        error
-      );
-    }
-  }
-
-  throw (
-    lastError ||
-    new Error(
-      'Could not load transaction from Explorer.'
-    )
-  );
-}
-
-/* GET ALL TRANSACTIONS */
-function getExplorerTransitions(
-  transaction
-) {
-  const result = [];
 
   if (
-    transaction?.execution &&
-    Array.isArray(
-      transaction.execution.transitions
-    )
+    !record ||
+    !walletAddress
   ) {
-    result.push(
-      ...transaction.execution.transitions
-    );
+
+    return false;
+
   }
+
+
+  const owner =
+    getRecordValue(
+      record,
+      ['owner']
+    );
+
 
   if (
-    Array.isArray(
-      transaction?.transitions
-    )
+    owner === null ||
+    owner === undefined
   ) {
-    result.push(
-      ...transaction.transitions
-    );
+
+    return false;
+
   }
 
-  if (
-    Array.isArray(
-      transaction?.execution?.transition
-    )
-  ) {
-    result.push(
-      ...transaction.execution.transition
-    );
-  }
 
-  if (
-    transaction?.execution?.transition &&
-    typeof transaction.execution.transition === 'object'
-  ) {
-    result.push(
-      transaction.execution.transition
-    );
-  }
-
-  return result;
-}
-
-/* FIND EXACT LOCK TRANSITION */
-function findLockTransition(
-  transaction
-) {
-  const transitions =
-    getExplorerTransitions(
-      transaction
-    );
-
-  console.log(
-    'USDCx LOCKED: Explorer transitions:',
-    transitions
+  return (
+    cleanAleoValue(owner).toLowerCase() ===
+    String(walletAddress).trim().toLowerCase()
   );
 
-  const lockTransition =
-    transitions.find(
-      transition => {
-        const program =
-          transition?.program ||
-          transition?.program_id ||
-          transition?.programId ||
-          '';
-
-        const functionName =
-          transition?.function ||
-          transition?.function_name ||
-          transition?.functionName ||
-          '';
-
-        return (
-          program ===
-            'vusdc_transaction.aleo' &&
-          functionName ===
-            'lock'
-        );
-      }
-    );
-
-  if (!lockTransition) {
-    throw new Error(
-      'The transaction does not contain vusdc_transaction.aleo::lock.'
-    );
-  }
-
-  console.log(
-    'USDCx LOCKED: Lock transition found:',
-    lockTransition
-  );
-
-  return lockTransition;
 }
 
-/* EXTRACT A RECORD ID FROM EXPLORER OUTPUT */
-function extractRecordIdFromValue(
-  value
-) {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return '';
-  }
-
-  if (
-    typeof value === 'string'
-  ) {
-    const match =
-      value.match(
-        /record1[a-z0-9]+/
-      );
-
-    return match
-      ? match[0]
-      : '';
-  }
-
-  if (
-    typeof value === 'object'
-  ) {
-    const possibleValues = [
-      value.value,
-      value.id,
-      value.record,
-      value.record_id,
-      value.recordId,
-      value.output,
-      value.data
-    ];
-
-    for (
-      const possible
-      of possibleValues
-    ) {
-      const found =
-        extractRecordIdFromValue(
-          possible
-        );
-
-      if (found) {
-        return found;
-      }
-    }
-  }
-
-  return '';
-}
-
-/* EXTRACT LOCK RECORD ID - OLD AEGIS ADMIN METHOD */
-function extractLockRecordId(
-  lockTransition,
-  transitions
-) {
-  const outputs = [
-    ...(lockTransition?.outputs || []),
-    ...transitions.flatMap(
-      transition =>
-        transition?.outputs || []
-    )
-  ];
-
-  console.log(
-    'USDCx LOCKED: Searching all Explorer outputs for Lock Record ID:',
-    outputs
-  );
-
-  for (
-    const output
-    of outputs
-  ) {
-    const values = [
-      output?.value,
-      output?.record,
-      output?.ciphertext,
-      output?.id
-    ];
-
-    for (
-      const value
-      of values
-    ) {
-      if (
-        typeof value === 'string' &&
-        value.startsWith('record1')
-      ) {
-        console.log(
-          'USDCx LOCKED: Lock Record ID found:',
-          value
-        );
-
-        return value;
-      }
-
-      if (
-        typeof value === 'string' &&
-        value.includes('record1')
-      ) {
-        const match =
-          value.match(
-            /record1[a-z0-9]+/
-          );
-
-        if (match) {
-          console.log(
-            'USDCx LOCKED: Lock Record ID found:',
-            match[0]
-          );
-
-          return match[0];
-        }
-      }
-    }
-  }
-
-  return '';
-}
 
 /* =========================================================
-   TOKEN ID
-   ========================================================= */
+ * REQUEST PRIVATE RECORDS
+ *
+ * ONLY:
+ *
+ * adapter.requestRecords(
+ *   'vusdc_transaction.aleo'
+ * )
+ *
+ * No Explorer.
+ * No Backend.
+ * ========================================================= */
 
-/*
-  Same Token ID used by the old AEGIS Admin.
+async function requestPlaintextRecords(adapter) {
 
-  Do NOT search arbitrary long numbers inside
-  public Explorer transition outputs.
-
-  The public transaction outputs are not the
-  private Token.token_id field.
-*/
-function getTokenId() {
-  return TOKEN_ID;
-}
-
-/* EXTRACT TRANSITION ID */
-function extractTransitionId(
-  transition
-) {
-  return cleanAleoValue(
-    transition?.id ||
-    transition?.transition_id ||
-    transition?.transitionId ||
-    ''
-  );
-}
-
-/* NORMALIZE EXPLORER DATA */
-function normalizeExplorerTransaction(
-  transaction,
-  transactionId
-) {
-  const transitions =
-    getExplorerTransitions(
-      transaction
-    );
-
-  const lockTransition =
-    findLockTransition(
-      transaction
-    );
-
-  const transitionId =
-    extractTransitionId(
-      lockTransition
-    );
-
-  /*
-    Same logic as the old AEGIS Admin:
-    search the lock transition and all
-    transaction transitions for record1...
-  */
-  const lockRecordId =
-    extractLockRecordId(
-      lockTransition,
-      transitions
-    );
-
-  /*
-    Token ID comes from the known Token ID
-    used by the old AEGIS Admin.
-  */
-  const tokenId =
-    getTokenId();
-
-  return {
-    transactionId:
-      transaction?.id ||
-      transaction?.transaction_id ||
-      transactionId,
-
-    transitionId,
-
-    program:
-      lockTransition?.program ||
-      lockTransition?.program_id ||
-      lockTransition?.programId ||
-      'vusdc_transaction.aleo',
-
-    function:
-      lockTransition?.function ||
-      lockTransition?.function_name ||
-      lockTransition?.functionName ||
-      'lock',
-
-    tokenId,
-
-    lockRecordId,
-
-    rawTransition:
-      lockTransition,
-
-    rawTransaction:
-      transaction
-  };
-}
-
-/* SAVE EXPLORER DATA */
-function saveExplorerTransaction(
-  explorerData
-) {
-  try {
-    sessionStorage.setItem(
-      'usdcxExplorerTransaction',
-      JSON.stringify(
-        explorerData.rawTransaction
-      )
-    );
-
-    sessionStorage.setItem(
-      'usdcxTransactionId',
-      explorerData.transactionId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxTransitionId',
-      explorerData.transitionId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxTokenId',
-      explorerData.tokenId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxLockRecordId',
-      explorerData.lockRecordId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxExplorerData',
-      JSON.stringify(
-        explorerData
-      )
-    );
-
-    console.log(
-      'USDCx LOCKED: Explorer data saved:',
-      explorerData
-    );
-
-  } catch (error) {
-    console.warn(
-      'USDCx LOCKED: Could not save Explorer data:',
-      error
-    );
-  }
-}
-
-/* =========================================================
-   REQUEST PRIVATE RECORDS
-   ========================================================= */
-
-async function requestPlaintextRecords(
-  adapter
-) {
   console.log(
-    'USDCx LOCKED: Requesting records from Leo Wallet...'
+    'AEGIS: Requesting private records from Leo Wallet...'
   );
+
 
   if (
     typeof adapter.requestRecords !==
     'function'
   ) {
+
     throw new Error(
       'Leo Wallet adapter does not expose requestRecords().'
     );
+
   }
 
-  console.log(
-    'USDCx LOCKED: Calling requestRecords(program)...'
-  );
 
   const allRecords = [];
 
+
   for (
-    const programId
-    of PROGRAM_IDS
+    const programId of PROGRAM_IDS
   ) {
+
     console.log(
-      'USDCx LOCKED: Requesting records from program:',
+      'AEGIS: Requesting records from program:',
       programId
     );
 
+
     try {
+
       const records =
         await adapter.requestRecords(
           programId
         );
 
+
       console.log(
-        'USDCx LOCKED: Records returned from',
+        'AEGIS: Records returned from',
         programId,
         records
       );
 
+
       const list =
-        extractRecordList(
-          records
-        );
+        extractRecordList(records);
+
 
       for (
-        const record
-        of list
+        const record of list
       ) {
+
         allRecords.push({
+
           record,
+
           programId
+
         });
+
       }
 
     } catch (error) {
+
       console.warn(
-        'USDCx LOCKED: Could not request records from',
+        'AEGIS: Could not request records from',
         programId,
         error
       );
+
     }
+
   }
 
+
   return allRecords;
+
 }
 
+
 /* =========================================================
-   GET YOUR RECORD
-   ========================================================= */
+ * GET YOUR RECORD
+ *
+ * Flow:
+ *
+ * 1. Connect wallet if necessary.
+ * 2. Request private records.
+ * 3. Use ONLY vusdc_transaction.aleo.
+ * 4. Match owner with connected wallet.
+ * 5. Select LockedRecord.
+ * 6. Save raw record for Page 3.
+ *
+ * No transaction ID required.
+ * No Explorer lookup.
+ * No Backend lookup.
+ * ========================================================= */
 
 async function getYourRecord() {
+
   const adapter =
     window.usdcxLeoAdapter;
 
+
   if (!adapter) {
+
     throw new Error(
       'Leo Wallet adapter not available.'
     );
+
   }
+
 
   console.log(
-    'USDCx LOCKED: GET YOUR RECORD'
+    'AEGIS: GET YOUR RECORD'
   );
 
-  /*
-    STEP 1
-    Read Transaction ID entered by user.
-  */
-
-  const transactionId =
-    getTransactionInput();
-
-  if (!transactionId) {
-    throw new Error(
-      'Please enter the Transaction ID first.'
-    );
-  }
 
   console.log(
-    'USDCx LOCKED: Transaction ID:',
-    transactionId
+    'AEGIS: Program:',
+    PROGRAM_ID
   );
 
-  /*
-    STEP 2
-    Search the transaction in Aleo Mainnet Explorer.
-  */
 
-  const explorerTransaction =
-    await getExplorerTransaction(
-      transactionId
-    );
-
-  /*
-    STEP 3
-    Find:
-    vusdc_transaction.aleo::lock
-  */
-
-  const explorerData =
-    normalizeExplorerTransaction(
-      explorerTransaction,
-      transactionId
-    );
-
-  /*
-    STEP 4
-    Make sure the Lock Record ID
-    was actually found.
-  */
-
-  if (
-    !explorerData.lockRecordId
-  ) {
-    console.warn(
-      'USDCx LOCKED: No Lock Record ID was found in Explorer outputs.'
-    );
-  }
-
-  /*
-    Token ID comes from the same source
-    used by the old AEGIS Admin.
-  */
-
-  if (
-    !explorerData.tokenId
-  ) {
-    console.warn(
-      'USDCx LOCKED: Token ID is not available.'
-    );
-  }
-
-  /*
-    STEP 5
-    Save Explorer information.
-  */
-
-  saveExplorerTransaction(
-    explorerData
-  );
-
-  /*
-    STEP 6
-    Connect Leo Wallet if needed.
-  */
+  /* Connect if necessary */
 
   if (!adapter.account) {
+
     await connectLeoForRecords();
+
   }
 
+
   if (!adapter.account) {
+
     throw new Error(
       'Leo Wallet connection was not established.'
     );
+
   }
 
-  const currentAddress =
-    cleanAleoValue(
-      adapter.account?.address ||
-      adapter.account?.publicKey ||
-      sessionStorage.getItem(
-        'usdcxAddress'
-      ) ||
-      ''
-    );
 
-  if (!currentAddress) {
+  const walletAddress =
+    adapter.account?.address ||
+    adapter.account?.publicKey ||
+    adapter.publicKey ||
+    sessionStorage.getItem('usdcxAddress') ||
+    '';
+
+
+  if (!walletAddress) {
+
     throw new Error(
-      'Connected wallet address could not be determined.'
+      'No connected wallet address available.'
     );
+
   }
 
-  console.log(
-    'USDCx LOCKED: Current wallet:',
-    currentAddress
-  );
 
   /*
-    STEP 7
-    Get private records from Leo Wallet.
-  */
+   * Request records ONLY after
+   * GET YOUR RECORD is clicked.
+   */
 
   const recordList =
     await requestPlaintextRecords(
       adapter
     );
 
+
   console.log(
-    'USDCx LOCKED: Total records returned:',
+    'AEGIS: Record count:',
     recordList.length
   );
 
+
   if (!recordList.length) {
+
     console.log(
-      'USDCx LOCKED: No records found.'
+      'AEGIS: No records found.'
     );
 
     return [];
+
   }
 
-  /*
-    STEP 8
-    Match records to connected wallet.
-  */
 
-  const matchingRecords =
+  /*
+   * Only records belonging to the
+   * connected wallet.
+   */
+
+  const ownedRecords =
     recordList.filter(
-      item => {
-        const owner =
-          getRecordValue(
-            item.record,
-            [
-              'owner',
-              'owner_address'
-            ]
-          );
-
-        const cleanOwner =
-          cleanAleoValue(
-            owner
-          );
-
-        const matches =
-          cleanOwner ===
-          currentAddress;
-
-        console.log(
-          'USDCx LOCKED: Checking record owner:',
-          cleanOwner,
-          'MATCH:',
-          matches,
-          'PROGRAM:',
-          item.programId
-        );
-
-        return matches;
-      }
-    );
-
-  console.log(
-    'USDCx LOCKED: Records matching current wallet:',
-    matchingRecords.length
-  );
-
-  if (!matchingRecords.length) {
-    console.log(
-      'USDCx LOCKED: No record belongs to the current wallet.'
-    );
-
-    return [];
-  }
-
-  /*
-    STEP 9
-    Normalize private allocation.
-  */
-
-  const allocations =
-    matchingRecords.map(
-      (item, index) =>
-        normalizeAllocationRecord(
+      item =>
+        item.programId === PROGRAM_ID &&
+        recordOwnerMatches(
           item.record,
-          index,
-          item.programId
+          walletAddress
         )
     );
 
-  /*
-    STEP 10
-    Attach Explorer data to selected allocation.
-  */
 
-  if (allocations[0]) {
-    allocations[0].transactionId =
-      explorerData.transactionId;
+  console.log(
+    'AEGIS: Matching records:',
+    ownedRecords.length
+  );
 
-    allocations[0].transitionId =
-      explorerData.transitionId;
 
-    allocations[0].tokenId =
-      explorerData.tokenId || TOKEN_ID;
-
-    allocations[0].lockRecordId =
-      explorerData.lockRecordId;
-
-    allocations[0].explorer =
-      explorerData;
-
-    allocations[0].program =
-      'vusdc_transaction.aleo';
-
-    allocations[0].function =
-      'lock';
-
-    /*
-      PRIVATE AMOUNT
-      Read the amount from the private backend
-      using BOTH wallet address and transaction ID.
-    */
-    allocations[0].amount =
-      await getBackendAllocationAmount(
-        currentAddress,
-        explorerData.transactionId
-      );
+  if (!ownedRecords.length) {
 
     console.log(
-      'USDCx LOCKED: Backend amount for wallet + transaction:',
-      allocations[0].amount || 'NOT FOUND'
+      'AEGIS: No matching LockedRecord found.'
     );
+
+    return [];
+
   }
 
+
   /*
-    STEP 11
-    Save selected private record.
-  */
+   * Prefer LockedRecord.
+   */
+
+  const lockedRecords =
+    ownedRecords.filter(
+      item =>
+        getRecordType(item.record) ===
+        'LockedRecord'
+    );
+
+
+  const selected =
+    lockedRecords.length
+      ? lockedRecords[0]
+      : ownedRecords[0];
+
+
+  /*
+   * Normalize ONLY actual record data.
+   */
+
+  const normalized =
+    normalizeLockedRecord(
+      selected.record,
+      0,
+      selected.programId
+    );
+
+
+  /*
+   * Save ORIGINAL raw private record.
+   *
+   * Page 3 uses this as its primary source.
+   */
 
   try {
+
     sessionStorage.setItem(
       'usdcxSelectedRecord',
       JSON.stringify(
-        allocations[0].raw
+        selected.record
       )
     );
+
+
+    /*
+     * Compatibility object for Page 3.
+     *
+     * It contains only data extracted from
+     * the actual record.
+     */
 
     sessionStorage.setItem(
       'usdcxSelectedAllocation',
       JSON.stringify(
-        allocations[0]
+        normalized
       )
     );
 
-    /*
-      Transaction-specific Explorer data.
-    */
-
-    sessionStorage.setItem(
-      'usdcxTransactionId',
-      explorerData.transactionId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxTransitionId',
-      explorerData.transitionId || ''
-    );
-
-    sessionStorage.setItem(
-      'usdcxTokenId',
-      explorerData.tokenId || TOKEN_ID
-    );
-
-    sessionStorage.setItem(
-      'usdcxLockRecordId',
-      explorerData.lockRecordId || ''
-    );
-
   } catch (storageError) {
+
     console.warn(
-      'USDCx LOCKED: Could not save selected record:',
+      'AEGIS: Could not save selected record:',
       storageError
     );
+
   }
 
-  console.log(
-    'USDCx LOCKED: Selected wallet record:',
-    allocations[0]
-  );
 
   console.log(
-    'USDCx LOCKED: Explorer Transaction:',
-    explorerData.transactionId
+    'AEGIS: Selected private LockedRecord:',
+    normalized
   );
 
-  console.log(
-    'USDCx LOCKED: Explorer Transition:',
-    explorerData.transitionId
-  );
 
-  console.log(
-    'USDCx LOCKED: Explorer Token ID:',
-    explorerData.tokenId
-  );
+  return [
+    normalized
+  ];
 
-  console.log(
-    'USDCx LOCKED: Lock Record ID:',
-    explorerData.lockRecordId
-  );
-
-  console.log(
-    'USDCx LOCKED: Allocations:',
-    allocations
-  );
-
-  return allocations;
 }
 
+
 /* =========================================================
-   GLOBAL FUNCTIONS
-   ========================================================= */
+ * GLOBAL FUNCTIONS
+ * ========================================================= */
 
 window.connectLeoForRecords =
   connectLeoForRecords;
@@ -1343,9 +1125,10 @@ window.shortenAddress =
 window.formatStatus =
   formatStatus;
 
+
 /* =========================================================
-   VIEW DETAILS
-   ========================================================= */
+ * VIEW DETAILS
+ * ========================================================= */
 
 document
   .querySelectorAll('[data-details]')
@@ -1355,28 +1138,40 @@ document
       'click',
       () => {
 
+        /*
+         * Page 3 reads the private record
+         * saved by GET YOUR RECORD.
+         */
+
         const selectedRecord =
           sessionStorage.getItem(
             'usdcxSelectedRecord'
           );
 
+
         if (!selectedRecord) {
+
           console.warn(
-            'USDCx LOCKED: No selected record available for Page 3.'
+            'AEGIS: No selected record available for Page 3.'
           );
 
           return;
+
         }
+
 
         location.href =
           'page3.html';
+
       }
     );
+
   });
 
+
 /* =========================================================
-   DISCONNECT WALLET
-   ========================================================= */
+ * DISCONNECT WALLET
+ * ========================================================= */
 
 document
   .querySelectorAll('[data-disconnect]')
@@ -1387,87 +1182,78 @@ document
       async () => {
 
         try {
+
           const adapter =
             window.usdcxLeoAdapter;
+
 
           if (
             adapter &&
             adapter.account
           ) {
+
             console.log(
-              'USDCx LOCKED: Disconnecting Leo Wallet...'
+              'AEGIS: Disconnecting Leo Wallet...'
             );
 
+
             await adapter.disconnect();
+
           }
 
         } catch (error) {
+
           console.warn(
-            'USDCx LOCKED: Wallet disconnect warning:',
+            'AEGIS: Wallet disconnect warning:',
             error
           );
+
         }
+
 
         sessionStorage.removeItem(
           'usdcxAddress'
         );
 
+
         sessionStorage.removeItem(
           'walletAddress'
         );
+
 
         sessionStorage.removeItem(
           'usdcxSelectedRecord'
         );
 
+
         sessionStorage.removeItem(
           'usdcxSelectedAllocation'
         );
 
-        sessionStorage.removeItem(
-          'usdcxExplorerTransaction'
-        );
-
-        sessionStorage.removeItem(
-          'usdcxExplorerData'
-        );
-
-        sessionStorage.removeItem(
-          'usdcxTransactionId'
-        );
-
-        sessionStorage.removeItem(
-          'usdcxTransitionId'
-        );
-
-        sessionStorage.removeItem(
-          'usdcxTokenId'
-        );
-
-        sessionStorage.removeItem(
-          'usdcxLockRecordId'
-        );
 
         location.href =
           'index.html';
+
       }
     );
+
   });
 
+
 /* =========================================================
-   PAGE READY
-   ========================================================= */
+ * PAGE READY
+ * ========================================================= */
 
 console.log(
-  'USDCx LOCKED: Page ready.'
+  'AEGIS: Page ready.'
 );
 
 console.log(
-  'USDCx LOCKED: Program:',
+  'AEGIS: Program:',
   PROGRAM_ID
 );
 
 console.log(
-  'USDCx LOCKED: Decrypt permission:',
+  'AEGIS: Decrypt permission:',
   DECRYPT_PERMISSION
 );
