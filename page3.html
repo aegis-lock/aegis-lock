@@ -1,541 +1,1888 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AEGIS - Private Record Details</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Private Record Details | AEGIS</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="app.css">
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#080e0c;color:#c8d1ce;font-family:'Inter',sans-serif;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
-a{text-decoration:none}
 
-/* HEADER */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;border-bottom:1px solid rgba(0,230,118,.08);background:rgba(8,14,12,.92);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50}
-.hdr-left{display:flex;align-items:center;gap:12px}
-.hdr-logo{width:40px;height:40px;background:linear-gradient(135deg,#00e676,#00c853);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.hdr-brand h1{font-size:17px;font-weight:800;color:#fff;letter-spacing:.5px;line-height:1.2}
-.hdr-brand h1 span{color:#00e676}
-.hdr-brand p{font-size:11px;color:#6b7b75;letter-spacing:.3px}
-.hdr-nav{display:flex;align-items:center;gap:36px}
-.hdr-nav a{color:#9daa9d;font-size:14px;font-weight:500;transition:color .2s}
-.hdr-nav a:hover{color:#00e676}
-.hdr-right{display:flex;align-items:center;gap:16px}
-.hdr-gear{width:38px;height:38px;border:1px solid rgba(0,230,118,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#00e676;font-size:16px;cursor:pointer}
-.btn-disconnect{display:flex;align-items:center;gap:8px;padding:10px 22px;border:1.5px solid #00e676;border-radius:8px;background:transparent;color:#00e676;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
-.btn-disconnect:hover{background:rgba(0,230,118,.1)}
+/* =========================================================
+   PAGE 3 — PRIVATE RECORD DETAILS
+   ========================================================= */
 
-/* SUB NAV */
-.subnav{display:flex;align-items:center;justify-content:space-between;padding:16px 48px;border-bottom:1px solid rgba(0,230,118,.06);background:rgba(8,14,12,.6)}
-.subnav-links{display:flex;gap:32px}
-.subnav-link{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#6b7b75;cursor:pointer;transition:color .2s;padding-bottom:4px}
-.subnav-link.active{color:#00e676;border-bottom:2px solid #00e676}
-.subnav-link:hover{color:#9daa9d}
-.subnav-right{display:flex;align-items:center;gap:16px}
-.wallet-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid rgba(0,230,118,.15);border-radius:8px;font-size:13px;color:#9daa9d}
-.wallet-badge .dot{width:8px;height:8px;background:#00e676;border-radius:50%}
-.network-badge{display:flex;align-items:center;gap:6px;font-size:13px;color:#6b7b75}
-.network-badge .dot{width:8px;height:8px;background:#00e676;border-radius:50%}
-
-/* MAIN */
-.main{flex:1;max-width:1100px;margin:0 auto;width:100%;padding:30px 48px 40px}
-
-/* BACK LINK */
-.back-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#9daa9d;padding:8px 16px;border:1px solid rgba(0,230,118,.15);border-radius:8px;cursor:pointer;transition:all .2s;margin-bottom:20px}
-.back-link:hover{color:#00e676;border-color:rgba(0,230,118,.35)}
-
-/* TITLE ROW */
-.title-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.page-title .green{color:#00e676;font-size:32px;font-weight:800}
-.page-title .white{color:#fff;font-size:32px;font-weight:800}
-
-/* STATUS BADGE */
-.status-badge{display:flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid rgba(0,230,118,.25);border-radius:12px;background:rgba(0,230,118,.03)}
-.status-badge .lock-icon{width:40px;height:40px;border:1px solid rgba(0,230,118,.3);border-radius:50%;display:flex;align-items:center;justify-content:center}
-.status-badge .lock-icon svg{width:20px;height:20px}
-.status-text{display:flex;flex-direction:column}
-.status-text .label{font-size:11px;color:#6b7b75}
-.status-text .value{font-size:16px;font-weight:700;color:#00e676}
-
-.page-sub{font-size:15px;color:#6b7b75;margin-bottom:32px}
-
-/* DETAIL CARD */
-.detail-card{border:1px solid rgba(0,230,118,.15);border-radius:16px;padding:28px;background:rgba(0,230,118,.02);margin-bottom:32px}
-.detail-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.alloc-title{font-size:16px;font-weight:800;color:#00e676;letter-spacing:1px}
-.ticket-ref{display:flex;align-items:center;gap:8px}
-.ticket-ref .label{font-size:12px;color:#6b7b75;text-align:right}
-.ticket-ref .value{font-size:14px;font-weight:600;color:#e0e8e4}
-.copy-icon{width:18px;height:18px;border:1px solid rgba(0,230,118,.25);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5a6b65;font-size:11px;transition:all .2s}
-.copy-icon:hover{border-color:#00e676;color:#00e676}
-
-.detail-card-body{display:flex;gap:40px}
-
-/* SHIELD */
-.shield-col{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.shield-wrap{width:160px;height:160px;position:relative;display:flex;align-items:center;justify-content:center}
-.shield-ring{position:absolute;border:1px solid rgba(0,230,118,.12);border-radius:50%}
-.shield-ring.r1{width:160px;height:160px}
-.shield-ring.r2{width:130px;height:130px}
-.shield-ring.r3{width:100px;height:100px}
-.shield-icon{width:60px;height:60px;display:flex;align-items:center;justify-content:center;z-index:2}
-.shield-icon svg{width:52px;height:52px}
-.shield-glow{position:absolute;width:80px;height:80px;background:radial-gradient(circle,rgba(0,230,118,.15) 0%,transparent 70%);border-radius:50%;z-index:1}
-
-.record-id-box{border:1px solid rgba(0,230,118,.12);border-radius:10px;padding:12px 16px;text-align:center;width:100%}
-.record-id-box .label{font-size:11px;color:#6b7b75;margin-bottom:4px}
-.record-id-box .value{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:#e0e8e4}
-
-/* INFO TABLE */
-.info-table{flex:1}
-.info-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(0,230,118,.06)}
-.info-row:last-child{border-bottom:none}
-.info-left{display:flex;align-items:center;gap:12px;font-size:14px;color:#9daa9d}
-.info-left .icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:#5a6b65}
-.info-left .icon svg{width:18px;height:18px}
-.info-right{font-size:14px;font-weight:500;color:#e0e8e4}
-.info-right.green{color:#00e676;font-weight:700}
-
-/* CLAIM SECTION */
-.claim-section{border:1px solid rgba(0,230,118,.1);border-radius:16px;padding:32px;display:flex;align-items:center;gap:32px;margin-bottom:32px;background:rgba(0,230,118,.02)}
-.claim-vault{flex:0 0 180px;height:180px;display:flex;align-items:center;justify-content:center;position:relative}
-.claim-vault-glow{position:absolute;width:180px;height:180px;background:radial-gradient(circle,rgba(0,230,118,.08) 0%,transparent 70%);border-radius:50%}
-.claim-vault-icon{font-size:80px;position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(0,230,118,.2))}
-.claim-info{flex:1}
-.claim-info h3{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
-.claim-info p{font-size:14px;color:#6b7b75;margin-bottom:20px;line-height:1.6}
-.btn-claim{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-size:16px;font-weight:700;letter-spacing:2px;cursor:not-allowed;opacity:.7;font-family:inherit;margin-bottom:12px}
-.btn-claim svg{width:20px;height:20px}
-.claim-note{display:flex;align-items:center;gap:6px;font-size:13px;color:#6b7b75;justify-content:center}
-.claim-note svg{width:16px;height:16px;color:#6b7b75}
-
-/* INFO BOXES */
-.info-boxes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
-.info-box{border:1px solid rgba(0,230,118,.1);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:14px;background:rgba(0,230,118,.02)}
-.info-box-icon{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,230,118,.2);border-radius:8px}
-.info-box-icon svg{width:20px;height:20px}
-.info-box-content h4{font-size:14px;font-weight:600;color:#e0e8e4;margin-bottom:4px}
-.info-box-content p{font-size:12px;color:#6b7b75;line-height:1.5}
-.info-box-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:600;color:#00e676;border:1px solid rgba(0,230,118,.25);border-radius:6px;padding:6px 12px;cursor:pointer;transition:all .2s}
-.info-box-link:hover{background:rgba(0,230,118,.06)}
-.info-box-link svg{width:12px;height:12px}
-
-/* FOOTER */
-.ftr{padding:24px 48px;border-top:1px solid rgba(0,230,118,.06);text-align:center;font-size:13px;color:#3e4e48;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:auto}
-.ftr svg{width:24px;height:24px;color:#3e4e48}
-.ftr-sep{width:4px;height:4px;background:#3e4e48;border-radius:50%}
-
-/* RESPONSIVE */
-@media(max-width:900px){
-  .main{padding:24px 20px}
-  .hdr,.subnav{padding-left:20px;padding-right:20px}
-  .title-row{flex-direction:column;gap:16px}
-  .detail-card-body{flex-direction:column;align-items:center}
-  .shield-col{flex:none;width:100%}
-  .claim-section{flex-direction:column;text-align:center}
-  .claim-vault{flex:none}
-  .info-boxes{grid-template-columns:1fr}
-  .subnav-right{display:none}
+.page3-value {
+  word-break: break-word;
 }
+
+.record-id-value {
+  font-family: monospace;
+  word-break: break-all;
+}
+
+
+/* =========================================================
+   REMOVE BOLD FROM PAGE 3
+   ========================================================= */
+
+main,
+main h1,
+main h2,
+main h3,
+main h4,
+main p,
+main span,
+main b,
+main strong,
+main small,
+main button {
+  font-weight: 400;
+}
+
+.rows .row b {
+  font-weight: 400 !important;
+}
+
+.lock-status strong {
+  font-weight: 400 !important;
+}
+
+.card-head .allocation {
+  font-weight: 400 !important;
+}
+
+
+/* =========================================================
+   FIELD ICONS
+   ========================================================= */
+
+.field-icon {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--green);
+}
+
+.field-icon svg {
+  width: 20px;
+  height: 20px;
+
+  display: block;
+}
+
+
+/* =========================================================
+   USDC LOGO
+   ========================================================= */
+
+.amount-usdc-logo {
+  width: 22px;
+  height: 22px;
+
+  min-width: 22px;
+
+  flex: 0 0 22px;
+
+  display: block;
+}
+
+
+/* =========================================================
+   LOCKED AMOUNT
+   ========================================================= */
+
+.amount-value {
+  color: #ffffff !important;
+
+  font-size: 22px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 1.25;
+}
+
+
+/* =========================================================
+   RECORD VISUAL COLUMN
+   ========================================================= */
+
+.record-visual-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+/* =========================================================
+   OWNER
+   ICON + OWNER
+   ADDRESS UNDER OWNER
+   ========================================================= */
+
+.owner-beside-image {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  gap: 0;
+
+  margin-top: -8px;
+
+  color: #b4c0bb;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  white-space: normal;
+
+  width: 100%;
+}
+
+.owner-beside-image .field-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+
+  display: inline-flex;
+
+  margin: 0 0 2px 0;
+}
+
+.owner-beside-image .field-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.owner-beside-image b {
+  position: absolute;
+
+  margin-left: 28px;
+
+  margin-top: 2px;
+
+  font-weight: 400 !important;
+
+  color: #9aa8a2;
+}
+
+.owner-value {
+  display: block;
+
+  width: 100%;
+
+  max-width: 260px;
+
+  margin-top: 1px;
+
+  color: #ffffff;
+
+  font-family: monospace;
+
+  word-break: break-all;
+
+  text-align: left;
+
+  font-weight: 400 !important;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   RECORD ID
+   ========================================================= */
+
+.record-id {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  width: 100%;
+
+  margin-top: 12px;
+
+  text-align: left;
+}
+
+.record-id small {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #9aa8a2;
+
+  font-size: 12px;
+
+  line-height: 1.4;
+
+  font-weight: 400 !important;
+}
+
+.record-id-value {
+  display: block;
+
+  width: 100%;
+
+  max-width: 260px;
+
+  color: #ffffff;
+
+  font-family: monospace;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+
+  word-break: break-all;
+
+  text-align: left;
+
+  font-weight: 400 !important;
+}
+
+
+/* =========================================================
+   COUNTDOWN
+   ========================================================= */
+
+.lock-countdown {
+  margin-top: 28px;
+
+  padding: 22px 24px;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.015)
+    );
+
+  text-align: center;
+}
+
+.lock-countdown-label {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: #9aa8a2;
+
+  font-size: 12px;
+
+  letter-spacing: .12em;
+
+  text-transform: uppercase;
+
+  font-weight: 400 !important;
+}
+
+.countdown-value {
+  display: block;
+
+  color: var(--green);
+
+  font-size: 28px;
+
+  line-height: 1.2;
+
+  letter-spacing: .04em;
+
+  font-weight: 400 !important;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-end {
+  display: block;
+
+  margin-top: 9px;
+
+  color: #8d9994;
+
+  font-size: 12px;
+
+  font-weight: 400 !important;
+}
+
+.countdown-ended {
+  color: var(--green) !important;
+}
+
+
+/* =========================================================
+   CLAIM SECTION
+   ========================================================= */
+
+.claim {
+  position: relative;
+}
+
+.claim-text {
+  width: 100%;
+}
+
+.claim-btn {
+  font-weight: 400 !important;
+}
+
+.claim-message {
+  display: none;
+
+  margin-top: 12px;
+
+  color: #ff7777;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  font-weight: 400 !important;
+}
+
+.claim-message.success {
+  color: var(--green) !important;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+[data-record-error] {
+  display: none;
+
+  margin-top: 20px;
+
+  padding: 14px 18px;
+
+  border: 1px solid rgba(255,80,80,.25);
+
+  border-radius: 12px;
+
+  color: #ff7777;
+
+  background: rgba(255,50,50,.05);
+
+  font-weight: 400 !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .row {
+    gap: 10px !important;
+  }
+
+  .row b {
+    white-space: nowrap;
+
+    font-weight: 400 !important;
+  }
+
+  .row > span:last-child {
+    text-align: right;
+
+    word-break: break-word;
+
+    font-weight: 400 !important;
+  }
+
+  .record-id {
+    word-break: break-all;
+
+    align-items: flex-start;
+
+    text-align: left;
+  }
+
+  .amount-usdc-logo {
+    width: 22px;
+    height: 22px;
+  }
+
+  .amount-value {
+    font-size: 21px !important;
+
+    font-weight: 400 !important;
+  }
+
+  .owner-beside-image {
+    width: 100%;
+
+    max-width: 100%;
+
+    margin-top: -5px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    justify-content: flex-start;
+
+    flex-wrap: nowrap;
+
+    white-space: normal;
+
+    text-align: left;
+  }
+
+  .owner-beside-image .field-icon {
+    margin-bottom: 2px;
+  }
+
+  .owner-beside-image b {
+    margin-left: 28px;
+
+    margin-top: 2px;
+  }
+
+  .owner-value {
+    width: 100%;
+
+    max-width: 220px;
+
+    margin-top: 1px;
+
+    text-align: left;
+
+    word-break: break-all;
+  }
+
+  .record-id {
+    width: 100%;
+
+    margin-top: 12px;
+
+    text-align: left;
+  }
+
+  .record-id-value {
+    width: 100%;
+
+    max-width: 220px;
+
+    text-align: left;
+
+    word-break: break-all;
+  }
+
+  .lock-countdown {
+    padding: 18px 14px;
+  }
+
+  .countdown-value {
+    font-size: 23px;
+  }
+
+}
+
 </style>
+
+<style>
+
+.page3-blockchain-refs {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.page3-ref-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.page3-ref-row b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.page3-link-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82em;
+}
+
+.page3-explorer-link {
+  flex: 0 0 auto;
+  width: 25px;
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.page3-explorer-link svg {
+  width: 17px;
+  height: 17px;
+}
+
+.page3-explorer-link:hover {
+  opacity: 0.75;
+}
+
+@media (max-width: 700px) {
+
+  .page3-ref-row {
+    gap: 6px;
+  }
+
+  .page3-link-value {
+    font-size: 0.74em;
+  }
+
+  .page3-explorer-link {
+    width: 23px;
+    height: 23px;
+  }
+
+  .page3-explorer-link svg {
+    width: 16px;
+    height: 16px;
+  }
+
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-<!-- HEADER -->
-<header class="hdr">
-  <div class="hdr-left">
-    <div class="hdr-logo">🔒</div>
-    <div class="hdr-brand">
-      <h1>USDCx <span>LOCKED</span></h1>
-      <p>Private Lock Protocol</p>
-    </div>
-  </div>
-  <nav class="hdr-nav">
-    <a href="index.html">About</a>
-    <a href="page2.html">How it works</a>
-  </nav>
-  <div class="hdr-right">
-    <div class="hdr-gear">⚙</div>
-    <button class="btn-disconnect">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      Disconnect Wallet
-    </button>
-  </div>
-</header>
+<div class="shell">
 
-<!-- SUB NAV -->
-<div class="subnav">
-  <div class="subnav-links">
-    <a href="index.html" class="subnav-link">📋 Dashboard</a>
-    <a href="page2.html" class="subnav-link active">🔒 Private Record</a>
-    <a href="#" class="subnav-link">⚙ Settings</a>
-  </div>
-  <div class="subnav-right">
-    <div class="wallet-badge">
-      <span class="dot"></span>
-      <span id="walletAddress">aleo1...6k3d</span>
-      <span class="copy-icon" onclick="copyText(document.getElementById('walletAddress').textContent)">📋</span>
-    </div>
-    <div class="network-badge">
-      <span class="dot"></span>
-      Network: <span id="networkName">Mainnet</span>
-    </div>
-  </div>
-</div>
 
-<!-- MAIN -->
-<main class="main">
+<header class="topbar">
 
-  <a href="page2.html" class="back-link">← Back to Allocations</a>
+  <a class="brand" href="index.html">
 
-  <div class="title-row">
-    <div>
-      <div class="page-title">
-        <span class="green">Private</span> <span class="white">Record Details</span>
-      </div>
-      <p class="page-sub">Below are the full details of your encrypted allocation record on Aleo.</p>
-    </div>
+    <span class="brand-mark">
 
-    <div class="status-badge">
-      <div class="lock-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2">
-          <rect x="5" y="11" width="14" height="11" rx="2"/>
-          <path d="M7 11V7a5 5 0 0110 0v4"/>
-        </svg>
-      </div>
+      <svg viewBox="0 0 48 54" fill="none">
 
-      <div class="status-text">
-        <span class="label">Status</span>
-        <span class="value" id="statusValue">------</span>
-      </div>
-    </div>
-  </div>
+        <path
+          d="M24 2 7 9v14c0 12.5 17 23 17 23s17-10.5 17-23V9L24 2Z"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
 
-  <div class="detail-card">
+        <rect
+          x="18"
+          y="21"
+          width="12"
+          height="10"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.7"
+        />
 
-    <div class="detail-card-header">
-      <div class="alloc-title" id="allocTitle">------</div>
+        <path
+          d="M20.5 21v-3.5a3.5 3.5 0 0 1 7 0V21"
+          stroke="currentColor"
+          stroke-width="1.7"
+        />
 
-      <div class="ticket-ref">
-        <div style="text-align:right">
-          <div class="label">Ticket Reference</div>
-          <div class="value" id="ticketRef">------</div>
-        </div>
+      </svg>
 
-        <span class="copy-icon" onclick="copyText(document.getElementById('ticketRef').textContent)">📋</span>
-      </div>
-    </div>
+    </span>
 
-    <div class="detail-card-body">
+    <span>
 
-      <div class="shield-col">
-
-        <div class="shield-wrap">
-          <div class="shield-ring r1"></div>
-          <div class="shield-ring r2"></div>
-          <div class="shield-ring r3"></div>
-          <div class="shield-glow"></div>
-
-          <div class="shield-icon">
-            <svg viewBox="0 0 60 70" fill="none">
-              <path d="M30 4L6 16v20c0 16 24 28 24 28s24-12 24-28V16L30 4z"
-                    stroke="#00e676"
-                    stroke-width="2"
-                    fill="rgba(0,230,118,.06)"/>
-              <rect x="22" y="30" width="16" height="14" rx="3"
-                    stroke="#00e676"
-                    stroke-width="1.5"
-                    fill="rgba(0,230,118,.08)"/>
-              <path d="M25 30v-4a5 5 0 0110 0v4"
-                    stroke="#00e676"
-                    stroke-width="1.5"
-                    fill="none"/>
-              <circle cx="30" cy="37" r="2" fill="#00e676"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="record-id-box">
-          <div class="label">Record ID</div>
-
-          <div class="value">
-            <span id="recordId">------</span>
-            <span class="copy-icon"
-                  onclick="copyText(document.getElementById('recordId').textContent)">
-              📋
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="info-table">
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </div>
-            Owner
-          </div>
-          <div class="info-right" id="owner">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v6l4 2"/>
-              </svg>
-            </div>
-            Locked Amount
-          </div>
-          <div class="info-right green" id="lockedAmount">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2"/>
-                <path d="M16 2v4M8 2v4M3 10h18"/>
-              </svg>
-            </div>
-            Locked Start
-          </div>
-          <div class="info-right" id="lockedStart">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2"/>
-                <path d="M16 2v4M8 2v4M3 10h18"/>
-              </svg>
-            </div>
-            Locked End
-          </div>
-          <div class="info-right" id="lockedEnd">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v6l4 2"/>
-              </svg>
-            </div>
-            Lock Duration
-          </div>
-          <div class="info-right" id="lockDuration">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 8v4M12 16h.01"/>
-              </svg>
-            </div>
-            Claimable Token
-          </div>
-          <div class="info-right" id="claimableToken">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 18 22 12 16 6"/>
-                <polyline points="8 6 2 12 8 18"/>
-              </svg>
-            </div>
-            Program
-          </div>
-          <div class="info-right" id="program">------</div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-left">
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-              </svg>
-            </div>
-            Record Type
-          </div>
-          <div class="info-right" id="recordType">------</div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="claim-section">
-
-    <div class="claim-vault">
-      <div class="claim-vault-glow"></div>
-      <div class="claim-vault-icon">🔐</div>
-    </div>
-
-    <div class="claim-info">
-      <h3>Claim Your Allocation</h3>
+      <h1>
+        AEGIS
+      </h1>
 
       <p>
-        You will be able to claim your locked amount and tokens once the lock period ends.
+        Private Asset Locking Infrastructure
       </p>
 
-      <button class="btn-claim" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="5" y="11" width="14" height="11" rx="2"/>
-          <path d="M7 11V7a5 5 0 0110 0v4"/>
-        </svg>
-        CLAIM
+    </span>
+
+  </a>
+
+
+  <nav class="links">
+
+    <a href="index.html">
+      About
+    </a>
+
+    <a href="#">
+      How it works
+    </a>
+
+  </nav>
+
+
+  <div class="top-actions">
+
+    <button
+      class="icon-btn"
+      aria-label="Settings"
+    >
+      ⚙
+    </button>
+
+
+    <button
+      class="wallet-btn"
+      data-disconnect
+    >
+      Disconnect Wallet
+    </button>
+
+  </div>
+
+</header>
+
+
+<div class="subnav">
+
+  <div class="tabs">
+
+    <a
+      class="tab"
+      href="#"
+    >
+      Dashboard
+    </a>
+
+
+    <a
+      class="tab active"
+      href="page2.html"
+    >
+      Private Record
+    </a>
+
+
+    <a
+      class="tab"
+      href="#"
+    >
+      Settings
+    </a>
+
+  </div>
+
+
+  <div class="status">
+
+    <div class="wallet-chip">
+
+      <span data-wallet>
+        Not connected
+      </span>
+
+
+      <button
+        data-copy
+        aria-label="Copy wallet address"
+      >
+        ⧉
       </button>
 
-      <div class="claim-note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4M12 16h.01"/>
-        </svg>
-        Available after the lock period ends.
-      </div>
+    </div>
+
+
+    <div class="network-chip">
+
+      <i class="dot"></i>
+
+      Network: Mainnet
+
     </div>
 
   </div>
 
-  <div class="info-boxes">
+</div>
 
-    <div class="info-box">
-      <div class="info-box-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2">
-          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-          <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/>
+
+<main>
+
+
+<a
+  class="back"
+  href="page2.html"
+>
+  ← &nbsp; Back to Allocations
+</a>
+
+
+<div class="heading-row">
+
+  <div>
+
+    <h2 class="eyebrow">
+
+      <span class="accent">
+        Private
+      </span>
+
+      Record Details
+
+    </h2>
+
+
+    <p class="intro">
+      Below are the full details of your encrypted allocation record on Aleo.
+    </p>
+
+  </div>
+
+
+  <div class="lock-status">
+
+    <svg
+      viewBox="0 0 50 55"
+      fill="none"
+    >
+
+      <rect
+        x="9"
+        y="23"
+        width="32"
+        height="25"
+        rx="4"
+        stroke="currentColor"
+        stroke-width="3"
+      />
+
+      <path
+        d="M16 23v-8a9 9 0 0 1 18 0v8"
+        stroke="currentColor"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="25"
+        cy="35"
+        r="3"
+        fill="currentColor"
+      />
+
+    </svg>
+
+
+    <span>
+
+      <small>
+        Status
+      </small>
+
+      <strong data-page3-status>
+        LOCKED
+      </strong>
+
+    </span>
+
+  </div>
+
+</div>
+
+
+<section class="record-card">
+
+
+  <div class="card-head">
+
+    <strong
+      class="allocation"
+      data-page3-allocation
+    >
+      ALLOCATION 01
+    </strong>
+
+  </div>
+
+
+  <div class="detail-layout">
+
+
+    <div class="record-visual-column">
+
+      <div class="seal">
+
+        <svg
+          viewBox="0 0 230 250"
+          fill="none"
+        >
+
+          <circle
+            cx="115"
+            cy="125"
+            r="102"
+            stroke="currentColor"
+            opacity=".22"
+            stroke-dasharray="2 5"
+          />
+
+          <circle
+            cx="115"
+            cy="125"
+            r="83"
+            stroke="currentColor"
+            opacity=".32"
+            stroke-dasharray="2 5"
+          />
+
+          <circle
+            cx="115"
+            cy="125"
+            r="65"
+            stroke="currentColor"
+            opacity=".18"
+          />
+
+          <path
+            d="M115 62 63 88v51c0 46 52 73 52 73s52-27 52-73V88l-52-26Z"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+
+          <rect
+            x="88"
+            y="119"
+            width="54"
+            height="43"
+            rx="7"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+
+          <path
+            d="M99 119V103a16 16 0 0 1 32 0v16"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+
+          <circle
+            cx="115"
+            cy="140"
+            r="5"
+            fill="currentColor"
+          />
+
         </svg>
+
       </div>
 
-      <div class="info-box-content">
-        <h4>Record Source</h4>
-        <p>
-          <strong id="recordSource">------</strong><br>
-          This record is stored and verified on the Aleo blockchain.
-        </p>
 
-        <a href="#" class="info-box-link">
-          View in Aleo Explorer
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+      <div class="owner-beside-image">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <circle
+              cx="12"
+              cy="8"
+              r="3.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+
           </svg>
-        </a>
+
+        </span>
+
+
+        <b>
+          Owner
+        </b>
+
+
+        <span
+          class="owner-value"
+          data-page3-owner
+        >
+          —
+        </span>
+
       </div>
+
+
+      <div class="record-id">
+
+        <small>
+          Record ID
+        </small>
+
+
+        <span
+          class="record-id-value"
+          data-page3-record-id
+        >
+          —
+        </span>
+
+      </div>
+
     </div>
 
-    <div class="info-box">
 
-      <div class="info-box-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    <div class="rows">
+
+
+      <div class="row">
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 16 16"
+          id="Usdc--Streamline-Cryptocurrency"
+          height="16"
+          width="16"
+          class="amount-usdc-logo"
+          aria-hidden="true"
+        >
+
+          <path
+            fill="#3e73c4"
+            d="M8 16c4.4183 0 8-3.5817 8-8 0-4.41828-3.5817-8-8-8C3.58172 0 0 3.5817 0 8c0 4.4183 3.58172 8 8 8Z"
+          ></path>
+
+          <path
+            fill="#ffffff"
+            d="M10.01105 9.062c0-1.062-.64-1.426-1.92-1.578-.914-.1215-1.0965-.364-1.0965-.789 0-.425.305-.698.914-.698.5485 0 .8535.182 1.0055.6375.0158.04405.04475.0822.08295.10925.03815.0271.0837.04185.13055.04225h.4875c.02815.00075.05615-.0042.08235-.0146-.02615-.0104-.04995-.02605-.0699-.0459-.01995-.01985-.0357-.0436-.0462-.0697-.01055-.02615-.01565-.05415-.01505-.0823v-.03c-.0596-.32955-.22635-.6302-.47435-.85525-.248-.22505-.5634-.36185-.89715-.38925V4.571005c0-.1215-.0915-.2125-.2435-.243h-.4575c-.1215 0-.213.091-.2435.243V5.269c-.9145.121-1.493.728-1.493 1.487 0 1.001.609 1.3955 1.889 1.5475.8535.1515 1.1275.334 1.1275.8195 0 .485-.4265.819-.1.0055 0-.7925 0-1.0665-.3335-1.158-.789-.03-.121-.122-.182-.2135-.182h-.518c-.02815-.0007-.0561.00435-.0822.0148-.02615.0104-.04985.02605-.0698.0459-.0199.01985-.03555.04355-.04605.06965-.0105.0261-.0156.05405-.01495.08215v.03c.1215.759.6095 1.305 1.615 1.457v.7285c0 .121.0915.2125.2435.2425h.4575c.1215 0 .213-.091.2435-.2425V10.67c.9145-.1515 1.5235-.789 1.5235-1.6085v.0005Z"
+          ></path>
+
+          <path
+            fill="#ffffff"
+            d="M6.446 12.2485c-2.37698-.85-3.59598-3.49-2.71198-5.8265.457-1.275 1.46248-2.2455 2.71198-2.701.122-.0605.1825-.1515.1825-.3035v-.425c0-.121-.0605-.212-.1825-.2425-.0305 0-.0915 0-.122.03-.68575.21416-1.3224.561865-1.87327 1.023085-.550855.461225-1.00503 1.026855-1.336385 1.664315-.331355.6375-.53334 1.3342-.59432 2.05005-.06098.71585.020245 1.4367.238995 2.12105.548 1.7 1.8585 3.005 3.56498 3.551.122.0605.244 0 .274-.1215.0305-.03.0305-.061.0305-.1215v-.425c0-.091-.091-.212-.1825-.273Z"
+          ></path>
+
+          <path
+            fill="#ffffff"
+            d="M9.676 2.7805c-.122-.061-.244 0-.274.121-.0305.0305-.0305.061-.0305.1215v.425c0 .1215.0915.2425.1825.3035 2.377.85 3.596 3.49 2.712 5.8265-.457 1.275-1.4625 2.2455-2.712 2.701-.122.0605-.1825.1515-.1825.3035v.425c0 .121.0605.212.1825.2425.0305 0 .0915 0 .122-.03.6858-.21415 1.32245-.56185 1.8733-1.0231.55085-.4612 1.00505-1.02685 1.3364-1.6643.33135-.6375.53335-1.3342.5943-2.05005.061-.71585-.02025-1.4367-.239-2.12105-.548-1.73-1.889-3.035-3.565-3.581Z"
+          ></path>
+
         </svg>
+
+
+        <b>
+          Locked Amount
+        </b>
+
+
+        <span
+          class="amount-value"
+          data-page3-amount
+        >
+          —
+        </span>
+
       </div>
 
-      <div class="info-box-content">
-        <h4>Security Notice</h4>
-        <p>
-          This is your private encrypted allocation record.
-          Only you can decrypt and view this record.
-          Never share your access codes with anyone.
-        </p>
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <rect
+              x="4"
+              y="5"
+              width="16"
+              height="15"
+              rx="2.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M8 3v4M16 3v4M4 9h16"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+
+            <circle
+              cx="9"
+              cy="13"
+              r="1"
+              fill="currentColor"
+            />
+
+            <path
+              d="M12 13h5M8 16h3"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Locked Start
+        </b>
+
+
+        <span data-page3-start>
+          —
+        </span>
+
       </div>
+
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <rect
+              x="4"
+              y="5"
+              width="16"
+              height="15"
+              rx="2.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M8 3v4M16 3v4M4 9h16"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="m8.5 14 2 2 5-5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Locked End
+        </b>
+
+
+        <span data-page3-end>
+          —
+        </span>
+
+      </div>
+
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <circle
+              cx="12"
+              cy="13"
+              r="7"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M12 9v4l2.5 1.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M9 3h6"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Lock Duration
+        </b>
+
+
+        <span data-page3-duration>
+          —
+        </span>
+
+      </div>
+
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <circle
+              cx="12"
+              cy="12"
+              r="8"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M14.7 10.2c-.2-1-1-1.5-2.5-1.5-1.4 0-2.3.6-2.3 1.5s.7 1.2 2.2 1.5c1.5.2 2.2.6 2.2 1.5s-.8 1.5-2.3 1.5c-1.5 0-2.3-.5-2.5-1.5"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M12 7v10"
+              stroke="currentColor"
+              stroke-width="1.3"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Claimable Token
+        </b>
+
+
+        <span data-page3-token>
+          —
+        </span>
+
+      </div>
+
+
+      <div class="page3-blockchain-refs">
+
+
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M10 13a5 5 0 0 0 7.07.07l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </span>
+
+
+          <b>
+            Transaction ID
+          </b>
+
+
+          <span
+            class="page3-link-value"
+            data-page3-transaction
+          >
+            —
+          </span>
+
+
+          <a
+            class="page3-explorer-link"
+            data-page3-transaction-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open transaction in Aleo Explorer"
+            title="Open Transaction in Aleo Explorer"
+          >
+
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </a>
+
+        </div>
+
+
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <circle
+                cx="12"
+                cy="12"
+                r="8"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <path
+                d="M8.5 12h7M12 8.5v7"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </span>
+
+
+          <b>
+            Token ID
+          </b>
+
+
+          <span
+            class="page3-link-value"
+            data-page3-token-id
+          >
+            —
+          </span>
+
+
+          <a
+            class="page3-explorer-link"
+            data-page3-token-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open token in Aleo Explorer"
+            title="Open Token in Aleo Explorer"
+          >
+
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </a>
+
+        </div>
+
+
+        <div class="row page3-ref-row">
+
+          <span class="field-icon" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <rect
+                x="5"
+                y="4"
+                width="14"
+                height="17"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <path
+                d="M9 8h6M9 12h6M9 16h4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </span>
+
+
+          <b>
+            Lock Record ID
+          </b>
+
+
+          <span
+            class="page3-link-value"
+            data-page3-lock-record-id
+          >
+            —
+          </span>
+
+
+          <a
+            class="page3-explorer-link"
+            data-page3-lock-record-link
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open lock record in Aleo Explorer"
+            title="Open Lock Record in Aleo Explorer"
+          >
+
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+
+              <path
+                d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1 1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M14 10a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 19.07l1-1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M8 12h8"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+
+            </svg>
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <path
+              d="m9 7-5 5 5 5"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <path
+              d="m15 7 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <path
+              d="m13 5-2 14"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Program
+        </b>
+
+
+        <span data-page3-program>
+          —
+        </span>
+
+      </div>
+
+
+      <div class="row">
+
+        <span
+          class="field-icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+
+            <rect
+              x="5"
+              y="4"
+              width="14"
+              height="17"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+
+            <path
+              d="M9 8h6M9 12h6M9 16h4"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <b>
+          Record Type
+        </b>
+
+
+        <span data-page3-type>
+          —
+        </span>
+
+      </div>
+
 
     </div>
 
   </div>
+
+
+  <div class="lock-countdown">
+
+    <span class="lock-countdown-label">
+      Lock Countdown
+    </span>
+
+
+    <span
+      class="countdown-value"
+      data-lock-countdown
+    >
+      —
+    </span>
+
+
+    <span
+      class="countdown-end"
+      data-countdown-end
+    >
+      Waiting for lock end time
+    </span>
+
+  </div>
+
+
+</section>
+
+
+<section class="claim">
+
+  <div class="claim-text">
+
+    <h2>
+      Claim Your Allocation
+    </h2>
+
+
+    <p>
+      Your allocation remains locked until the lock period ends.
+    </p>
+
+
+    <button
+      class="claim-btn"
+      type="button"
+      data-claim-button
+    >
+      CLAIM
+    </button>
+
+
+    <p
+      class="claim-message"
+      data-claim-message
+    ></p>
+
+
+    <p class="after-lock">
+      ⓘ &nbsp; Claim becomes available after the lock period ends.
+    </p>
+
+  </div>
+
+</section>
+
+
+<section class="info-grid">
+
+
+  <div class="info">
+
+    <span
+      style="font-size:34px;color:var(--green)"
+    >
+      ⬡
+    </span>
+
+
+    <div>
+
+      <h3>
+        Record Source
+      </h3>
+
+
+      <p>
+
+        Aleo Blockchain (Mainnet)
+
+        <br>
+
+        This record is stored and verified on the Aleo blockchain.
+
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="info">
+
+    <span
+      style="font-size:34px;color:var(--green)"
+    >
+      ♙
+    </span>
+
+
+    <div>
+
+      <h3>
+        Security Notice
+      </h3>
+
+
+      <p>
+        This is your private encrypted allocation record. Only you can decrypt and view this record.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<div data-record-error>
+
+  No private allocation record was selected.
+
+  <br>
+
+  Please return to Page 2 and use GET YOUR RECORD first.
+
+</div>
+
+
+<footer class="footer">
+
+  Built on Aleo
+
+  <i>•</i>
+
+  Private by design
+
+  <i>•</i>
+
+  Secure by cryptography
+
+</footer>
+
 
 </main>
 
-<footer class="ftr">
-  <svg viewBox="0 0 60 70" fill="none">
-    <path d="M30 4L6 16v20c0 16 24 28 24 28s24-12 24-28V16L30 4z"
-          stroke="currentColor"
-          stroke-width="2"
-          fill="rgba(0,230,118,.06)"/>
-    <rect x="22" y="30" width="16" height="14" rx="3"
-          stroke="currentColor"
-          stroke-width="1.5"
-          fill="rgba(0,230,118,.08)"/>
-    <path d="M25 30v-4a5 5 0 0110 0v4"
-          stroke="currentColor"
-          stroke-width="1.5"
-          fill="none"/>
-  </svg>
+</div>
 
-  Built on Aleo
-  <div class="ftr-sep"></div>
-  Private by design
-  <div class="ftr-sep"></div>
-  Secure by cryptography
-</footer>
+
+<script src="leo-wallet.bundle.js"></script>
+
+<script src="app.js"></script>
+
 
 <script>
 
-/*
- * PAGE 3
- * Source: ONLY sessionStorage.usdcxSelectedRecord
- * No backend
- * No Explorer
- * No localStorage
- * No allocation lookup
- * No hardcoded record data
- */
-
 (function () {
 
+  console.log(
+    'USDCx LOCKED: Page 3 loading selected record...'
+  );
+
+
+  /* =======================================================
+     CONSTANTS
+     ======================================================= */
+
+  const LOCK_DURATION_DAYS = 365;
+  const LOCK_DURATION_SECONDS =
+    LOCK_DURATION_DAYS * 86400;
+
+  /* =======================================================
+     FIXED TOKEN ID
+     Same VUSDC Token ID for all locks
+     ======================================================= */
+
+  const FIXED_TOKEN_ID =
+    '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
+
+
+  /* =======================================================
+     CLEAN ALEO VALUE
+     ======================================================= */
+
   function clean(value) {
-    if (value === null || value === undefined) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
       return '';
     }
 
-    return String(value)
-      .trim()
-      .replace(/^"(.*)"$/, '$1')
-      .replace(/\.(private|public)$/i, '')
-      .trim();
+    let text = String(value).trim();
+
+    text = text.replace(
+      /^"(.*)"$/,
+      '$1'
+    );
+
+    text = text.replace(
+      /\.(private|public)$/i,
+      ''
+    );
+
+    text = text.replace(
+      /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
+      ''
+    );
+
+    return text.trim();
+
   }
 
-  function getRecordField(record, name) {
+
+  /* =======================================================
+     GET VALUE FROM RECORD / ALLOCATION
+     ======================================================= */
+
+  function getValue(record, names) {
 
     if (!record) {
-      return '';
+      return null;
     }
+
+    for (const name of names) {
+
+      if (
+        record[name] !== undefined &&
+        record[name] !== null
+      ) {
+
+        return record[name];
+
+      }
+
+    }
+
 
     if (
       record.data &&
-      typeof record.data === 'object' &&
-      record.data[name] !== undefined
+      typeof record.data === 'object'
     ) {
-      return clean(record.data[name]);
+
+      for (const name of names) {
+
+        if (
+          record.data[name] !== undefined &&
+          record.data[name] !== null
+        ) {
+
+          return record.data[name];
+
+        }
+
+      }
+
     }
 
-    if (record[name] !== undefined) {
-      return clean(record[name]);
+
+    if (
+      record.record &&
+      typeof record.record === 'object'
+    ) {
+
+      for (const name of names) {
+
+        if (
+          record.record[name] !== undefined &&
+          record.record[name] !== null
+        ) {
+
+          return record.record[name];
+
+        }
+
+      }
+
     }
 
-    return '';
+
+    return null;
+
   }
 
-  function setText(id, value) {
+
+  /* =======================================================
+     SET PAGE VALUE
+     ======================================================= */
+
+  function set(selector, value) {
 
     const element =
-      document.getElementById(id);
+      document.querySelector(selector);
 
     if (!element) {
       return;
@@ -547,389 +1894,1247 @@ a{text-decoration:none}
       value !== ''
         ? value
         : '—';
+
   }
+
+
+  /* =======================================================
+     FORMAT AMOUNT
+     ======================================================= */
+
+  function formatAmount(value) {
+
+    const text =
+      clean(value);
+
+    if (!text) {
+      return '—';
+    }
+
+    if (
+      text.includes('vUSDC') ||
+      text.includes('VUSDC') ||
+      text.includes('USDCx')
+    ) {
+
+      return text;
+
+    }
+
+    if (text.includes('.')) {
+
+      return text + ' vUSDC';
+
+    }
+
+    if (/^\d+$/.test(text)) {
+
+      const number =
+        Number(text);
+
+      if (Number.isSafeInteger(number)) {
+
+        return (
+          number / 100
+        ).toFixed(2) +
+        ' vUSDC';
+
+      }
+
+    }
+
+    return text + ' vUSDC';
+
+  }
+
+
+  /* =======================================================
+     FORMAT TIMESTAMP
+     ======================================================= */
 
   function formatTimestamp(value) {
 
-    const raw =
-      clean(value)
-        .replace(/u64$/i, '');
+    const text =
+      clean(value);
 
-    if (!/^\d+$/.test(raw)) {
-      return '';
+    if (!text) {
+      return '—';
+    }
+
+    if (/^\d+$/.test(text)) {
+
+      const seconds =
+        Number(text);
+
+      if (
+        Number.isSafeInteger(seconds) &&
+        seconds > 100000000
+      ) {
+
+        const date =
+          new Date(
+            seconds * 1000
+          );
+
+        if (
+          !Number.isNaN(
+            date.getTime()
+          )
+        ) {
+
+          return date.toLocaleString(
+            'en-US',
+            {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+              timeZone: 'UTC',
+              timeZoneName: 'short'
+            }
+          );
+
+        }
+
+      }
+
+    }
+
+    return text;
+
+  }
+
+
+  /* =======================================================
+     GET UNIX SECONDS
+     ======================================================= */
+
+  function getTimestampSeconds(value) {
+
+    const text =
+      clean(value);
+
+    if (!text) {
+      return null;
+    }
+
+    if (/^\d+$/.test(text)) {
+
+      const seconds =
+        Number(text);
+
+      if (
+        Number.isSafeInteger(seconds) &&
+        seconds > 100000000
+      ) {
+
+        return seconds;
+
+      }
+
+    }
+
+    const parsed =
+      Date.parse(text);
+
+    if (Number.isFinite(parsed)) {
+
+      return Math.floor(
+        parsed / 1000
+      );
+
+    }
+
+    return null;
+
+  }
+
+
+  /* =======================================================
+     CALCULATE DURATION
+     ======================================================= */
+
+  function calculateDuration(start, end) {
+
+    const s =
+      getTimestampSeconds(start);
+
+    const e =
+      getTimestampSeconds(end);
+
+    if (
+      s === null ||
+      e === null
+    ) {
+
+      return '—';
+
     }
 
     const seconds =
-      Number(raw);
+      e - s;
 
-    if (!Number.isSafeInteger(seconds)) {
-      return '';
+    if (seconds <= 0) {
+      return '—';
     }
 
-    const date =
-      new Date(seconds * 1000);
+    const days =
+      seconds / 86400;
 
-    if (Number.isNaN(date.getTime())) {
-      return '';
+    if (
+      Math.abs(
+        days - Math.round(days)
+      ) < 0.01
+    ) {
+
+      return (
+        Math.round(days) +
+        ' Days'
+      );
+
     }
 
-    return date.toLocaleString(
-      'en-US',
-      {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC'
-      }
-    ) + ' UTC';
+    return (
+      days.toFixed(2) +
+      ' Days'
+    );
+
   }
 
-  let record = null;
+
+  /* =======================================================
+     FIND RECORD ID
+     ======================================================= */
+
+  function findRecordId(record) {
+
+    return getValue(
+      record,
+      [
+        'id',
+        'record_id',
+        'recordId',
+        'serial_number',
+        'commitment'
+      ]
+    );
+
+  }
+
+
+  /* =======================================================
+     READ PAGE 2 SESSION DATA
+     ======================================================= */
+
+  let allocation = null;
+  let rawRecord = null;
+
 
   try {
 
-    const raw =
+    const savedAllocation =
+      sessionStorage.getItem(
+        'usdcxSelectedAllocation'
+      );
+
+
+    const savedRecord =
       sessionStorage.getItem(
         'usdcxSelectedRecord'
       );
 
-    if (raw) {
-      record =
-        JSON.parse(raw);
+
+    if (savedAllocation) {
+
+      allocation =
+        JSON.parse(
+          savedAllocation
+        );
+
+    }
+
+
+    if (savedRecord) {
+
+      rawRecord =
+        JSON.parse(
+          savedRecord
+        );
+
     }
 
   } catch (error) {
 
     console.error(
-      'AEGIS: Could not read wallet LockedRecord:',
+      'USDCx LOCKED: Could not read Page 3 session data:',
       error
     );
 
   }
 
-  if (!record) {
 
-    console.error(
-      'AEGIS: No wallet LockedRecord was passed from Page 2.'
-    );
+  console.log(
+    'USDCx LOCKED: Selected allocation:',
+    allocation
+  );
 
-    return;
-  }
 
-  /*
-   * Validate the exact wallet record.
-   */
+  console.log(
+    'USDCx LOCKED: Raw record:',
+    rawRecord
+  );
 
-  if (
-    clean(record.program_id).toLowerCase() !==
-    'vusdc_transaction.aleo'
-  ) {
 
-    console.error(
-      'AEGIS: Wrong program record:',
-      record
-    );
-
-    return;
-  }
+  /* =======================================================
+     FALLBACK TO RAW RECORD
+     ======================================================= */
 
   if (
-    clean(record.recordName) !==
-    'LockedRecord'
+    !allocation &&
+    rawRecord
   ) {
 
-    console.error(
-      'AEGIS: Wrong record type:',
-      record
+    allocation = {
+
+      allocationNumber: 1,
+
+      amount:
+        getValue(
+          rawRecord,
+          [
+            'display_amount',
+            'amount',
+            'locked_amount'
+          ]
+        ),
+
+      ticket:
+        getValue(
+          rawRecord,
+          [
+            'ticket_ref',
+            'ticket_reference',
+            'ticket'
+          ]
+        ),
+
+      start:
+        getValue(
+          rawRecord,
+          [
+            'locked_start',
+            'start_time',
+            'start'
+          ]
+        ),
+
+      end:
+        getValue(
+          rawRecord,
+          [
+            'locked_end',
+            'end_time',
+            'end'
+          ]
+        ),
+
+      status:
+        getValue(
+          rawRecord,
+          [
+            'status'
+          ]
+        ),
+
+      program:
+        getValue(
+          rawRecord,
+          [
+            'program',
+            'program_id',
+            'programId'
+          ]
+        ) ||
+        'vusdc_transaction.aleo',
+
+      raw:
+        rawRecord
+
+    };
+
+  }
+
+
+  /* =======================================================
+     NO RECORD
+     ======================================================= */
+
+  if (!allocation) {
+
+    const errorBox =
+      document.querySelector(
+        '[data-record-error]'
+      );
+
+    if (errorBox) {
+
+      errorBox.style.display =
+        'block';
+
+    }
+
+    console.warn(
+      'USDCx LOCKED: No selected allocation found.'
     );
 
     return;
+
   }
 
-  /*
-   * ONLY fields actually present in Wallet LockedRecord.
-   */
+
+  /* =======================================================
+     SOURCE RECORD
+     ======================================================= */
+
+  const raw =
+    allocation.raw ||
+    rawRecord ||
+    allocation;
+
+
+  /* =======================================================
+     OWNER
+     ======================================================= */
 
   const owner =
-    clean(record.owner);
-
-  const program =
-    clean(record.program_id);
-
-  const recordType =
-    clean(record.recordName);
-
-  const recordId =
-    clean(record.id);
-
-  const statusRaw =
-    getRecordField(
-      record,
-      'status'
-    ).replace(
-      /u8$/i,
-      ''
+    getValue(
+      raw,
+      [
+        'owner',
+        'owner_address'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'owner'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxAddress'
     );
 
-  const lockedEndRaw =
-    getRecordField(
-      record,
-      'locked_end'
-    );
 
-  const claimRoute =
-    getRecordField(
-      record,
-      'claim_route'
-    );
+  /* =======================================================
+     AMOUNT
+     ======================================================= */
 
-  const version =
-    getRecordField(
-      record,
-      '_version'
-    );
+  const amount =
+    getValue(
+      raw,
+      [
+        'display_amount',
+        'amount',
+        'locked_amount'
+      ]
+    ) ||
+    allocation.amount;
 
-  const status =
-    statusRaw === '1'
-      ? 'LOCKED'
-      : statusRaw === '2'
-        ? 'CLAIMED'
-        : statusRaw;
 
-  const lockedEnd =
-    formatTimestamp(
-      lockedEndRaw
-    );
+  /* =======================================================
+     START
+     ======================================================= */
 
-  /*
-   * Wallet data only.
-   */
+  let start =
+    getValue(
+      raw,
+      [
+        'locked_start',
+        'start_time',
+        'start'
+      ]
+    ) ||
+    allocation.start;
 
-  setText(
-    'walletAddress',
-    owner
-  );
 
-  setText(
-    'networkName',
-    'Mainnet'
-  );
+  /* =======================================================
+     END
+     ======================================================= */
 
-  setText(
-    'statusValue',
-    status
-  );
+  const end =
+    getValue(
+      raw,
+      [
+        'locked_end',
+        'end_time',
+        'end'
+      ]
+    ) ||
+    allocation.end;
 
-  setText(
-    'allocTitle',
-    recordType
-  );
 
-  setText(
-    'recordId',
-    recordId
-  );
+  /* =======================================================
+     DERIVE START FROM END
+     ======================================================= */
 
-  setText(
-    'owner',
-    owner
-  );
+  if (
+    !clean(start) &&
+    clean(end)
+  ) {
 
-  setText(
-    'lockedEnd',
-    lockedEnd
-  );
+    const endSeconds =
+      getTimestampSeconds(end);
 
-  setText(
-    'program',
-    program
-  );
+    if (
+      endSeconds !== null
+    ) {
 
-  setText(
-    'recordType',
-    recordType
-  );
+      start =
+        String(
+          endSeconds -
+          LOCK_DURATION_SECONDS
+        );
 
-  /*
-   * These fields DO NOT exist in the wallet LockedRecord.
-   * They must remain empty / —.
-   */
+    }
 
-  setText(
-    'lockedAmount',
-    ''
-  );
-
-  setText(
-    'lockedStart',
-    ''
-  );
-
-  setText(
-    'lockDuration',
-    ''
-  );
-
-  setText(
-    'claimableToken',
-    ''
-  );
-
-  /*
-   * Ticket Reference is not part of LockedRecord.
-   */
-
-  const ticket =
-    document.querySelector(
-      '.ticket-ref'
-    );
-
-  if (ticket) {
-    ticket.style.display = 'none';
   }
 
-  /*
-   * Record Source remains descriptive only.
-   * No external lookup is performed.
-   */
 
-  setText(
-    'recordSource',
-    'Aleo Wallet (Mainnet)'
+  /* =======================================================
+     STATUS
+     ======================================================= */
+
+  const status =
+    getValue(
+      raw,
+      [
+        'status'
+      ]
+    ) ||
+    allocation.status ||
+    'LOCKED';
+
+
+  /* =======================================================
+     PROGRAM
+     ======================================================= */
+
+  const program =
+    getValue(
+      raw,
+      [
+        'program',
+        'program_id',
+        'programId'
+      ]
+    ) ||
+    allocation.program ||
+    'vusdc_transaction.aleo';
+
+
+  /* =======================================================
+     TOKEN
+     ======================================================= */
+
+  const token =
+    getValue(
+      raw,
+      [
+        'token',
+        'tokenSymbol',
+        'asset',
+        'claimableToken'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'token',
+        'tokenSymbol',
+        'asset',
+        'claimableToken'
+      ]
+    ) ||
+    'vUSDC';
+
+
+  /* =======================================================
+     TRANSACTION ID
+     ======================================================= */
+
+  const transactionId =
+    getValue(
+      raw,
+      [
+        'transaction_id',
+        'transactionId',
+        'tx_id',
+        'txId',
+        'transaction'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'transaction_id',
+        'transactionId',
+        'tx_id',
+        'txId',
+        'transaction'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxTransactionId'
+    );
+
+
+  /* =======================================================
+     TOKEN ID
+     FIXED — SAME FOR ALL LOCKS
+     ======================================================= */
+
+  const tokenId =
+    FIXED_TOKEN_ID;
+
+
+  /* =======================================================
+     LOCK RECORD ID
+     ======================================================= */
+
+  const lockRecordId =
+    getValue(
+      raw,
+      [
+        'lock_record_id',
+        'lockRecordId'
+      ]
+    ) ||
+    getValue(
+      allocation,
+      [
+        'lock_record_id',
+        'lockRecordId'
+      ]
+    ) ||
+    sessionStorage.getItem(
+      'usdcxLockRecordId'
+    );
+
+
+  /* =======================================================
+     RECORD TYPE
+     ======================================================= */
+
+  let recordType =
+    'Record';
+
+
+  if (
+    getValue(
+      raw,
+      [
+        'claim_route'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'LockedRecord';
+
+  } else if (
+    getValue(
+      raw,
+      [
+        'token_id',
+        'tokenId'
+      ]
+    ) !== null
+  ) {
+
+    recordType =
+      'AllocationRecord';
+
+  }
+
+
+  /* =======================================================
+     RECORD ID
+     ======================================================= */
+
+  const recordId =
+    findRecordId(raw);
+
+
+  /* =======================================================
+     RECORD NUMBER
+     ======================================================= */
+
+  const allocationNumber =
+    allocation.allocationNumber || 1;
+
+
+  /* =======================================================
+     STATUS DISPLAY
+     ======================================================= */
+
+  let displayStatus =
+    clean(status).toUpperCase();
+
+
+  if (
+    displayStatus === '1'
+  ) {
+
+    displayStatus =
+      'LOCKED';
+
+  }
+
+
+  /* =======================================================
+     DURATION
+     ======================================================= */
+
+  let duration =
+    calculateDuration(
+      start,
+      end
+    );
+
+
+  if (
+    duration === '—' &&
+    clean(start) &&
+    clean(end)
+  ) {
+
+    const startSeconds =
+      getTimestampSeconds(start);
+
+    const endSeconds =
+      getTimestampSeconds(end);
+
+    if (
+      startSeconds !== null &&
+      endSeconds !== null &&
+      endSeconds - startSeconds ===
+        LOCK_DURATION_SECONDS
+    ) {
+
+      duration =
+        '365 Days';
+
+    }
+
+  }
+
+
+  /* =======================================================
+     POPULATE PAGE 3
+     ======================================================= */
+
+  set(
+    '[data-page3-allocation]',
+    'ALLOCATION ' +
+    String(
+      allocationNumber
+    ).padStart(2, '0')
   );
 
-  /*
-   * Countdown uses ONLY locked_end from wallet.
-   */
 
-  const countdown =
+  set(
+    '[data-page3-owner]',
+    clean(owner)
+  );
+
+
+  set(
+    '[data-page3-amount]',
+    formatAmount(amount)
+  );
+
+
+  set(
+    '[data-page3-start]',
+    formatTimestamp(start)
+  );
+
+
+  set(
+    '[data-page3-end]',
+    formatTimestamp(end)
+  );
+
+
+  set(
+    '[data-page3-duration]',
+    duration
+  );
+
+
+  set(
+    '[data-page3-token]',
+    clean(token)
+  );
+
+
+  set(
+    '[data-page3-program]',
+    clean(program)
+  );
+
+
+  set(
+    '[data-page3-type]',
+    recordType
+  );
+
+
+  set(
+    '[data-page3-status]',
+    displayStatus
+  );
+
+
+  set(
+    '[data-page3-record-id]',
+    clean(recordId)
+  );
+
+
+  /* =======================================================
+     BLOCKCHAIN REFERENCES
+     ======================================================= */
+
+  set(
+    '[data-page3-transaction]',
+    clean(transactionId)
+  );
+
+
+  set(
+    '[data-page3-token-id]',
+    clean(tokenId)
+  );
+
+
+  set(
+    '[data-page3-lock-record-id]',
+    clean(lockRecordId)
+  );
+
+
+  /* =======================================================
+     TRANSACTION LINK
+     ======================================================= */
+
+  const transactionLink =
+    document.querySelector(
+      '[data-page3-transaction-link]'
+    );
+
+
+  if (
+    transactionLink &&
+    clean(transactionId)
+  ) {
+
+    transactionLink.href =
+      'https://explorer.provable.com/transaction/' +
+      clean(transactionId);
+
+  } else if (transactionLink) {
+
+    transactionLink.removeAttribute(
+      'href'
+    );
+
+  }
+
+
+  /* =======================================================
+     TOKEN LINK
+     ======================================================= */
+
+  const tokenLink =
+    document.querySelector(
+      '[data-page3-token-link]'
+    );
+
+
+  if (
+    tokenLink &&
+    clean(tokenId)
+  ) {
+
+    tokenLink.href =
+      'https://explorer.provable.com/program/token_registry.aleo';
+
+  } else if (tokenLink) {
+
+    tokenLink.removeAttribute(
+      'href'
+    );
+
+  }
+
+
+  /* =======================================================
+     LOCK RECORD LINK
+     ======================================================= */
+
+  const lockRecordLink =
+    document.querySelector(
+      '[data-page3-lock-record-link]'
+    );
+
+
+  if (
+    lockRecordLink &&
+    clean(transactionId)
+  ) {
+
+    lockRecordLink.href =
+      'https://explorer.provable.com/transaction/' +
+      clean(transactionId);
+
+  } else if (lockRecordLink) {
+
+    lockRecordLink.removeAttribute(
+      'href'
+    );
+
+  }
+
+
+  /* =======================================================
+     COUNTDOWN
+     ======================================================= */
+
+  const countdownElement =
     document.querySelector(
       '[data-lock-countdown]'
     );
 
-  const countdownEnd =
+
+  const countdownEndElement =
     document.querySelector(
       '[data-countdown-end]'
     );
 
-  /*
-   * This current page does not have
-   * data-lock-countdown / data-countdown-end,
-   * so the existing visual design remains untouched.
-   */
 
-  if (
-    countdown &&
-    countdownEnd &&
-    lockedEndRaw
-  ) {
+  const claimButton =
+    document.querySelector(
+      '[data-claim-button]'
+    );
 
-    countdownEnd.textContent =
-      'Ends: ' + lockedEnd;
 
-    const endSeconds =
-      Number(
-        clean(lockedEndRaw)
-          .replace(/u64$/i, '')
-      );
+  const claimMessage =
+    document.querySelector(
+      '[data-claim-message]'
+    );
 
-    if (
-      Number.isSafeInteger(
-        endSeconds
-      )
-    ) {
 
-      function updateCountdown() {
+  const endSeconds =
+    getTimestampSeconds(end);
 
-        const remaining =
-          endSeconds * 1000 -
-          Date.now();
 
-        if (remaining <= 0) {
+  let countdownTimer =
+    null;
 
-          countdown.textContent =
-            'Unlocked';
 
-          return;
-        }
+  let lockEnded =
+    false;
 
-        const totalSeconds =
-          Math.floor(
-            remaining / 1000
-          );
 
-        const days =
-          Math.floor(
-            totalSeconds / 86400
-          );
+  /* =======================================================
+     UPDATE COUNTDOWN
+     ======================================================= */
 
-        const hours =
-          Math.floor(
-            (totalSeconds % 86400) /
-            3600
-          );
+  function updateCountdown() {
 
-        const minutes =
-          Math.floor(
-            (totalSeconds % 3600) /
-            60
-          );
+    if (!countdownElement) {
+      return;
+    }
 
-        const seconds =
-          totalSeconds % 60;
 
-        countdown.textContent =
-          days +
-          'd ' +
-          hours +
-          'h ' +
-          minutes +
-          'm ' +
-          String(seconds).padStart(2, '0') +
-          's';
+    if (!endSeconds) {
+
+      countdownElement.textContent =
+        '—';
+
+
+      if (countdownEndElement) {
+
+        countdownEndElement.textContent =
+          'Lock end time unavailable';
+
       }
 
-      updateCountdown();
+      return;
 
+    }
+
+
+    const nowSeconds =
+      Math.floor(
+        Date.now() / 1000
+      );
+
+
+    let remaining =
+      endSeconds - nowSeconds;
+
+
+    if (remaining <= 0) {
+
+      lockEnded =
+        true;
+
+
+      countdownElement.textContent =
+        'LOCK ENDED';
+
+
+      countdownElement.classList.add(
+        'countdown-ended'
+      );
+
+
+      if (countdownEndElement) {
+
+        countdownEndElement.textContent =
+          'The lock period has ended';
+
+      }
+
+
+      if (claimButton) {
+
+        claimButton.disabled =
+          false;
+
+        claimButton.textContent =
+          'CLAIM';
+
+      }
+
+
+      if (countdownTimer) {
+
+        clearInterval(
+          countdownTimer
+        );
+
+        countdownTimer =
+          null;
+
+      }
+
+
+      return;
+
+    }
+
+
+    const days =
+      Math.floor(
+        remaining / 86400
+      );
+
+
+    remaining -=
+      days * 86400;
+
+
+    const hours =
+      Math.floor(
+        remaining / 3600
+      );
+
+
+    remaining -=
+      hours * 3600;
+
+
+    const minutes =
+      Math.floor(
+        remaining / 60
+      );
+
+
+    remaining -=
+      minutes * 60;
+
+
+    const seconds =
+      remaining;
+
+
+    countdownElement.textContent =
+      String(days) +
+      'd ' +
+      String(hours).padStart(2, '0') +
+      'h ' +
+      String(minutes).padStart(2, '0') +
+      'm ' +
+      String(seconds).padStart(2, '0') +
+      's';
+
+
+    if (countdownEndElement) {
+
+      countdownEndElement.textContent =
+        'Ends: ' +
+        formatTimestamp(end);
+
+    }
+
+  }
+
+
+  /* =======================================================
+     START COUNTDOWN
+     ======================================================= */
+
+  updateCountdown();
+
+
+  if (endSeconds) {
+
+    countdownTimer =
       setInterval(
         updateCountdown,
         1000
       );
-    }
+
   }
 
-  /*
-   * Debug only.
-   * claim_route is NOT displayed.
-   */
+
+  /* =======================================================
+     CLAIM BUTTON
+     ======================================================= */
+
+  if (claimButton) {
+
+    claimButton.addEventListener(
+      'click',
+      function () {
+
+        if (!lockEnded) {
+
+          if (claimMessage) {
+
+            claimMessage.classList.remove(
+              'success'
+            );
+
+
+            claimMessage.style.display =
+              'block';
+
+
+            claimMessage.textContent =
+              'Not available until lock end.';
+
+          }
+
+
+          return;
+
+        }
+
+
+        if (claimMessage) {
+
+          claimMessage.classList.add(
+            'success'
+          );
+
+
+          claimMessage.style.display =
+            'block';
+
+
+          claimMessage.textContent =
+            'Lock ended. Claim is available for contract integration.';
+
+        }
+
+
+        console.log(
+          'USDCx LOCKED: Lock ended. No transaction was sent.'
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     FINAL LOG
+     ======================================================= */
 
   console.log(
-    'AEGIS: Page 3 received exact Leo Wallet LockedRecord:',
-    record
+    'USDCx LOCKED: Page 3 populated from Page 2 selected record.'
   );
 
-  console.log(
-    'AEGIS: Wallet record fields:',
-    Object.keys(record)
-  );
 
   console.log(
-    'AEGIS: Wallet record data fields:',
-    Object.keys(record.data || {})
+    'USDCx LOCKED: Owner:',
+    clean(owner)
   );
 
-  console.log(
-    'AEGIS: Wallet claim_route:',
-    claimRoute
-  );
 
   console.log(
-    'AEGIS: Wallet _version:',
-    version
+    'USDCx LOCKED: Amount:',
+    formatAmount(amount)
   );
+
+
+  console.log(
+    'USDCx LOCKED: Start:',
+    formatTimestamp(start)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: End:',
+    formatTimestamp(end)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Duration:',
+    duration
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Transaction:',
+    clean(transactionId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Token ID:',
+    clean(tokenId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: Lock Record ID:',
+    clean(lockRecordId)
+  );
+
+
+  console.log(
+    'USDCx LOCKED: No transaction / no balance transfer.'
+  );
+
 
 })();
 
