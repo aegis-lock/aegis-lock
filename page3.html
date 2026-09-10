@@ -14,10 +14,6 @@
 
 <style>
 
-/* =========================================================
-   PAGE 3 — PRIVATE RECORD DETAILS
-   ========================================================= */
-
 .page3-value {
   word-break: break-word;
 }
@@ -26,11 +22,6 @@
   font-family: monospace;
   word-break: break-all;
 }
-
-
-/* =========================================================
-   REMOVE BOLD FROM PAGE 3
-   ========================================================= */
 
 main,
 main h1,
@@ -58,65 +49,36 @@ main button {
   font-weight: 400 !important;
 }
 
-
-/* =========================================================
-   FIELD ICONS
-   ========================================================= */
-
 .field-icon {
   width: 22px;
   height: 22px;
   min-width: 22px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   color: var(--green);
 }
 
 .field-icon svg {
   width: 20px;
   height: 20px;
-
   display: block;
 }
-
-
-/* =========================================================
-   USDC LOGO
-   ========================================================= */
 
 .amount-usdc-logo {
   width: 22px;
   height: 22px;
-
   min-width: 22px;
-
   flex: 0 0 22px;
-
   display: block;
 }
 
-
-/* =========================================================
-   LOCKED AMOUNT
-   ========================================================= */
-
 .amount-value {
   color: #ffffff !important;
-
   font-size: 22px !important;
-
   font-weight: 400 !important;
-
   line-height: 1.25;
 }
-
-
-/* =========================================================
-   RECORD VISUAL COLUMN
-   ========================================================= */
 
 .record-visual-column {
   display: flex;
@@ -124,31 +86,17 @@ main button {
   align-items: flex-start;
 }
 
-
-/* =========================================================
-   OWNER
-   ICON + OWNER
-   ADDRESS UNDER OWNER
-   ========================================================= */
-
 .owner-beside-image {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-
   gap: 0;
-
   margin-top: -8px;
-
   color: #b4c0bb;
-
   font-size: 13px;
-
   line-height: 1.4;
-
   white-space: normal;
-
   width: 100%;
 }
 
@@ -156,9 +104,7 @@ main button {
   width: 20px;
   height: 20px;
   min-width: 20px;
-
   display: inline-flex;
-
   margin: 0 0 2px 0;
 }
 
@@ -169,167 +115,101 @@ main button {
 
 .owner-beside-image b {
   position: absolute;
-
   margin-left: 28px;
-
   margin-top: 2px;
-
   font-weight: 400 !important;
-
   color: #9aa8a2;
 }
 
 .owner-value {
   display: block;
-
   width: 100%;
-
   max-width: 260px;
-
   margin-top: 1px;
-
   color: #ffffff;
-
   font-family: monospace;
-
   word-break: break-all;
-
   text-align: left;
-
   font-weight: 400 !important;
-
   line-height: 1.45;
 }
-
-
-/* =========================================================
-   RECORD ID
-   ========================================================= */
 
 .record-id {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
   width: 100%;
-
   margin-top: 12px;
-
   text-align: left;
 }
 
 .record-id small {
   display: block;
-
   margin-bottom: 5px;
-
   color: #9aa8a2;
-
   font-size: 12px;
-
   line-height: 1.4;
-
   font-weight: 400 !important;
 }
 
 .record-id-value {
   display: block;
-
   width: 100%;
-
   max-width: 260px;
-
   color: #ffffff;
-
   font-family: monospace;
-
   font-size: 11px;
-
   line-height: 1.45;
-
   word-break: break-all;
-
   text-align: left;
-
   font-weight: 400 !important;
 }
 
-
-/* =========================================================
-   COUNTDOWN
-   ========================================================= */
-
 .lock-countdown {
   margin-top: 28px;
-
   padding: 22px 24px;
-
   border: 1px solid rgba(255,255,255,.08);
-
   border-radius: 16px;
-
   background:
     linear-gradient(
       135deg,
       rgba(255,255,255,.035),
       rgba(255,255,255,.015)
     );
-
   text-align: center;
 }
 
 .lock-countdown-label {
   display: block;
-
   margin-bottom: 12px;
-
   color: #9aa8a2;
-
   font-size: 12px;
-
   letter-spacing: .12em;
-
   text-transform: uppercase;
-
   font-weight: 400 !important;
 }
 
 .countdown-value {
   display: block;
-
   color: var(--green);
-
   font-size: 28px;
-
   line-height: 1.2;
-
   letter-spacing: .04em;
-
   font-weight: 400 !important;
-
   font-variant-numeric: tabular-nums;
 }
 
 .countdown-end {
   display: block;
-
   margin-top: 9px;
-
   color: #8d9994;
-
   font-size: 12px;
-
   font-weight: 400 !important;
 }
 
 .countdown-ended {
   color: var(--green) !important;
 }
-
-
-/* =========================================================
-   CLAIM SECTION
-   ========================================================= */
 
 .claim {
   position: relative;
@@ -345,15 +225,10 @@ main button {
 
 .claim-message {
   display: none;
-
   margin-top: 12px;
-
   color: #ff7777;
-
   font-size: 13px;
-
   line-height: 1.5;
-
   font-weight: 400 !important;
 }
 
@@ -361,33 +236,16 @@ main button {
   color: var(--green) !important;
 }
 
-
-/* =========================================================
-   ERROR
-   ========================================================= */
-
 [data-record-error] {
   display: none;
-
   margin-top: 20px;
-
   padding: 14px 18px;
-
   border: 1px solid rgba(255,80,80,.25);
-
   border-radius: 12px;
-
   color: #ff7777;
-
   background: rgba(255,50,50,.05);
-
   font-weight: 400 !important;
 }
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 700px) {
 
@@ -397,23 +255,18 @@ main button {
 
   .row b {
     white-space: nowrap;
-
     font-weight: 400 !important;
   }
 
   .row > span:last-child {
     text-align: right;
-
     word-break: break-word;
-
     font-weight: 400 !important;
   }
 
   .record-id {
     word-break: break-all;
-
     align-items: flex-start;
-
     text-align: left;
   }
 
@@ -424,29 +277,19 @@ main button {
 
   .amount-value {
     font-size: 21px !important;
-
     font-weight: 400 !important;
   }
 
   .owner-beside-image {
     width: 100%;
-
     max-width: 100%;
-
     margin-top: -5px;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: flex-start;
-
     justify-content: flex-start;
-
     flex-wrap: nowrap;
-
     white-space: normal;
-
     text-align: left;
   }
 
@@ -456,37 +299,27 @@ main button {
 
   .owner-beside-image b {
     margin-left: 28px;
-
     margin-top: 2px;
   }
 
   .owner-value {
     width: 100%;
-
     max-width: 220px;
-
     margin-top: 1px;
-
     text-align: left;
-
     word-break: break-all;
   }
 
   .record-id {
     width: 100%;
-
     margin-top: 12px;
-
     text-align: left;
   }
 
   .record-id-value {
     width: 100%;
-
     max-width: 220px;
-
     text-align: left;
-
     word-break: break-all;
   }
 
@@ -576,11 +409,9 @@ main button {
 
 </head>
 
-
 <body>
 
 <div class="shell">
-
 
 <header class="topbar">
 
@@ -630,7 +461,6 @@ main button {
 
   </a>
 
-
   <nav class="links">
 
     <a href="index.html">
@@ -643,7 +473,6 @@ main button {
 
   </nav>
 
-
   <div class="top-actions">
 
     <button
@@ -652,7 +481,6 @@ main button {
     >
       ⚙
     </button>
-
 
     <button
       class="wallet-btn"
@@ -665,7 +493,6 @@ main button {
 
 </header>
 
-
 <div class="subnav">
 
   <div class="tabs">
@@ -677,14 +504,12 @@ main button {
       Dashboard
     </a>
 
-
     <a
       class="tab active"
       href="page2.html"
     >
       Private Record
     </a>
-
 
     <a
       class="tab"
@@ -695,7 +520,6 @@ main button {
 
   </div>
 
-
   <div class="status">
 
     <div class="wallet-chip">
@@ -703,7 +527,6 @@ main button {
       <span data-wallet>
         Not connected
       </span>
-
 
       <button
         data-copy
@@ -713,7 +536,6 @@ main button {
       </button>
 
     </div>
-
 
     <div class="network-chip">
 
@@ -727,9 +549,7 @@ main button {
 
 </div>
 
-
 <main>
-
 
 <a
   class="back"
@@ -737,7 +557,6 @@ main button {
 >
   ← &nbsp; Back to Allocations
 </a>
-
 
 <div class="heading-row">
 
@@ -753,13 +572,11 @@ main button {
 
     </h2>
 
-
     <p class="intro">
       Below are the full details of your encrypted allocation record on Aleo.
     </p>
 
   </div>
-
 
   <div class="lock-status">
 
@@ -793,7 +610,6 @@ main button {
 
     </svg>
 
-
     <span>
 
       <small>
@@ -810,9 +626,7 @@ main button {
 
 </div>
 
-
 <section class="record-card">
-
 
   <div class="card-head">
 
@@ -825,9 +639,7 @@ main button {
 
   </div>
 
-
   <div class="detail-layout">
-
 
     <div class="record-visual-column">
 
@@ -897,7 +709,6 @@ main button {
 
       </div>
 
-
       <div class="owner-beside-image">
 
         <span
@@ -929,11 +740,9 @@ main button {
 
         </span>
 
-
         <b>
           Owner
         </b>
-
 
         <span
           class="owner-value"
@@ -944,13 +753,11 @@ main button {
 
       </div>
 
-
       <div class="record-id">
 
         <small>
           Record ID
         </small>
-
 
         <span
           class="record-id-value"
@@ -963,9 +770,7 @@ main button {
 
     </div>
 
-
     <div class="rows">
-
 
       <div class="row">
 
@@ -1002,11 +807,9 @@ main button {
 
         </svg>
 
-
         <b>
           Locked Amount
         </b>
-
 
         <span
           class="amount-value"
@@ -1016,7 +819,6 @@ main button {
         </span>
 
       </div>
-
 
       <div class="row">
 
@@ -1065,18 +867,15 @@ main button {
 
         </span>
 
-
         <b>
           Locked Start
         </b>
-
 
         <span data-page3-start>
           —
         </span>
 
       </div>
-
 
       <div class="row">
 
@@ -1119,18 +918,15 @@ main button {
 
         </span>
 
-
         <b>
           Locked End
         </b>
-
 
         <span data-page3-end>
           —
         </span>
 
       </div>
-
 
       <div class="row">
 
@@ -1170,18 +966,15 @@ main button {
 
         </span>
 
-
         <b>
           Lock Duration
         </b>
-
 
         <span data-page3-duration>
           —
         </span>
 
       </div>
-
 
       <div class="row">
 
@@ -1221,11 +1014,9 @@ main button {
 
         </span>
 
-
         <b>
           Claimable Token
         </b>
-
 
         <span data-page3-token>
           —
@@ -1233,9 +1024,7 @@ main button {
 
       </div>
 
-
       <div class="page3-blockchain-refs">
-
 
         <div class="row page3-ref-row">
 
@@ -1261,11 +1050,9 @@ main button {
 
           </span>
 
-
           <b>
             Transaction ID
           </b>
-
 
           <span
             class="page3-link-value"
@@ -1273,7 +1060,6 @@ main button {
           >
             —
           </span>
-
 
           <a
             class="page3-explorer-link"
@@ -1314,7 +1100,6 @@ main button {
 
         </div>
 
-
         <div class="row page3-ref-row">
 
           <span class="field-icon" aria-hidden="true">
@@ -1340,11 +1125,9 @@ main button {
 
           </span>
 
-
           <b>
             Token ID
           </b>
-
 
           <span
             class="page3-link-value"
@@ -1352,7 +1135,6 @@ main button {
           >
             —
           </span>
-
 
           <a
             class="page3-explorer-link"
@@ -1393,7 +1175,6 @@ main button {
 
         </div>
 
-
         <div class="row page3-ref-row">
 
           <span class="field-icon" aria-hidden="true">
@@ -1421,11 +1202,9 @@ main button {
 
           </span>
 
-
           <b>
             Lock Record ID
           </b>
-
 
           <span
             class="page3-link-value"
@@ -1433,7 +1212,6 @@ main button {
           >
             —
           </span>
-
 
           <a
             class="page3-explorer-link"
@@ -1476,7 +1254,6 @@ main button {
 
       </div>
 
-
       <div class="row">
 
         <span
@@ -1516,18 +1293,15 @@ main button {
 
         </span>
 
-
         <b>
           Program
         </b>
-
 
         <span data-page3-program>
           —
         </span>
 
       </div>
-
 
       <div class="row">
 
@@ -1562,11 +1336,9 @@ main button {
 
         </span>
 
-
         <b>
           Record Type
         </b>
-
 
         <span data-page3-type>
           —
@@ -1574,11 +1346,9 @@ main button {
 
       </div>
 
-
     </div>
 
   </div>
-
 
   <div class="lock-countdown">
 
@@ -1586,14 +1356,12 @@ main button {
       Lock Countdown
     </span>
 
-
     <span
       class="countdown-value"
       data-lock-countdown
     >
       —
     </span>
-
 
     <span
       class="countdown-end"
@@ -1604,9 +1372,7 @@ main button {
 
   </div>
 
-
 </section>
-
 
 <section class="claim">
 
@@ -1616,11 +1382,9 @@ main button {
       Claim Your Allocation
     </h2>
 
-
     <p>
       Your allocation remains locked until the lock period ends.
     </p>
-
 
     <button
       class="claim-btn"
@@ -1630,12 +1394,10 @@ main button {
       CLAIM
     </button>
 
-
     <p
       class="claim-message"
       data-claim-message
     ></p>
-
 
     <p class="after-lock">
       ⓘ &nbsp; Claim becomes available after the lock period ends.
@@ -1645,9 +1407,7 @@ main button {
 
 </section>
 
-
 <section class="info-grid">
-
 
   <div class="info">
 
@@ -1657,13 +1417,11 @@ main button {
       ⬡
     </span>
 
-
     <div>
 
       <h3>
         Record Source
       </h3>
-
 
       <p>
 
@@ -1679,7 +1437,6 @@ main button {
 
   </div>
 
-
   <div class="info">
 
     <span
@@ -1688,13 +1445,11 @@ main button {
       ♙
     </span>
 
-
     <div>
 
       <h3>
         Security Notice
       </h3>
-
 
       <p>
         This is your private encrypted allocation record. Only you can decrypt and view this record.
@@ -1706,7 +1461,6 @@ main button {
 
 </section>
 
-
 <div data-record-error>
 
   No private allocation record was selected.
@@ -1716,7 +1470,6 @@ main button {
   Please return to Page 2 and use GET YOUR RECORD first.
 
 </div>
-
 
 <footer class="footer">
 
@@ -1732,46 +1485,43 @@ main button {
 
 </footer>
 
-
 </main>
 
 </div>
-
 
 <script src="leo-wallet.bundle.js"></script>
 
 <script src="app.js"></script>
 
-
 <script>
 
 (function () {
 
-  console.log(
-    'USDCx LOCKED: Page 3 loading selected record...'
-  );
+  console.log('AEGIS: Page 3 loading wallet LockedRecord...');
 
-
-  /* =======================================================
-     CONSTANTS
-     ======================================================= */
-
-  const LOCK_DURATION_DAYS = 365;
-  const LOCK_DURATION_SECONDS =
-    LOCK_DURATION_DAYS * 86400;
-
-  /* =======================================================
-     FIXED TOKEN ID
-     Same VUSDC Token ID for all locks
-     ======================================================= */
-
-  const FIXED_TOKEN_ID =
-    '6088188135219746443092391282916151282477828391085949070550825603498725268775field';
-
-
-  /* =======================================================
-     CLEAN ALEO VALUE
-     ======================================================= */
+  /*
+   * PAGE 3 DATA SOURCE
+   *
+   * The wallet record is the ONLY source of record data.
+   *
+   * Wallet record:
+   * {
+   *   id,
+   *   owner,
+   *   program_id,
+   *   recordName,
+   *   data: {
+   *     claim_route,
+   *     locked_end,
+   *     status,
+   *     _version
+   *   }
+   * }
+   *
+   * Nothing is derived from old transactions,
+   * old allocations, sessionStorage fallbacks,
+   * fixed token IDs, or assumed lock duration.
+   */
 
   function clean(value) {
 
@@ -1804,81 +1554,6 @@ main button {
   }
 
 
-  /* =======================================================
-     GET VALUE FROM RECORD / ALLOCATION
-     ======================================================= */
-
-  function getValue(record, names) {
-
-    if (!record) {
-      return null;
-    }
-
-    for (const name of names) {
-
-      if (
-        record[name] !== undefined &&
-        record[name] !== null
-      ) {
-
-        return record[name];
-
-      }
-
-    }
-
-
-    if (
-      record.data &&
-      typeof record.data === 'object'
-    ) {
-
-      for (const name of names) {
-
-        if (
-          record.data[name] !== undefined &&
-          record.data[name] !== null
-        ) {
-
-          return record.data[name];
-
-        }
-
-      }
-
-    }
-
-
-    if (
-      record.record &&
-      typeof record.record === 'object'
-    ) {
-
-      for (const name of names) {
-
-        if (
-          record.record[name] !== undefined &&
-          record.record[name] !== null
-        ) {
-
-          return record.record[name];
-
-        }
-
-      }
-
-    }
-
-
-    return null;
-
-  }
-
-
-  /* =======================================================
-     SET PAGE VALUE
-     ======================================================= */
-
   function set(selector, value) {
 
     const element =
@@ -1889,68 +1564,13 @@ main button {
     }
 
     element.textContent =
-      value !== null &&
-      value !== undefined &&
-      value !== ''
-        ? value
-        : '—';
+      value === null ||
+      value === undefined
+        ? ''
+        : String(value);
 
   }
 
-
-  /* =======================================================
-     FORMAT AMOUNT
-     ======================================================= */
-
-  function formatAmount(value) {
-
-    const text =
-      clean(value);
-
-    if (!text) {
-      return '—';
-    }
-
-    if (
-      text.includes('vUSDC') ||
-      text.includes('VUSDC') ||
-      text.includes('USDCx')
-    ) {
-
-      return text;
-
-    }
-
-    if (text.includes('.')) {
-
-      return text + ' vUSDC';
-
-    }
-
-    if (/^\d+$/.test(text)) {
-
-      const number =
-        Number(text);
-
-      if (Number.isSafeInteger(number)) {
-
-        return (
-          number / 100
-        ).toFixed(2) +
-        ' vUSDC';
-
-      }
-
-    }
-
-    return text + ' vUSDC';
-
-  }
-
-
-  /* =======================================================
-     FORMAT TIMESTAMP
-     ======================================================= */
 
   function formatTimestamp(value) {
 
@@ -1958,58 +1578,50 @@ main button {
       clean(value);
 
     if (!text) {
-      return '—';
+      return '';
     }
 
-    if (/^\d+$/.test(text)) {
+    if (!/^\d+$/.test(text)) {
+      return '';
+    }
 
-      const seconds =
-        Number(text);
+    const seconds =
+      Number(text);
 
-      if (
-        Number.isSafeInteger(seconds) &&
-        seconds > 100000000
-      ) {
+    if (
+      !Number.isSafeInteger(seconds) ||
+      seconds <= 100000000
+    ) {
+      return '';
+    }
 
-        const date =
-          new Date(
-            seconds * 1000
-          );
+    const date =
+      new Date(seconds * 1000);
 
-        if (
-          !Number.isNaN(
-            date.getTime()
-          )
-        ) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '';
+    }
 
-          return date.toLocaleString(
-            'en-US',
-            {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true,
-              timeZone: 'UTC',
-              timeZoneName: 'short'
-            }
-          );
-
-        }
-
+    return date.toLocaleString(
+      'en-US',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'UTC',
+        timeZoneName: 'short'
       }
-
-    }
-
-    return text;
+    );
 
   }
 
-
-  /* =======================================================
-     GET UNIX SECONDS
-     ======================================================= */
 
   function getTimestampSeconds(value) {
 
@@ -2020,145 +1632,61 @@ main button {
       return null;
     }
 
-    if (/^\d+$/.test(text)) {
-
-      const seconds =
-        Number(text);
-
-      if (
-        Number.isSafeInteger(seconds) &&
-        seconds > 100000000
-      ) {
-
-        return seconds;
-
-      }
-
-    }
-
-    const parsed =
-      Date.parse(text);
-
-    if (Number.isFinite(parsed)) {
-
-      return Math.floor(
-        parsed / 1000
-      );
-
-    }
-
-    return null;
-
-  }
-
-
-  /* =======================================================
-     CALCULATE DURATION
-     ======================================================= */
-
-  function calculateDuration(start, end) {
-
-    const s =
-      getTimestampSeconds(start);
-
-    const e =
-      getTimestampSeconds(end);
-
-    if (
-      s === null ||
-      e === null
-    ) {
-
-      return '—';
-
+    if (!/^\d+$/.test(text)) {
+      return null;
     }
 
     const seconds =
-      e - s;
-
-    if (seconds <= 0) {
-      return '—';
-    }
-
-    const days =
-      seconds / 86400;
+      Number(text);
 
     if (
-      Math.abs(
-        days - Math.round(days)
-      ) < 0.01
+      !Number.isSafeInteger(seconds) ||
+      seconds <= 100000000
     ) {
+      return null;
+    }
 
-      return (
-        Math.round(days) +
-        ' Days'
-      );
+    return seconds;
 
+  }
+
+
+  function isLockedRecord(record) {
+
+    if (!record) {
+      return false;
     }
 
     return (
-      days.toFixed(2) +
-      ' Days'
+      String(
+        record.recordName || ''
+      ).trim() === 'LockedRecord'
     );
 
   }
 
 
-  /* =======================================================
-     FIND RECORD ID
-     ======================================================= */
+  /*
+   * Read ONLY usdcxSelectedRecord.
+   *
+   * No allocation object.
+   * No old transaction.
+   * No address fallback.
+   * No fixed token ID.
+   */
 
-  function findRecordId(record) {
-
-    return getValue(
-      record,
-      [
-        'id',
-        'record_id',
-        'recordId',
-        'serial_number',
-        'commitment'
-      ]
-    );
-
-  }
-
-
-  /* =======================================================
-     READ PAGE 2 SESSION DATA
-     ======================================================= */
-
-  let allocation = null;
-  let rawRecord = null;
-
+  let parsed = null;
 
   try {
-
-    const savedAllocation =
-      sessionStorage.getItem(
-        'usdcxSelectedAllocation'
-      );
-
 
     const savedRecord =
       sessionStorage.getItem(
         'usdcxSelectedRecord'
       );
 
-
-    if (savedAllocation) {
-
-      allocation =
-        JSON.parse(
-          savedAllocation
-        );
-
-    }
-
-
     if (savedRecord) {
 
-      rawRecord =
+      parsed =
         JSON.parse(
           savedRecord
         );
@@ -2168,110 +1696,66 @@ main button {
   } catch (error) {
 
     console.error(
-      'USDCx LOCKED: Could not read Page 3 session data:',
+      'AEGIS: Could not read wallet LockedRecord:',
       error
     );
 
   }
 
 
-  console.log(
-    'USDCx LOCKED: Selected allocation:',
-    allocation
-  );
+  /*
+   * Resolve the wallet record.
+   *
+   * Supports:
+   *   [ { LockedRecord } ]
+   *   { LockedRecord }
+   *   { record: { LockedRecord } }
+   *
+   * The record must explicitly identify itself
+   * as LockedRecord.
+   */
+
+  let walletRecord = null;
 
 
-  console.log(
-    'USDCx LOCKED: Raw record:',
-    rawRecord
-  );
+  if (Array.isArray(parsed)) {
 
+    walletRecord =
+      parsed.find(
+        function (record) {
+          return isLockedRecord(record);
+        }
+      ) || null;
 
-  /* =======================================================
-     FALLBACK TO RAW RECORD
-     ======================================================= */
+  } else if (isLockedRecord(parsed)) {
 
-  if (
-    !allocation &&
-    rawRecord
+    walletRecord =
+      parsed;
+
+  } else if (
+    parsed &&
+    parsed.record &&
+    isLockedRecord(parsed.record)
   ) {
 
-    allocation = {
-
-      allocationNumber: 1,
-
-      amount:
-        getValue(
-          rawRecord,
-          [
-            'display_amount',
-            'amount',
-            'locked_amount'
-          ]
-        ),
-
-      ticket:
-        getValue(
-          rawRecord,
-          [
-            'ticket_ref',
-            'ticket_reference',
-            'ticket'
-          ]
-        ),
-
-      start:
-        getValue(
-          rawRecord,
-          [
-            'locked_start',
-            'start_time',
-            'start'
-          ]
-        ),
-
-      end:
-        getValue(
-          rawRecord,
-          [
-            'locked_end',
-            'end_time',
-            'end'
-          ]
-        ),
-
-      status:
-        getValue(
-          rawRecord,
-          [
-            'status'
-          ]
-        ),
-
-      program:
-        getValue(
-          rawRecord,
-          [
-            'program',
-            'program_id',
-            'programId'
-          ]
-        ) ||
-        'vusdc_transaction.aleo',
-
-      raw:
-        rawRecord
-
-    };
+    walletRecord =
+      parsed.record;
 
   }
 
 
-  /* =======================================================
-     NO RECORD
-     ======================================================= */
+  console.log(
+    'AEGIS: Wallet LockedRecord:',
+    walletRecord
+  );
 
-  if (!allocation) {
+
+  /*
+   * If the wallet did not provide a LockedRecord,
+   * keep the page visible and show the existing error.
+   */
+
+  if (!walletRecord) {
 
     const errorBox =
       document.querySelector(
@@ -2279,370 +1763,121 @@ main button {
       );
 
     if (errorBox) {
-
-      errorBox.style.display =
-        'block';
-
+      errorBox.style.display = 'block';
     }
 
-    console.warn(
-      'USDCx LOCKED: No selected allocation found.'
-    );
+    /*
+     * Explicitly blank all record fields.
+     */
+
+    set('[data-page3-allocation]', '');
+    set('[data-page3-owner]', '');
+    set('[data-page3-record-id]', '');
+    set('[data-page3-amount]', '');
+    set('[data-page3-start]', '');
+    set('[data-page3-end]', '');
+    set('[data-page3-duration]', '');
+    set('[data-page3-token]', '');
+    set('[data-page3-transaction]', '');
+    set('[data-page3-token-id]', '');
+    set('[data-page3-lock-record-id]', '');
+    set('[data-page3-program]', '');
+    set('[data-page3-type]', '');
+    set('[data-page3-status]', '');
 
     return;
 
   }
 
 
-  /* =======================================================
-     SOURCE RECORD
-     ======================================================= */
-
-  const raw =
-    allocation.raw ||
-    rawRecord ||
-    allocation;
-
-
-  /* =======================================================
-     OWNER
-     ======================================================= */
+  /*
+   * =======================================================
+   * ONLY VALUES THAT ACTUALLY EXIST IN THE WALLET RECORD
+   * =======================================================
+   */
 
   const owner =
-    getValue(
-      raw,
-      [
-        'owner',
-        'owner_address'
-      ]
-    ) ||
-    getValue(
-      allocation,
-      [
-        'owner'
-      ]
-    ) ||
-    sessionStorage.getItem(
-      'usdcxAddress'
-    );
+    walletRecord.owner || '';
 
 
-  /* =======================================================
-     AMOUNT
-     ======================================================= */
-
-  const amount =
-    getValue(
-      raw,
-      [
-        'display_amount',
-        'amount',
-        'locked_amount'
-      ]
-    ) ||
-    allocation.amount;
+  const programId =
+    walletRecord.program_id || '';
 
 
-  /* =======================================================
-     START
-     ======================================================= */
+  const recordName =
+    walletRecord.recordName || '';
 
-  let start =
-    getValue(
-      raw,
-      [
-        'locked_start',
-        'start_time',
-        'start'
-      ]
-    ) ||
-    allocation.start;
-
-
-  /* =======================================================
-     END
-     ======================================================= */
-
-  const end =
-    getValue(
-      raw,
-      [
-        'locked_end',
-        'end_time',
-        'end'
-      ]
-    ) ||
-    allocation.end;
-
-
-  /* =======================================================
-     DERIVE START FROM END
-     ======================================================= */
-
-  if (
-    !clean(start) &&
-    clean(end)
-  ) {
-
-    const endSeconds =
-      getTimestampSeconds(end);
-
-    if (
-      endSeconds !== null
-    ) {
-
-      start =
-        String(
-          endSeconds -
-          LOCK_DURATION_SECONDS
-        );
-
-    }
-
-  }
-
-
-  /* =======================================================
-     STATUS
-     ======================================================= */
-
-  const status =
-    getValue(
-      raw,
-      [
-        'status'
-      ]
-    ) ||
-    allocation.status ||
-    'LOCKED';
-
-
-  /* =======================================================
-     PROGRAM
-     ======================================================= */
-
-  const program =
-    getValue(
-      raw,
-      [
-        'program',
-        'program_id',
-        'programId'
-      ]
-    ) ||
-    allocation.program ||
-    'vusdc_transaction.aleo';
-
-
-  /* =======================================================
-     TOKEN
-     ======================================================= */
-
-  const token =
-    getValue(
-      raw,
-      [
-        'token',
-        'tokenSymbol',
-        'asset',
-        'claimableToken'
-      ]
-    ) ||
-    getValue(
-      allocation,
-      [
-        'token',
-        'tokenSymbol',
-        'asset',
-        'claimableToken'
-      ]
-    ) ||
-    'vUSDC';
-
-
-  /* =======================================================
-     TRANSACTION ID
-     ======================================================= */
-
-  const transactionId =
-    getValue(
-      raw,
-      [
-        'transaction_id',
-        'transactionId',
-        'tx_id',
-        'txId',
-        'transaction'
-      ]
-    ) ||
-    getValue(
-      allocation,
-      [
-        'transaction_id',
-        'transactionId',
-        'tx_id',
-        'txId',
-        'transaction'
-      ]
-    ) ||
-    sessionStorage.getItem(
-      'usdcxTransactionId'
-    );
-
-
-  /* =======================================================
-     TOKEN ID
-     FIXED — SAME FOR ALL LOCKS
-     ======================================================= */
-
-  const tokenId =
-    FIXED_TOKEN_ID;
-
-
-  /* =======================================================
-     LOCK RECORD ID
-     ======================================================= */
-
-  const lockRecordId =
-    getValue(
-      raw,
-      [
-        'lock_record_id',
-        'lockRecordId'
-      ]
-    ) ||
-    getValue(
-      allocation,
-      [
-        'lock_record_id',
-        'lockRecordId'
-      ]
-    ) ||
-    sessionStorage.getItem(
-      'usdcxLockRecordId'
-    );
-
-
-  /* =======================================================
-     RECORD TYPE
-     ======================================================= */
-
-  let recordType =
-    'Record';
-
-
-  if (
-    getValue(
-      raw,
-      [
-        'claim_route'
-      ]
-    ) !== null
-  ) {
-
-    recordType =
-      'LockedRecord';
-
-  } else if (
-    getValue(
-      raw,
-      [
-        'token_id',
-        'tokenId'
-      ]
-    ) !== null
-  ) {
-
-    recordType =
-      'AllocationRecord';
-
-  }
-
-
-  /* =======================================================
-     RECORD ID
-     ======================================================= */
 
   const recordId =
-    findRecordId(raw);
+    walletRecord.id || '';
 
 
-  /* =======================================================
-     RECORD NUMBER
-     ======================================================= */
+  const data =
+    (
+      walletRecord.data &&
+      typeof walletRecord.data === 'object'
+    )
+      ? walletRecord.data
+      : {};
 
-  const allocationNumber =
-    allocation.allocationNumber || 1;
+
+  const lockedEnd =
+    data.locked_end || '';
 
 
-  /* =======================================================
-     STATUS DISPLAY
-     ======================================================= */
+  const status =
+    data.status || '';
+
+
+  /*
+   * claim_route EXISTS in the wallet record,
+   * but it is deliberately NEVER displayed.
+   */
+
+  const claimRoute =
+    data.claim_route || '';
+
+  void claimRoute;
+
+
+  /*
+   * =======================================================
+   * STATUS DISPLAY
+   * =======================================================
+   */
 
   let displayStatus =
-    clean(status).toUpperCase();
+    clean(status);
 
 
-  if (
-    displayStatus === '1'
-  ) {
-
+  if (displayStatus === '1') {
+    displayStatus = 'LOCKED';
+  } else if (displayStatus) {
     displayStatus =
-      'LOCKED';
-
+      displayStatus.toUpperCase();
   }
 
 
-  /* =======================================================
-     DURATION
-     ======================================================= */
+  /*
+   * =======================================================
+   * POPULATE ONLY WALLET RECORD DATA
+   * =======================================================
+   */
 
-  let duration =
-    calculateDuration(
-      start,
-      end
-    );
-
-
-  if (
-    duration === '—' &&
-    clean(start) &&
-    clean(end)
-  ) {
-
-    const startSeconds =
-      getTimestampSeconds(start);
-
-    const endSeconds =
-      getTimestampSeconds(end);
-
-    if (
-      startSeconds !== null &&
-      endSeconds !== null &&
-      endSeconds - startSeconds ===
-        LOCK_DURATION_SECONDS
-    ) {
-
-      duration =
-        '365 Days';
-
-    }
-
-  }
-
-
-  /* =======================================================
-     POPULATE PAGE 3
-     ======================================================= */
+  /*
+   * ALLOCATION 01 is NOT in the wallet record.
+   * Therefore it must be blank.
+   */
 
   set(
     '[data-page3-allocation]',
-    'ALLOCATION ' +
-    String(
-      allocationNumber
-    ).padStart(2, '0')
+    ''
   );
 
+
+  /*
+   * Owner comes directly from walletRecord.owner.
+   */
 
   set(
     '[data-page3-owner]',
@@ -2650,53 +1885,9 @@ main button {
   );
 
 
-  set(
-    '[data-page3-amount]',
-    formatAmount(amount)
-  );
-
-
-  set(
-    '[data-page3-start]',
-    formatTimestamp(start)
-  );
-
-
-  set(
-    '[data-page3-end]',
-    formatTimestamp(end)
-  );
-
-
-  set(
-    '[data-page3-duration]',
-    duration
-  );
-
-
-  set(
-    '[data-page3-token]',
-    clean(token)
-  );
-
-
-  set(
-    '[data-page3-program]',
-    clean(program)
-  );
-
-
-  set(
-    '[data-page3-type]',
-    recordType
-  );
-
-
-  set(
-    '[data-page3-status]',
-    displayStatus
-  );
-
+  /*
+   * Record ID comes directly from walletRecord.id.
+   */
 
   set(
     '[data-page3-record-id]',
@@ -2704,86 +1895,140 @@ main button {
   );
 
 
-  /* =======================================================
-     BLOCKCHAIN REFERENCES
-     ======================================================= */
+  /*
+   * These fields do NOT exist in the supplied
+   * LockedRecord, therefore they remain blank.
+   */
+
+  set(
+    '[data-page3-amount]',
+    ''
+  );
+
+  set(
+    '[data-page3-start]',
+    ''
+  );
+
+  set(
+    '[data-page3-duration]',
+    ''
+  );
+
+  set(
+    '[data-page3-token]',
+    ''
+  );
 
   set(
     '[data-page3-transaction]',
-    clean(transactionId)
+    ''
   );
-
 
   set(
     '[data-page3-token-id]',
-    clean(tokenId)
+    ''
   );
-
 
   set(
     '[data-page3-lock-record-id]',
-    clean(lockRecordId)
+    ''
   );
 
 
-  /* =======================================================
-     TRANSACTION LINK
-     ======================================================= */
+  /*
+   * Program comes directly from walletRecord.program_id.
+   */
+
+  set(
+    '[data-page3-program]',
+    clean(programId)
+  );
+
+
+  /*
+   * Record Type comes directly from walletRecord.recordName.
+   */
+
+  set(
+    '[data-page3-type]',
+    clean(recordName)
+  );
+
+
+  /*
+   * Status comes directly from walletRecord.data.status.
+   */
+
+  set(
+    '[data-page3-status]',
+    displayStatus
+  );
+
+
+  /*
+   * Locked End comes directly from walletRecord.data.locked_end.
+   */
+
+  set(
+    '[data-page3-end]',
+    formatTimestamp(lockedEnd)
+  );
+
+
+  /*
+   * =======================================================
+   * BLOCKCHAIN LINKS
+   *
+   * No transaction ID exists in this wallet record.
+   * No token ID exists in this wallet record.
+   * No lock record ID exists in this wallet record.
+   *
+   * Therefore all three values and their links stay blank.
+   * =======================================================
+   */
+
+  const transactionElement =
+    document.querySelector(
+      '[data-page3-transaction]'
+    );
+
+  const tokenIdElement =
+    document.querySelector(
+      '[data-page3-token-id]'
+    );
+
+  const lockRecordIdElement =
+    document.querySelector(
+      '[data-page3-lock-record-id]'
+    );
+
+
+  set(
+    '[data-page3-transaction]',
+    ''
+  );
+
+  set(
+    '[data-page3-token-id]',
+    ''
+  );
+
+  set(
+    '[data-page3-lock-record-id]',
+    ''
+  );
+
 
   const transactionLink =
     document.querySelector(
       '[data-page3-transaction-link]'
     );
 
-
-  if (
-    transactionLink &&
-    clean(transactionId)
-  ) {
-
-    transactionLink.href =
-      'https://explorer.provable.com/transaction/' +
-      clean(transactionId);
-
-  } else if (transactionLink) {
-
-    transactionLink.removeAttribute(
-      'href'
-    );
-
-  }
-
-
-  /* =======================================================
-     TOKEN LINK
-     ======================================================= */
-
   const tokenLink =
     document.querySelector(
       '[data-page3-token-link]'
     );
-
-
-  if (
-    tokenLink &&
-    clean(tokenId)
-  ) {
-
-    tokenLink.href =
-      'https://explorer.provable.com/program/token_registry.aleo';
-
-  } else if (tokenLink) {
-
-    tokenLink.removeAttribute(
-      'href'
-    );
-
-  }
-
-
-  /* =======================================================
-     LOCK RECORD LINK
-     ======================================================= */
 
   const lockRecordLink =
     document.querySelector(
@@ -2791,27 +2036,62 @@ main button {
     );
 
 
-  if (
-    lockRecordLink &&
-    clean(transactionId)
-  ) {
+  if (transactionLink) {
 
-    lockRecordLink.href =
-      'https://explorer.provable.com/transaction/' +
-      clean(transactionId);
+    transactionLink.removeAttribute(
+      'href'
+    );
 
-  } else if (lockRecordLink) {
+    transactionLink.style.display =
+      'none';
+
+  }
+
+
+  if (tokenLink) {
+
+    tokenLink.removeAttribute(
+      'href'
+    );
+
+    tokenLink.style.display =
+      'none';
+
+  }
+
+
+  if (lockRecordLink) {
 
     lockRecordLink.removeAttribute(
       'href'
     );
 
+    lockRecordLink.style.display =
+      'none';
+
   }
 
 
-  /* =======================================================
-     COUNTDOWN
-     ======================================================= */
+  void transactionElement;
+  void tokenIdElement;
+  void lockRecordIdElement;
+
+
+  /*
+   * =======================================================
+   * COUNTDOWN
+   *
+   * The countdown uses ONLY locked_end from the wallet.
+   *
+   * We do NOT calculate:
+   *   - locked_start
+   *   - duration
+   *   - 365 days
+   *
+   * The countdown is simply a live display based on
+   * the actual locked_end field supplied by the wallet.
+   * =======================================================
+   */
 
   const countdownElement =
     document.querySelector(
@@ -2838,7 +2118,9 @@ main button {
 
 
   const endSeconds =
-    getTimestampSeconds(end);
+    getTimestampSeconds(
+      lockedEnd
+    );
 
 
   let countdownTimer =
@@ -2849,10 +2131,6 @@ main button {
     false;
 
 
-  /* =======================================================
-     UPDATE COUNTDOWN
-     ======================================================= */
-
   function updateCountdown() {
 
     if (!countdownElement) {
@@ -2860,16 +2138,15 @@ main button {
     }
 
 
-    if (!endSeconds) {
+    if (endSeconds === null) {
 
       countdownElement.textContent =
-        '—';
-
+        '';
 
       if (countdownEndElement) {
 
         countdownEndElement.textContent =
-          'Lock end time unavailable';
+          '';
 
       }
 
@@ -2988,21 +2265,17 @@ main button {
 
       countdownEndElement.textContent =
         'Ends: ' +
-        formatTimestamp(end);
+        formatTimestamp(lockedEnd);
 
     }
 
   }
 
 
-  /* =======================================================
-     START COUNTDOWN
-     ======================================================= */
-
   updateCountdown();
 
 
-  if (endSeconds) {
+  if (endSeconds !== null) {
 
     countdownTimer =
       setInterval(
@@ -3013,9 +2286,13 @@ main button {
   }
 
 
-  /* =======================================================
-     CLAIM BUTTON
-     ======================================================= */
+  /*
+   * =======================================================
+   * CLAIM BUTTON
+   *
+   * No transaction is sent.
+   * =======================================================
+   */
 
   if (claimButton) {
 
@@ -3031,16 +2308,13 @@ main button {
               'success'
             );
 
-
             claimMessage.style.display =
               'block';
-
 
             claimMessage.textContent =
               'Not available until lock end.';
 
           }
-
 
           return;
 
@@ -3053,10 +2327,8 @@ main button {
             'success'
           );
 
-
           claimMessage.style.display =
             'block';
-
 
           claimMessage.textContent =
             'Lock ended. Claim is available for contract integration.';
@@ -3065,7 +2337,7 @@ main button {
 
 
         console.log(
-          'USDCx LOCKED: Lock ended. No transaction was sent.'
+          'AEGIS: Lock ended. No transaction was sent.'
         );
 
       }
@@ -3074,67 +2346,73 @@ main button {
   }
 
 
-  /* =======================================================
-     FINAL LOG
-     ======================================================= */
+  /*
+   * =======================================================
+   * FINAL VERIFICATION LOG
+   * =======================================================
+   */
 
   console.log(
-    'USDCx LOCKED: Page 3 populated from Page 2 selected record.'
+    'AEGIS: Page 3 populated directly from wallet LockedRecord.'
   );
 
-
   console.log(
-    'USDCx LOCKED: Owner:',
+    'AEGIS: Owner:',
     clean(owner)
   );
 
-
   console.log(
-    'USDCx LOCKED: Amount:',
-    formatAmount(amount)
+    'AEGIS: Program:',
+    clean(programId)
   );
 
-
   console.log(
-    'USDCx LOCKED: Start:',
-    formatTimestamp(start)
+    'AEGIS: Record Type:',
+    clean(recordName)
   );
 
-
   console.log(
-    'USDCx LOCKED: End:',
-    formatTimestamp(end)
+    'AEGIS: Record ID:',
+    clean(recordId)
   );
 
-
   console.log(
-    'USDCx LOCKED: Duration:',
-    duration
+    'AEGIS: Locked End:',
+    formatTimestamp(lockedEnd)
   );
 
-
   console.log(
-    'USDCx LOCKED: Transaction:',
-    clean(transactionId)
+    'AEGIS: Status:',
+    displayStatus
   );
 
-
   console.log(
-    'USDCx LOCKED: Token ID:',
-    clean(tokenId)
+    'AEGIS: Amount: blank — not present in wallet record.'
   );
 
-
   console.log(
-    'USDCx LOCKED: Lock Record ID:',
-    clean(lockRecordId)
+    'AEGIS: Locked Start: blank — not present in wallet record.'
   );
 
-
   console.log(
-    'USDCx LOCKED: No transaction / no balance transfer.'
+    'AEGIS: Duration: blank — not present in wallet record.'
   );
 
+  console.log(
+    'AEGIS: Claimable Token: blank — not present in wallet record.'
+  );
+
+  console.log(
+    'AEGIS: Transaction ID: blank — not present in wallet record.'
+  );
+
+  console.log(
+    'AEGIS: Token ID: blank — not present in wallet record.'
+  );
+
+  console.log(
+    'AEGIS: Lock Record ID: blank — not present in wallet record.'
+  );
 
 })();
 
