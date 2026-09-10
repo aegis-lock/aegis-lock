@@ -6,6 +6,9 @@ const PROGRAM_IDS = [
 
 const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
 
+const ALEO_MAINNET_API =
+  'https://api.provable.com/v2';
+
 
 /* =========================================================
  * WALLET ADDRESS
@@ -192,6 +195,162 @@ async function connectLeoForRecords() {
 
 
   return account;
+
+}
+
+
+/* =========================================================
+ * ALEO MAINNET TRANSACTION LOOKUP
+ *
+ * SOURCE:
+ * Transaction ID entered by the client.
+ *
+ * NETWORK:
+ * ALEO MAINNET
+ *
+ * NO BACKEND
+ * NO MATCHING
+ * NO HARDCODED TRANSACTION
+ * ========================================================= */
+
+async function fetchMainnetTransaction(
+  transactionId
+) {
+
+  const id =
+    String(transactionId || '').trim();
+
+
+  if (!id) {
+
+    throw new Error(
+      'Please enter a Transaction ID.'
+    );
+
+  }
+
+
+  console.log(
+    'AEGIS: Looking up Aleo Mainnet transaction:',
+    id
+  );
+
+
+  const url =
+    ALEO_MAINNET_API +
+    '/transaction/' +
+    encodeURIComponent(id);
+
+
+  let response;
+
+
+  try {
+
+    response =
+      await fetch(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json'
+          }
+        }
+      );
+
+  } catch (error) {
+
+    console.error(
+      'AEGIS: Mainnet transaction request failed:',
+      error
+    );
+
+    throw new Error(
+      'Could not connect to the Aleo Mainnet.'
+    );
+
+  }
+
+
+  if (!response.ok) {
+
+    if (response.status === 404) {
+
+      throw new Error(
+        'Transaction was not found on Aleo Mainnet.'
+      );
+
+    }
+
+
+    throw new Error(
+      `Transaction lookup failed (${response.status}).`
+    );
+
+  }
+
+
+  let transaction;
+
+
+  try {
+
+    transaction =
+      await response.json();
+
+  } catch (error) {
+
+    console.error(
+      'AEGIS: Invalid transaction response:',
+      error
+    );
+
+    throw new Error(
+      'Aleo Mainnet returned an invalid transaction response.'
+    );
+
+  }
+
+
+  console.log(
+    'AEGIS: Mainnet transaction response:',
+    transaction
+  );
+
+
+  /*
+   * Save the ORIGINAL blockchain response.
+   *
+   * Nothing is modified.
+   * Nothing is invented.
+   */
+
+  try {
+
+    sessionStorage.setItem(
+      'usdcxTransaction',
+      JSON.stringify(
+        transaction
+      )
+    );
+
+
+    sessionStorage.setItem(
+      'usdcxTransactionId',
+      id
+    );
+
+  } catch (storageError) {
+
+    console.warn(
+      'AEGIS: Could not save transaction:',
+      storageError
+    );
+
+  }
+
+
+  return transaction;
 
 }
 
@@ -800,7 +959,6 @@ function recordOwnerMatches(
  *   'vusdc_transaction.aleo'
  * )
  *
- * No Explorer.
  * No Backend.
  * ========================================================= */
 
@@ -869,6 +1027,7 @@ async function requestPlaintextRecords(adapter) {
 
       }
 
+
     } catch (error) {
 
       console.warn(
@@ -890,18 +1049,15 @@ async function requestPlaintextRecords(adapter) {
 /* =========================================================
  * GET YOUR RECORD
  *
- * Flow:
+ * CURRENT STEP:
  *
- * 1. Connect wallet if necessary.
- * 2. Request private records.
- * 3. Use ONLY vusdc_transaction.aleo.
- * 4. Match owner with connected wallet.
- * 5. Select LockedRecord.
- * 6. Save raw record for Page 3.
+ * 1. Read Transaction ID entered by client.
+ * 2. Search Aleo Mainnet.
+ * 3. Save original transaction response.
+ * 4. Continue existing Leo Wallet lookup.
  *
- * No transaction ID required.
- * No Explorer lookup.
- * No Backend lookup.
+ * NO BACKEND.
+ * NO MATCHING.
  * ========================================================= */
 
 async function getYourRecord() {
@@ -927,6 +1083,56 @@ async function getYourRecord() {
   console.log(
     'AEGIS: Program:',
     PROGRAM_ID
+  );
+
+
+  /* =======================================================
+   * STEP 1
+   * CLIENT ENTERED TRANSACTION ID
+   * ======================================================= */
+
+  const transactionInput =
+    document.querySelector(
+      '#transaction-id'
+    );
+
+
+  if (!transactionInput) {
+
+    throw new Error(
+      'Transaction ID input was not found.'
+    );
+
+  }
+
+
+  const transactionId =
+    transactionInput.value.trim();
+
+
+  if (!transactionId) {
+
+    throw new Error(
+      'Please enter a Transaction ID.'
+    );
+
+  }
+
+
+  /* =======================================================
+   * STEP 2
+   * ALEO MAINNET TRANSACTION LOOKUP
+   * ======================================================= */
+
+  const transaction =
+    await fetchMainnetTransaction(
+      transactionId
+    );
+
+
+  console.log(
+    'AEGIS: Transaction lookup successful:',
+    transaction
   );
 
 
@@ -1119,11 +1325,64 @@ window.connectLeoForRecords =
 window.getYourRecord =
   getYourRecord;
 
+window.fetchMainnetTransaction =
+  fetchMainnetTransaction;
+
 window.shortenAddress =
   shortenAddress;
 
 window.formatStatus =
   formatStatus;
+
+
+/* =========================================================
+ * GET YOUR RECORD BUTTON
+ *
+ * SAME BUTTON:
+ *
+ * Client enters Transaction ID
+ *            ↓
+ * GET YOUR RECORD
+ *            ↓
+ * Mainnet Transaction Lookup
+ *            ↓
+ * Leo Wallet Record Lookup
+ * ========================================================= */
+
+document
+  .querySelectorAll('[data-get-record]')
+  .forEach(button => {
+
+    button.addEventListener(
+      'click',
+      async () => {
+
+        try {
+
+          button.disabled = true;
+
+
+          await getYourRecord();
+
+
+        } catch (error) {
+
+          console.error(
+            'AEGIS: GET YOUR RECORD failed:',
+            error
+          );
+
+
+        } finally {
+
+          button.disabled = false;
+
+        }
+
+      }
+    );
+
+  });
 
 
 /* =========================================================
@@ -1231,6 +1490,16 @@ document
         );
 
 
+        sessionStorage.removeItem(
+          'usdcxTransaction'
+        );
+
+
+        sessionStorage.removeItem(
+          'usdcxTransactionId'
+        );
+
+
         location.href =
           'index.html';
 
@@ -1251,6 +1520,11 @@ console.log(
 console.log(
   'AEGIS: Program:',
   PROGRAM_ID
+);
+
+console.log(
+  'AEGIS: Mainnet API:',
+  ALEO_MAINNET_API
 );
 
 console.log(
