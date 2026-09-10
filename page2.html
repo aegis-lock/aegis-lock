@@ -420,6 +420,7 @@ body {
 <a class="brand" href="index.html">
 
 <span class="brand-mark">
+
 <svg viewBox="0 0 48 54" fill="none">
 
 <path
@@ -442,6 +443,7 @@ stroke="currentColor"
 stroke-width="1.7"/>
 
 </svg>
+
 </span>
 
 <span>
@@ -680,7 +682,7 @@ type="button">
 <section
 class="record-card"
 data-allocation-card
-data-program="usdcx_locked.aleo">
+data-program="vusdc_transaction.aleo">
 
 <div class="card-head">
 
@@ -793,7 +795,7 @@ Record Found
 <span>Program</span>
 
 <strong data-mini-program>
-usdcx_locked.aleo
+vusdc_transaction.aleo
 </strong>
 
 </div>
@@ -935,7 +937,7 @@ document
       ) {
 
         console.error(
-          'USDCx LOCKED: getYourRecord() is not available.'
+          'AEGIS: getYourRecord() is not available.'
         );
 
         return;
@@ -955,7 +957,7 @@ document
           await window.getYourRecord();
 
         console.log(
-          'USDCx LOCKED: Page 2 records:',
+          'AEGIS: Page 2 records:',
           records
         );
 
@@ -965,7 +967,7 @@ document
         ) {
 
           console.log(
-            'USDCx LOCKED: No allocation records found.'
+            'AEGIS: No allocation records found.'
           );
 
           button.innerHTML =
@@ -987,7 +989,7 @@ document
           records[0];
 
         console.log(
-          'USDCx LOCKED: Selected record:',
+          'AEGIS: Selected record:',
           record
         );
 
@@ -995,9 +997,14 @@ document
           record?.allocationNumber || 1;
 
         /*
-         * Amount and asset are taken ONLY from the real record.
-         * No hardcoded asset type and no fabricated amount.
+         * Amount and asset are taken ONLY
+         * from the actual returned record.
+         *
+         * The current LockedRecord does not
+         * contain amount or token, so these
+         * remain empty.
          */
+
         const amount =
           record?.amount ??
           record?.display_amount ??
@@ -1067,7 +1074,7 @@ document
 
           miniProgram.textContent =
             record?.program ||
-            'usdcx_locked.aleo';
+            'vusdc_transaction.aleo';
 
         }
 
@@ -1085,35 +1092,37 @@ document
 
         }
 
-        /* Save selected record */
+        /*
+         * IMPORTANT:
+         *
+         * DO NOT overwrite
+         * sessionStorage.usdcxSelectedRecord
+         * here.
+         *
+         * app.js already stored the ORIGINAL
+         * raw LockedRecord:
+         *
+         * {
+         *   id,
+         *   owner,
+         *   program_id,
+         *   recordName,
+         *   data: {
+         *     claim_route,
+         *     locked_end,
+         *     status,
+         *     _version
+         *   }
+         * }
+         *
+         * Page 3 must receive that exact record.
+         */
 
-        try {
+        console.log(
+          'AEGIS: Raw LockedRecord preserved for Page 3.'
+        );
 
-          const safeRecord = JSON.parse(
-            JSON.stringify(
-              record,
-              (_, value) =>
-                typeof value === 'bigint'
-                  ? value.toString()
-                  : value
-            )
-          );
-
-          sessionStorage.setItem(
-            'usdcxSelectedRecord',
-            JSON.stringify(safeRecord)
-          );
-
-        } catch (storageError) {
-
-          console.warn(
-            'USDCx LOCKED: Could not save selected record:',
-            storageError
-          );
-
-        }
-
-        /* Save Transaction ID */
+        /* Save Transaction ID only if entered */
 
         const transactionInput =
           document.querySelector(
@@ -1153,7 +1162,7 @@ document
       } catch (error) {
 
         console.error(
-          'USDCx LOCKED: GET YOUR RECORD failed:',
+          'AEGIS: GET YOUR RECORD failed:',
           error
         );
 
@@ -1178,23 +1187,16 @@ document
 
 /* =========================================================
    VIEW DETAILS
+
+   IMPORTANT:
+   app.js already owns the [data-details]
+   listener and checks that the raw record
+   exists before opening Page 3.
+
+   Therefore Page 2 does NOT add another
+   View Details listener here.
    ========================================================= */
 
-document
-.querySelectorAll('[data-details]')
-.forEach(button => {
-
-  button.addEventListener(
-    'click',
-    () => {
-
-      window.location.href =
-        'page3.html';
-
-    }
-  );
-
-});
 
 /* =========================================================
    RESTORE TRANSACTION ID
@@ -1225,7 +1227,7 @@ try {
 } catch (error) {
 
   console.warn(
-    'USDCx LOCKED: Could not restore Transaction ID:',
+    'AEGIS: Could not restore Transaction ID:',
     error
   );
 
