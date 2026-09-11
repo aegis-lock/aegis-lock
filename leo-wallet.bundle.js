@@ -1012,20 +1012,29 @@
           return;
         }
         connectButton.addEventListener("click", async () => {
-          try {
-            connectButton.disabled = true;
-            console.log(
-              "USDCx LOCKED: Connecting to Leo Wallet on MAINNET...",
-              { isMobile }
-            );
-            const account = await adapter.connect(
-              Network.MAINNET,
-              WalletDecryptPermission.NoDecrypt
-            );
-            console.log(
-              "USDCx LOCKED: Leo Wallet connected:",
-              account
-            );
+  try {
+
+    if (isMobile && !window.leoWallet && !window.leo) {
+      window.location.href = adapter.url;
+      return;
+    }
+
+    connectButton.disabled = true;
+
+    console.log(
+      "USDCx LOCKED: Connecting to Leo Wallet on MAINNET...",
+      { isMobile }
+    );
+
+    const account = await adapter.connect(
+      Network.MAINNET,
+      WalletDecryptPermission.NoDecrypt
+    );
+
+    console.log(
+      "USDCx LOCKED: Leo Wallet connected:",
+      account
+    );
             const address = account?.address || account?.publicKey || adapter.publicKey;
             if (!address) {
               throw new Error(
