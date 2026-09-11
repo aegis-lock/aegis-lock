@@ -1,3 +1,5 @@
+const AEGIS_API_BASE = 'https://aegis-backend-1-3dph.onrender.com';
+
 const PROGRAM_ID = 'vusdc_transaction.aleo';
 
 const PROGRAM_IDS = [
@@ -599,6 +601,15 @@ function normalizeLockedRecord(
   programId
 ) {
 
+       const recordId =
+    getRecordValue(
+      record,
+      [
+        'id',
+        'record_id',
+        'recordId'
+      ]
+    );
   const owner =
     getRecordValue(
       record,
@@ -711,6 +722,11 @@ function normalizeLockedRecord(
 
     allocationNumber:
       index + 1,
+        
+         recordId:
+  recordId !== null
+    ? String(recordId)
+    : '',
 
     recordType:
       getRecordType(record),
@@ -1055,10 +1071,79 @@ async function requestPlaintextRecords(adapter) {
  * 2. Try searching Aleo Mainnet.
  * 3. Blockchain failure MUST NOT stop Leo Wallet.
  * 4. Continue Leo Wallet lookup.
- *
- * NO BACKEND.
- * NO MATCHING.
  * ========================================================= */
+
+async function matchBackendRecord(walletAddress, transactionId) {
+
+  const wallet =
+    cleanAleoValue(walletAddress || '');
+
+  const transaction =
+    String(transactionId || '').trim();
+
+
+  if (!wallet || !transaction) {
+    return null;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${AEGIS_API_BASE}/api/admin/match`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            owner: wallet,
+            transaction: transaction
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+
+      console.error(
+        'AEGIS: Backend match failed:',
+        response.status
+      );
+
+      return null;
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.found || !data.record) {
+
+      return null;
+
+    }
+
+
+    return data.record;
+
+
+  } catch (error) {
+
+    console.error(
+      'AEGIS: Backend record match failed:',
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
 
 async function getYourRecord() {
 
@@ -1121,52 +1206,89 @@ async function getYourRecord() {
 
   /* =======================================================
    * STEP 2
-   * ALEO MAINNET TRANSACTION LOOKUP
-   *
-   * IMPORTANT:
-   *
-   * Blockchain lookup is independent from
-   * Leo Wallet lookup.
-   *
-   * If browser CORS prevents the request,
-   * Leo Wallet lookup MUST continue.
+   * GET CONNECTED WALLET ADDRESS
    * ======================================================= */
 
-  let transaction = null;
+  const walletAddress =
+    adapter.account?.address ||
+    adapter.account?.publicKey ||
+    adapter.publicKey ||
+    sessionStorage.getItem('usdcxAddress') ||
+    sessionStorage.getItem('walletAddress') ||
+    '';
 
 
-  try {
+  if (!walletAddress) {
 
-    transaction =
-      await fetchMainnetTransaction(
-        transactionId
-      );
-
-
-    console.log(
-      'AEGIS: Transaction lookup successful:',
-      transaction
-    );
-
-
-  } catch (error) {
-
-    console.warn(
-      'AEGIS: Blockchain transaction lookup failed:',
-      error
-    );
-
-
-    console.warn(
-      'AEGIS: Continuing with Leo Wallet record lookup.'
+    throw new Error(
+      'Please connect your Leo Wallet first.'
     );
 
   }
 
 
+  console.log(
+    'AEGIS: Connected wallet:',
+    walletAddress
+  );
+
+
   /* =======================================================
    * STEP 3
-   * CONNECT LEO WALLET IF NECESSARY
+   * BACKEND OWNER + TRANSACTION MATCH
+   *
+   * IMPORTANT:
+   *
+   * No Leo Wallet record request happens before
+   * this backend match succeeds.
+   *
+   * No browser Mainnet transaction lookup.
+   * ======================================================= */
+
+  console.log(
+    'AEGIS: Checking Backend Owner + Transaction match...'
+  );
+
+
+  const backendRecord =
+    await matchBackendRecord(
+      walletAddress,
+      transactionId
+    );
+
+
+  if (!backendRecord) {
+
+    console.warn(
+      'AEGIS: Backend match failed. RECORD NOT FOUND.'
+    );
+
+
+    sessionStorage.removeItem(
+      'usdcxSelectedRecord'
+    );
+
+    sessionStorage.removeItem(
+      'usdcxSelectedAllocation'
+    );
+
+
+    return [];
+
+  }
+
+
+  console.log(
+    'AEGIS: Backend Owner + Transaction MATCH confirmed:',
+    backendRecord
+  );
+
+
+  /* =======================================================
+   * STEP 4
+   * REQUEST PRIVATE RECORDS FROM LEO WALLET
+   *
+   * This happens ONLY after Backend MATCH.
    * ======================================================= */
 
   if (!adapter.account) {
@@ -1185,15 +1307,16 @@ async function getYourRecord() {
   }
 
 
-  const walletAddress =
+  const connectedWalletAddress =
     adapter.account?.address ||
     adapter.account?.publicKey ||
     adapter.publicKey ||
     sessionStorage.getItem('usdcxAddress') ||
+    sessionStorage.getItem('walletAddress') ||
     '';
 
 
-  if (!walletAddress) {
+  if (!connectedWalletAddress) {
 
     throw new Error(
       'No connected wallet address available.'
@@ -1202,10 +1325,10 @@ async function getYourRecord() {
   }
 
 
-  /* =======================================================
-   * STEP 4
-   * REQUEST PRIVATE RECORDS
-   * ======================================================= */
+  console.log(
+    'AEGIS: Backend matched. Requesting private LockedRecord...'
+  );
+
 
   const recordList =
     await requestPlaintextRecords(
@@ -1221,8 +1344,8 @@ async function getYourRecord() {
 
   if (!recordList.length) {
 
-    console.log(
-      'AEGIS: No records found.'
+    console.warn(
+      'AEGIS: No private records returned.'
     );
 
     return [];
@@ -1232,8 +1355,7 @@ async function getYourRecord() {
 
   /* =======================================================
    * STEP 5
-   * ONLY RECORDS BELONGING TO
-   * CONNECTED WALLET
+   * ONLY VUSDC LockedRecord OWNED BY CONNECTED WALLET
    * ======================================================= */
 
   const ownedRecords =
@@ -1242,21 +1364,21 @@ async function getYourRecord() {
         item.programId === PROGRAM_ID &&
         recordOwnerMatches(
           item.record,
-          walletAddress
+          connectedWalletAddress
         )
     );
 
 
   console.log(
-    'AEGIS: Matching records:',
+    'AEGIS: Matching wallet records:',
     ownedRecords.length
   );
 
 
   if (!ownedRecords.length) {
 
-    console.log(
-      'AEGIS: No matching LockedRecord found.'
+    console.warn(
+      'AEGIS: Backend matched, but no matching private LockedRecord was found.'
     );
 
     return [];
@@ -1285,7 +1407,7 @@ async function getYourRecord() {
 
   /* =======================================================
    * STEP 7
-   * NORMALIZE ONLY ACTUAL RECORD DATA
+   * NORMALIZE ACTUAL PRIVATE RECORD
    * ======================================================= */
 
   const normalized =
@@ -1298,32 +1420,40 @@ async function getYourRecord() {
 
   /* =======================================================
    * STEP 8
-   * SAVE ORIGINAL PRIVATE RECORD
+   * SAVE PRIVATE RECORD
    *
-   * Page 3 uses this as its primary source.
+   * Backend data is kept separate.
+   * Record ID = private wallet record.
+   * Lock Record ID = backend record.
    * ======================================================= */
 
   try {
 
-    sessionStorage.setItem(
-      'usdcxSelectedRecord',
-      JSON.stringify(
-        selected.record
-      )
-    );
+    const walletRecord =
+  selected.record?.raw ||
+  selected.record?.record ||
+  selected.record;
 
+sessionStorage.setItem(
+  'usdcxSelectedRecord',
+  JSON.stringify(
+    walletRecord
+  )
+);
 
-    /*
-     * Compatibility object for Page 3.
-     *
-     * It contains only data extracted from
-     * the actual record.
-     */
 
     sessionStorage.setItem(
       'usdcxSelectedAllocation',
       JSON.stringify(
         normalized
+      )
+    );
+
+
+    sessionStorage.setItem(
+      'aegisBackendRecord',
+      JSON.stringify(
+        backendRecord
       )
     );
 
@@ -1339,24 +1469,14 @@ async function getYourRecord() {
 
 
   console.log(
-    'AEGIS: Selected private LockedRecord:',
-    normalized
+    'AEGIS: Backend MATCH confirmed.'
   );
 
 
-  if (transaction) {
-
-    console.log(
-      'AEGIS: Blockchain transaction data is available.'
-    );
-
-  } else {
-
-    console.warn(
-      'AEGIS: Blockchain transaction data is not available from this browser request.'
-    );
-
-  }
+  console.log(
+    'AEGIS: Selected private LockedRecord:',
+    normalized
+  );
 
 
   return [
@@ -1364,7 +1484,6 @@ async function getYourRecord() {
   ];
 
 }
-
 
 /* =========================================================
  * GLOBAL FUNCTIONS
@@ -1399,42 +1518,6 @@ window.formatStatus =
  *            ↓
  * Leo Wallet Record Lookup
  * ========================================================= */
-
-document
-  .querySelectorAll('[data-get-record]')
-  .forEach(button => {
-
-    button.addEventListener(
-      'click',
-      async () => {
-
-        try {
-
-          button.disabled = true;
-
-
-          await getYourRecord();
-
-
-        } catch (error) {
-
-          console.error(
-            'AEGIS: GET YOUR RECORD failed:',
-            error
-          );
-
-
-        } finally {
-
-          button.disabled = false;
-
-        }
-
-      }
-    );
-
-  });
-
 
 /* =========================================================
  * VIEW DETAILS
