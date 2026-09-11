@@ -1494,603 +1494,460 @@ main button {
 <script src="app.js"></script>
 
 <script>
-
 (function () {
+  'use strict';
 
-  console.log('AEGIS: Page 3 loading wallet LockedRecord...');
+  console.log('AEGIS: Page 3 loading two-source record data...');
 
-  /*
-   * PAGE 3 DATA SOURCE
-   *
-   * The wallet record is the ONLY source of record data.
-   *
-   * Wallet record:
-   * {
-   *   id,
-   *   owner,
-   *   program_id,
-   *   recordName,
-   *   data: {
-   *     claim_route,
-   *     locked_end,
-   *     status,
-   *     _version
-   *   }
-   * }
-   *
-   * Nothing is derived from old transactions,
-   * old allocations, sessionStorage fallbacks,
-   * fixed token IDs, or assumed lock duration.
-   */
+  const TARGET_PROGRAM = 'vusdc_transaction.aleo';
 
   function clean(value) {
-
-    if (
-      value === null ||
-      value === undefined
-    ) {
-      return '';
-    }
+    if (value === null || value === undefined) return '';
 
     let text = String(value).trim();
 
-    text = text.replace(
-      /^"(.*)"$/,
-      '$1'
-    );
-
-    text = text.replace(
-      /\.(private|public)$/i,
-      ''
-    );
-
+    text = text.replace(/^"(.*)"$/, '$1');
+    text = text.replace(/\.(private|public)$/i, '');
     text = text.replace(
       /(u8|u16|u32|u64|u128|u256|field|group|scalar)$/i,
       ''
     );
 
     return text.trim();
-
   }
 
+  function getValue(object, names) {
+    if (!object) return '';
+
+    for (const name of names) {
+      if (
+        object[name] !== undefined &&
+        object[name] !== null &&
+        String(object[name]).trim() !== ''
+      ) {
+        return object[name];
+      }
+    }
+
+    if (object.data && typeof object.data === 'object') {
+      for (const name of names) {
+        if (
+          object.data[name] !== undefined &&
+          object.data[name] !== null &&
+          String(object.data[name]).trim() !== ''
+        ) {
+          return object.data[name];
+        }
+      }
+    }
+
+    return '';
+  }
 
   function set(selector, value) {
+    const element = document.querySelector(selector);
 
-    const element =
-      document.querySelector(selector);
-
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.textContent =
-      value === null ||
-      value === undefined
-        ? ''
-        : String(value);
-
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ''
+        ? String(value)
+        : '—';
   }
 
+  function normalizeStatus(value) {
+    const status = clean(value);
+
+    if (status === '1') return 'LOCKED';
+    if (status === '2') return 'CLAIMED';
+    if (status === '0') return 'UNKNOWN';
+
+    return status || '—';
+  }
+
+  function parseTimestamp(value) {
+    if (
+      value === null ||
+      value === undefined ||
+      String(value).trim() === ''
+    ) {
+      return null;
+    }
+
+    let text = String(value).trim();
+
+    text = text.replace(/^"(.*)"$/, '$1');
+    text = text.replace(/\.(private|public)$/i, '');
+    text = text.replace(/u64$/i, '');
+    text = text.replace(/u32$/i, '');
+    text = text.replace(/u128$/i, '');
+
+    if (/^\d+$/.test(text)) {
+      const number = Number(text);
+
+      if (Number.isFinite(number)) {
+        if (number > 100000000000) {
+          return new Date(number);
+        }
+
+        return new Date(number * 1000);
+      }
+    }
+
+    const parsed = new Date(text);
+
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+
+    return null;
+  }
 
   function formatTimestamp(value) {
+    const date = parseTimestamp(value);
 
-    const text =
-      clean(value);
-
-    if (!text) {
-      return '';
+    if (!date) {
+      return clean(value) || '—';
     }
 
-    if (!/^\d+$/.test(text)) {
-      return '';
-    }
-
-    const seconds =
-      Number(text);
-
-    if (
-      !Number.isSafeInteger(seconds) ||
-      seconds <= 100000000
-    ) {
-      return '';
-    }
-
-    const date =
-      new Date(seconds * 1000);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return '';
-    }
-
-    return date.toLocaleString(
-      'en-US',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC',
-        timeZoneName: 'short'
-      }
-    );
-
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZone: 'UTC',
+      timeZoneName: 'short'
+    }).format(date);
   }
 
+  function getWalletRecord() {
+    const raw = sessionStorage.getItem('usdcxSelectedRecord');
 
-  function getTimestampSeconds(value) {
+    if (!raw) return null;
 
-    const text =
-      clean(value);
-
-    if (!text) {
-      return null;
-    }
-
-    if (!/^\d+$/.test(text)) {
-      return null;
-    }
-
-    const seconds =
-      Number(text);
-
-    if (
-      !Number.isSafeInteger(seconds) ||
-      seconds <= 100000000
-    ) {
-      return null;
-    }
-
-    return seconds;
-
-  }
-
-
-  function isLockedRecord(record) {
-
-    if (!record) {
-      return false;
-    }
-
-    return (
-      String(
-        record.recordName || ''
-      ).trim() === 'LockedRecord'
-    );
-
-  }
-
-
-  /*
-   * Read ONLY usdcxSelectedRecord.
-   *
-   * No allocation object.
-   * No old transaction.
-   * No address fallback.
-   * No fixed token ID.
-   */
-
-  let parsed = null;
-
-  try {
-
-    const savedRecord =
-      sessionStorage.getItem(
-        'usdcxSelectedRecord'
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error(
+        'AEGIS: Could not parse Leo Wallet record:',
+        error
       );
-
-    if (savedRecord) {
-
-      parsed =
-        JSON.parse(
-          savedRecord
-        );
-
+      return null;
     }
-
-  } catch (error) {
-
-    console.error(
-      'AEGIS: Could not read wallet LockedRecord:',
-      error
-    );
-
   }
 
+  function getBackendRecord() {
+    const raw = sessionStorage.getItem('aegisBackendRecord');
 
-  /*
-   * Resolve the wallet record.
-   *
-   * Supports:
-   *   [ { LockedRecord } ]
-   *   { LockedRecord }
-   *   { record: { LockedRecord } }
-   *
-   * The record must explicitly identify itself
-   * as LockedRecord.
-   */
+    if (!raw) return null;
 
-  let walletRecord = null;
-
-
-  if (Array.isArray(parsed)) {
-
-    walletRecord =
-      parsed.find(
-        function (record) {
-          return isLockedRecord(record);
-        }
-      ) || null;
-
-  } else if (isLockedRecord(parsed)) {
-
-    walletRecord =
-      parsed;
-
-  } else if (
-    parsed &&
-    parsed.record &&
-    isLockedRecord(parsed.record)
-  ) {
-
-    walletRecord =
-      parsed.record;
-
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error(
+        'AEGIS: Could not parse Backend record:',
+        error
+      );
+      return null;
+    }
   }
 
+  /*
+   * =========================================================
+   * SOURCE 1 — LEO WALLET
+   * =========================================================
+   */
 
-  console.log(
-    'AEGIS: Wallet LockedRecord:',
-    walletRecord
-  );
-
+  const walletRecord = getWalletRecord();
 
   /*
-   * If the wallet did not provide a LockedRecord,
-   * keep the page visible and show the existing error.
+   * =========================================================
+   * SOURCE 2 — BACKEND / ADMIN
+   * =========================================================
    */
+
+  const backendRecord = getBackendRecord();
+
+  console.log('AEGIS: Leo Wallet source:', walletRecord);
+  console.log('AEGIS: Backend source:', backendRecord);
 
   if (!walletRecord) {
+    console.error(
+      'AEGIS: Page 3 cannot load because the Leo Wallet record is missing.'
+    );
 
-    const errorBox =
-      document.querySelector(
-        '[data-record-error]'
-      );
-
-    if (errorBox) {
-      errorBox.style.display = 'block';
-    }
-
-    /*
-     * Explicitly blank all record fields.
-     */
-
-    set('[data-page3-allocation]', '');
-    set('[data-page3-owner]', '');
-    set('[data-page3-record-id]', '');
-    set('[data-page3-amount]', '');
-    set('[data-page3-start]', '');
-    set('[data-page3-end]', '');
-    set('[data-page3-duration]', '');
-    set('[data-page3-token]', '');
-    set('[data-page3-transaction]', '');
-    set('[data-page3-token-id]', '');
-    set('[data-page3-lock-record-id]', '');
-    set('[data-page3-program]', '');
-    set('[data-page3-type]', '');
-    set('[data-page3-status]', '');
+    set('[data-page3-status]', '—');
+    set('[data-page3-owner]', '—');
+    set('[data-page3-record-id]', '—');
+    set('[data-page3-program]', '—');
+    set('[data-page3-type]', '—');
 
     return;
-
   }
 
+  if (!backendRecord) {
+    console.error(
+      'AEGIS: Page 3 cannot load because the Backend record is missing.'
+    );
 
-  /*
-   * =======================================================
-   * ONLY VALUES THAT ACTUALLY EXIST IN THE WALLET RECORD
-   * =======================================================
-   */
+    set('[data-page3-status]', '—');
+    set('[data-page3-owner]', '—');
+    set('[data-page3-record-id]', '—');
+    set('[data-page3-amount]', '—');
+    set('[data-page3-start]', '—');
+    set('[data-page3-end]', '—');
+    set('[data-page3-duration]', '—');
+    set('[data-page3-token]', '—');
+    set('[data-page3-transaction]', '—');
+    set('[data-page3-token-id]', '—');
+    set('[data-page3-lock-record-id]', '—');
+    set('[data-page3-program]', '—');
+    set('[data-page3-type]', '—');
 
-  const owner =
-    walletRecord.owner || '';
-
-
-  const programId =
-    walletRecord.program_id || '';
-
-
-  const recordName =
-    walletRecord.recordName || '';
-
-
-  const recordId =
-    walletRecord.id || '';
-
-
-  const data =
-    (
-      walletRecord.data &&
-      typeof walletRecord.data === 'object'
-    )
-      ? walletRecord.data
-      : {};
-
-
-  const lockedEnd =
-    data.locked_end || '';
-
-
-  const status =
-    data.status || '';
-
-
-  /*
-   * claim_route EXISTS in the wallet record,
-   * but it is deliberately NEVER displayed.
-   */
-
-  const claimRoute =
-    data.claim_route || '';
-
-  void claimRoute;
-
-
-  /*
-   * =======================================================
-   * STATUS DISPLAY
-   * =======================================================
-   */
-
-  let displayStatus =
-    clean(status);
-
-
-  if (displayStatus === '1') {
-    displayStatus = 'LOCKED';
-  } else if (displayStatus) {
-    displayStatus =
-      displayStatus.toUpperCase();
+    return;
   }
 
-
   /*
-   * =======================================================
-   * POPULATE ONLY WALLET RECORD DATA
-   * =======================================================
+   * =========================================================
+   * WALLET DATA
+   * =========================================================
    */
 
-  /*
-   * ALLOCATION 01 is NOT in the wallet record.
-   * Therefore it must be blank.
-   */
-
-  set(
-    '[data-page3-allocation]',
-    ''
+  const walletOwner = clean(
+    getValue(walletRecord, [
+      'owner'
+    ])
   );
 
+  const walletRecordId = clean(
+    getValue(walletRecord, [
+      'id',
+      'record_id',
+      'recordId'
+    ])
+  );
+
+  const walletStatus = normalizeStatus(
+    getValue(walletRecord, [
+      'status'
+    ])
+  );
+
+  const walletProgram = clean(
+    getValue(walletRecord, [
+      'program_id',
+      'programId',
+      'program'
+    ])
+  ) || TARGET_PROGRAM;
+
+  const walletRecordType = clean(
+    getValue(walletRecord, [
+      'recordName',
+      'record_name',
+      'recordType',
+      'record_type'
+    ])
+  );
 
   /*
-   * Owner comes directly from walletRecord.owner.
+   * =========================================================
+   * BACKEND DATA
+   * =========================================================
+   */
+
+  const backendAmount = clean(
+    getValue(backendRecord, [
+      'locked_amount',
+      'lockedAmount',
+      'amount'
+    ])
+  );
+
+  const backendStart = getValue(
+    backendRecord,
+    [
+      'locked_start',
+      'lockedStart',
+      'start'
+    ]
+  );
+
+  const backendEnd = getValue(
+    backendRecord,
+    [
+      'locked_end',
+      'lockedEnd',
+      'end'
+    ]
+  );
+
+  const backendDuration = clean(
+    getValue(backendRecord, [
+      'lock_duration',
+      'lockDuration',
+      'duration'
+    ])
+  );
+
+  const backendToken = clean(
+    getValue(backendRecord, [
+      'claimable_token',
+      'claimableToken',
+      'token'
+    ])
+  );
+
+  const backendTransaction = clean(
+    getValue(backendRecord, [
+      'transaction_id',
+      'transactionId',
+      'transaction'
+    ])
+  );
+
+  const backendTokenId = clean(
+    getValue(backendRecord, [
+      'token_id',
+      'tokenId'
+    ])
+  );
+
+  const backendLockRecordId = String(
+    getValue(backendRecord, [
+      'lock_record_id',
+      'lockRecordId'
+    ]) || ''
+  ).trim();
+
+  /*
+   * =========================================================
+   * POPULATE WALLET FIELDS
+   * =========================================================
    */
 
   set(
     '[data-page3-owner]',
-    clean(owner)
+    walletOwner
   );
-
-
-  /*
-   * Record ID comes directly from walletRecord.id.
-   */
 
   set(
     '[data-page3-record-id]',
-    clean(recordId)
+    walletRecordId
   );
 
+  set(
+    '[data-page3-status]',
+    walletStatus
+  );
+
+  set(
+    '[data-page3-program]',
+    walletProgram
+  );
+
+  set(
+    '[data-page3-type]',
+    walletRecordType
+  );
 
   /*
-   * These fields do NOT exist in the supplied
-   * LockedRecord, therefore they remain blank.
+   * =========================================================
+   * POPULATE BACKEND FIELDS
+   * =========================================================
    */
 
   set(
     '[data-page3-amount]',
-    ''
+    backendAmount
   );
 
   set(
     '[data-page3-start]',
-    ''
+    formatTimestamp(backendStart)
+  );
+
+  set(
+    '[data-page3-end]',
+    formatTimestamp(backendEnd)
   );
 
   set(
     '[data-page3-duration]',
-    ''
+    backendDuration
   );
 
   set(
     '[data-page3-token]',
-    ''
+    backendToken
   );
 
   set(
     '[data-page3-transaction]',
-    ''
+    backendTransaction
   );
 
   set(
     '[data-page3-token-id]',
-    ''
+    backendTokenId
   );
 
   set(
     '[data-page3-lock-record-id]',
-    ''
+    backendLockRecordId
   );
 
-
   /*
-   * Program comes directly from walletRecord.program_id.
-   */
-
-  set(
-    '[data-page3-program]',
-    clean(programId)
-  );
-
-
-  /*
-   * Record Type comes directly from walletRecord.recordName.
-   */
-
-  set(
-    '[data-page3-type]',
-    clean(recordName)
-  );
-
-
-  /*
-   * Status comes directly from walletRecord.data.status.
-   */
-
-  set(
-    '[data-page3-status]',
-    displayStatus
-  );
-
-
-  /*
-   * Locked End comes directly from walletRecord.data.locked_end.
-   */
-
-  set(
-    '[data-page3-end]',
-    formatTimestamp(lockedEnd)
-  );
-
-
-  /*
-   * =======================================================
-   * BLOCKCHAIN LINKS
+   * =========================================================
+   * ALLOCATION LABEL
+   * =========================================================
    *
-   * No transaction ID exists in this wallet record.
-   * No token ID exists in this wallet record.
-   * No lock record ID exists in this wallet record.
-   *
-   * Therefore all three values and their links stay blank.
-   * =======================================================
+   * Do not invent an allocation number.
+   * Use the existing Page 2 selection only if available.
    */
 
-  const transactionElement =
-    document.querySelector(
-      '[data-page3-transaction]'
+  try {
+    const allocationRaw =
+      sessionStorage.getItem('usdcxSelectedAllocation');
+
+    if (allocationRaw) {
+      const allocation = JSON.parse(allocationRaw);
+
+      const allocationNumber =
+        allocation?.allocationNumber;
+
+      if (
+        allocationNumber !== undefined &&
+        allocationNumber !== null &&
+        String(allocationNumber).trim() !== ''
+      ) {
+        set(
+          '[data-page3-allocation]',
+          'ALLOCATION ' +
+          String(allocationNumber).padStart(2, '0')
+        );
+      }
+    }
+  } catch (error) {
+    console.warn(
+      'AEGIS: Could not read allocation label:',
+      error
     );
-
-  const tokenIdElement =
-    document.querySelector(
-      '[data-page3-token-id]'
-    );
-
-  const lockRecordIdElement =
-    document.querySelector(
-      '[data-page3-lock-record-id]'
-    );
-
-
-  set(
-    '[data-page3-transaction]',
-    ''
-  );
-
-  set(
-    '[data-page3-token-id]',
-    ''
-  );
-
-  set(
-    '[data-page3-lock-record-id]',
-    ''
-  );
-
-
-  const transactionLink =
-    document.querySelector(
-      '[data-page3-transaction-link]'
-    );
-
-  const tokenLink =
-    document.querySelector(
-      '[data-page3-token-link]'
-    );
-
-  const lockRecordLink =
-    document.querySelector(
-      '[data-page3-lock-record-link]'
-    );
-
-
-  if (transactionLink) {
-
-    transactionLink.removeAttribute(
-      'href'
-    );
-
-    transactionLink.style.display =
-      'none';
-
   }
-
-
-  if (tokenLink) {
-
-    tokenLink.removeAttribute(
-      'href'
-    );
-
-    tokenLink.style.display =
-      'none';
-
-  }
-
-
-  if (lockRecordLink) {
-
-    lockRecordLink.removeAttribute(
-      'href'
-    );
-
-    lockRecordLink.style.display =
-      'none';
-
-  }
-
-
-  void transactionElement;
-  void tokenIdElement;
-  void lockRecordIdElement;
-
 
   /*
-   * =======================================================
+   * =========================================================
    * COUNTDOWN
+   * =========================================================
    *
-   * The countdown uses ONLY locked_end from the wallet.
-   *
-   * We do NOT calculate:
-   *   - locked_start
-   *   - duration
-   *   - 365 days
-   *
-   * The countdown is simply a live display based on
-   * the actual locked_end field supplied by the wallet.
-   * =======================================================
+   * IMPORTANT:
+   * Countdown uses BACKEND locked_end.
+   * It does NOT use Leo Wallet locked_end.
    */
 
   const countdownElement =
@@ -2098,324 +1955,138 @@ main button {
       '[data-lock-countdown]'
     );
 
-
   const countdownEndElement =
     document.querySelector(
       '[data-countdown-end]'
     );
 
+  const countdownDate =
+    parseTimestamp(backendEnd);
+
+  function updateCountdown() {
+    if (!countdownElement) return;
+
+    if (!countdownDate) {
+      countdownElement.textContent = '—';
+
+      if (countdownEndElement) {
+        countdownEndElement.textContent = '—';
+      }
+
+      return;
+    }
+
+    const now = Date.now();
+    const target = countdownDate.getTime();
+    const difference = target - now;
+
+    if (difference <= 0) {
+      countdownElement.textContent = 'LOCK ENDED';
+
+      if (countdownEndElement) {
+        countdownEndElement.textContent =
+          formatTimestamp(backendEnd);
+      }
+
+      return;
+    }
+
+    const totalSeconds =
+      Math.floor(difference / 1000);
+
+    const days =
+      Math.floor(totalSeconds / 86400);
+
+    const hours =
+      Math.floor(
+        (totalSeconds % 86400) / 3600
+      );
+
+    const minutes =
+      Math.floor(
+        (totalSeconds % 3600) / 60
+      );
+
+    const seconds =
+      totalSeconds % 60;
+
+    countdownElement.textContent =
+      `${days}d ${String(hours).padStart(2, '0')}h ` +
+      `${String(minutes).padStart(2, '0')}m ` +
+      `${String(seconds).padStart(2, '0')}s`;
+
+    if (countdownEndElement) {
+      countdownEndElement.textContent =
+        formatTimestamp(backendEnd);
+    }
+  }
+
+  updateCountdown();
+
+  if (countdownDate) {
+    setInterval(updateCountdown, 1000);
+  }
+
+  /*
+   * =========================================================
+   * CLAIM BUTTON
+   * =========================================================
+   *
+   * No claim transaction is sent here.
+   */
 
   const claimButton =
     document.querySelector(
       '[data-claim-button]'
     );
 
-
   const claimMessage =
     document.querySelector(
       '[data-claim-message]'
     );
 
-
-  const endSeconds =
-    getTimestampSeconds(
-      lockedEnd
-    );
-
-
-  let countdownTimer =
-    null;
-
-
-  let lockEnded =
-    false;
-
-
-  function updateCountdown() {
-
-    if (!countdownElement) {
-      return;
-    }
-
-
-    if (endSeconds === null) {
-
-      countdownElement.textContent =
-        '';
-
-      if (countdownEndElement) {
-
-        countdownEndElement.textContent =
-          '';
-
-      }
-
-      return;
-
-    }
-
-
-    const nowSeconds =
-      Math.floor(
-        Date.now() / 1000
-      );
-
-
-    let remaining =
-      endSeconds - nowSeconds;
-
-
-    if (remaining <= 0) {
-
-      lockEnded =
-        true;
-
-
-      countdownElement.textContent =
-        'LOCK ENDED';
-
-
-      countdownElement.classList.add(
-        'countdown-ended'
-      );
-
-
-      if (countdownEndElement) {
-
-        countdownEndElement.textContent =
-          'The lock period has ended';
-
-      }
-
-
-      if (claimButton) {
-
-        claimButton.disabled =
-          false;
-
-        claimButton.textContent =
-          'CLAIM';
-
-      }
-
-
-      if (countdownTimer) {
-
-        clearInterval(
-          countdownTimer
-        );
-
-        countdownTimer =
-          null;
-
-      }
-
-
-      return;
-
-    }
-
-
-    const days =
-      Math.floor(
-        remaining / 86400
-      );
-
-
-    remaining -=
-      days * 86400;
-
-
-    const hours =
-      Math.floor(
-        remaining / 3600
-      );
-
-
-    remaining -=
-      hours * 3600;
-
-
-    const minutes =
-      Math.floor(
-        remaining / 60
-      );
-
-
-    remaining -=
-      minutes * 60;
-
-
-    const seconds =
-      remaining;
-
-
-    countdownElement.textContent =
-      String(days) +
-      'd ' +
-      String(hours).padStart(2, '0') +
-      'h ' +
-      String(minutes).padStart(2, '0') +
-      'm ' +
-      String(seconds).padStart(2, '0') +
-      's';
-
-
-    if (countdownEndElement) {
-
-      countdownEndElement.textContent =
-        'Ends: ' +
-        formatTimestamp(lockedEnd);
-
-    }
-
-  }
-
-
-  updateCountdown();
-
-
-  if (endSeconds !== null) {
-
-    countdownTimer =
-      setInterval(
-        updateCountdown,
-        1000
-      );
-
-  }
-
-
-  /*
-   * =======================================================
-   * CLAIM BUTTON
-   *
-   * No transaction is sent.
-   * =======================================================
-   */
-
   if (claimButton) {
-
-    claimButton.addEventListener(
-      'click',
-      function () {
-
-        if (!lockEnded) {
-
-          if (claimMessage) {
-
-            claimMessage.classList.remove(
-              'success'
-            );
-
-            claimMessage.style.display =
-              'block';
-
-            claimMessage.textContent =
-              'Not available until lock end.';
-
-          }
-
-          return;
-
-        }
-
-
-        if (claimMessage) {
-
-          claimMessage.classList.add(
-            'success'
-          );
-
-          claimMessage.style.display =
-            'block';
-
-          claimMessage.textContent =
-            'Lock ended. Claim is available for contract integration.';
-
-        }
-
-
-        console.log(
-          'AEGIS: Lock ended. No transaction was sent.'
-        );
-
-      }
-    );
-
+    claimButton.disabled = true;
   }
 
-
-  /*
-   * =======================================================
-   * FINAL VERIFICATION LOG
-   * =======================================================
-   */
+  if (claimMessage) {
+    claimMessage.textContent =
+      countdownDate &&
+      countdownDate.getTime() > Date.now()
+        ? 'Available after the lock period ends.'
+        : '';
+  }
 
   console.log(
-    'AEGIS: Page 3 populated directly from wallet LockedRecord.'
+    'AEGIS: Page 3 populated successfully.'
   );
 
   console.log(
-    'AEGIS: Owner:',
-    clean(owner)
+    'AEGIS: Wallet fields:',
+    {
+      owner: walletOwner,
+      recordId: walletRecordId,
+      status: walletStatus,
+      program: walletProgram,
+      recordType: walletRecordType
+    }
   );
 
   console.log(
-    'AEGIS: Program:',
-    clean(programId)
-  );
-
-  console.log(
-    'AEGIS: Record Type:',
-    clean(recordName)
-  );
-
-  console.log(
-    'AEGIS: Record ID:',
-    clean(recordId)
-  );
-
-  console.log(
-    'AEGIS: Locked End:',
-    formatTimestamp(lockedEnd)
-  );
-
-  console.log(
-    'AEGIS: Status:',
-    displayStatus
-  );
-
-  console.log(
-    'AEGIS: Amount: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Locked Start: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Duration: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Claimable Token: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Transaction ID: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Token ID: blank — not present in wallet record.'
-  );
-
-  console.log(
-    'AEGIS: Lock Record ID: blank — not present in wallet record.'
+    'AEGIS: Backend fields:',
+    {
+      amount: backendAmount,
+      lockedStart: backendStart,
+      lockedEnd: backendEnd,
+      duration: backendDuration,
+      claimableToken: backendToken,
+      transactionId: backendTransaction,
+      tokenId: backendTokenId,
+      lockRecordId: backendLockRecordId
+    }
   );
 
 })();
-
 </script>
 
 </body>
