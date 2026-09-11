@@ -602,14 +602,14 @@ function normalizeLockedRecord(
 ) {
 
        const recordId =
-    getRecordValue(
-      record,
-      [
-        'id',
-        'record_id',
-        'recordId'
-      ]
-    );
+  getRecordValue(
+    record,
+    [
+      'record_id',
+      'recordId',
+      'id'
+    ]
+  );
   const owner =
     getRecordValue(
       record,
