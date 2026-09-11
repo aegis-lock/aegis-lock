@@ -731,7 +731,7 @@
             scopePollingDetectionStrategy(() => this._checkAvailability());
           }
           if (config?.isMobile) {
-            this.url = `https://app.leo.app/browser?url=${config.mobileWebviewUrl}`;
+            this.url = `https://app.leo.app/browser?url=${encodeURIComponent(config.mobileWebviewUrl)}`;
           }
         }
         /**
