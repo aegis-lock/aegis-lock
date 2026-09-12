@@ -1901,6 +1901,60 @@ main button {
     '[data-page3-lock-record-id]',
     backendLockRecordId
   );
+  
+    /*
+   * =========================================================
+   * BLOCKCHAIN EXPLORER LINKS
+   * =========================================================
+   */
+
+  const transactionLink =
+    document.querySelector(
+      '[data-page3-transaction-link]'
+    );
+
+  const tokenLink =
+    document.querySelector(
+      '[data-page3-token-link]'
+    );
+
+  const lockRecordLink =
+    document.querySelector(
+      '[data-page3-lock-record-link]'
+    );
+
+  const ALEO_EXPLORER =
+    'https://explorer.provable.com';
+
+  if (
+    transactionLink &&
+    backendTransaction
+  ) {
+    transactionLink.href =
+      ALEO_EXPLORER +
+      '/transaction/' +
+      encodeURIComponent(
+        backendTransaction
+      );
+  }
+
+  if (tokenLink) {
+    tokenLink.href =
+      ALEO_EXPLORER +
+      '/program/token_registry.aleo';
+  }
+
+  if (
+    lockRecordLink &&
+    backendTransaction
+  ) {
+    lockRecordLink.href =
+      ALEO_EXPLORER +
+      '/transaction/' +
+      encodeURIComponent(
+        backendTransaction
+      );
+  }
 
   /*
    * =========================================================
