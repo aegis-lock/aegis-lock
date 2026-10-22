@@ -1362,7 +1362,7 @@ async function getYourRecord() {
   const ownedRecords =
     recordList.filter(
       item =>
-        item.programId === PROGRAM_ID &&
+        PROGRAM_IDS.includes(item.programId) &&
         recordOwnerMatches(
           item.record,
           connectedWalletAddress
