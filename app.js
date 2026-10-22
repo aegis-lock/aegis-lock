@@ -3,7 +3,8 @@ const AEGIS_API_BASE = 'https://aegis-backend-1-3dph.onrender.com';
 const PROGRAM_ID = 'vusdc_transaction.aleo';
 
 const PROGRAM_IDS = [
-  'vusdc_transaction.aleo'
+  'vusdc_transaction.aleo',
+  'usdcx_locktransfer.aleo'
 ];
 
 const DECRYPT_PERMISSION = 'DECRYPT_UPON_REQUEST';
